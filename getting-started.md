@@ -58,24 +58,30 @@ public class ArmSubsystem extends SubsystemBase {
 ## Minimal Example — C++
 
 ```cpp
-#include "yams/mechanisms/Arm.h"
-#include "yams/mechanisms/config/ArmConfig.h"
-#include "yams/motorcontrollers/SmartMotorController.h"
-#include "yams/motorcontrollers/SmartMotorControllerConfig.h"
+#include <rev/SparkMax.h>
+#include "yams/mechanisms/Arm.hpp"
+#include "yams/mechanisms/config/ArmConfig.hpp"
+#include "yams/motorcontrollers/SmartMotorControllerConfig.hpp"
+#include "yams/motorcontrollers/local/SparkWrapper.hpp"
 
 class ArmSubsystem : public frc2::SubsystemBase {
 public:
     ArmSubsystem() {
-        motorConfig.WithGearing(Constants::kArmGearing);
-        motor.emplace(spark, frc::DCMotor::NEO(1), motorConfig);
+        motorConfig.WithSubsystem(this).WithGearing(Constants::kArmGearing);
+        motor.emplace(&m_sparkMax, frc::DCMotor::NEO(1), &motorConfig);
         armConfig.WithName("Arm").WithTolerance(2_deg);
-        arm.emplace(armConfig, &motor.value());
+        arm.emplace(&armConfig, &motor.value());
     }
 
     void Periodic() override { arm->Periodic(); }
 
 private:
-    std::unique_ptr<yams::Arm> arm;
+    rev::spark::SparkMax m_sparkMax{Constants::kArmCanId,
+                                    rev::spark::SparkMax::MotorType::kBrushless};
+    yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
+    std::optional<yams::motorcontrollers::local::SparkWrapper> motor;
+    yams::mechanisms::config::ArmConfig armConfig;
+    std::optional<yams::mechanisms::Arm> arm;
 };
 ```
 
