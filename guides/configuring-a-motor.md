@@ -2,7 +2,7 @@
 
 **Goal:** Build and instantiate a `SmartMotorController` ready for use in a mechanism or standalone.
 
----
+***
 
 ## Steps
 
@@ -10,8 +10,8 @@
 
 Identify which motor controller you are using:
 
-- **REV SPARK MAX / SPARK FLEX** — requires the REVLib vendordep.
-- **CTRE TalonFX / TalonFXS** — requires the Phoenix 6 vendordep.
+* **REV SPARK MAX / SPARK FLEX** — requires the REVLib vendordep.
+* **CTRE TalonFX / TalonFXS** — requires the Phoenix 6 vendordep.
 
 Add the appropriate vendordep to your project before proceeding.
 
@@ -81,21 +81,17 @@ The returned `SmartMotorController` is ready to hand to `Arm`, `Elevator`, `FlyW
 Arm arm = new Arm(armConfig, motor);
 ```
 
----
+***
 
 ## Notes
 
-{% hint style="warning" %}
-If you are using a SPARK MAX with an **absolute encoder**, you must call `.withExternalEncoderDiscontinuityPoint(angle)` on the config to set the wrap point. Without it, the encoder will report a discontinuity at 0°/360° and the closed-loop controller will behave erratically near that boundary.
-{% endhint %}
-
 {% hint style="info" %}
-`withClosedLoopController(kP, kI, kD)` sets position PID. For velocity control (flywheel), use `withVelocityPID(kP, kI, kD)` instead.
+If you are using a SPARK MAX with an **absolute encoder**, you should call `.withExternalEncoderDiscontinuityPoint(angle)` on the config to set the wrap point. Without it, the encoder will report a discontinuity at 0°/360° and the closed-loop controller will behave erratically near that boundary.
 {% endhint %}
 
----
+***
 
 ## Related pages
 
-- [SmartMotorControllerConfig](../api/java/motor-controllers/smart-motor-controller-config.md)
-- [MechanismGearing](../api/java/gearing/mechanism-gearing.md)
+* [SmartMotorControllerConfig](../api/java/motor-controllers/smart-motor-controller-config.md)
+* [MechanismGearing](../api/java/gearing/mechanism-gearing.md)
