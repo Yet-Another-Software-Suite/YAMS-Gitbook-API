@@ -15,10 +15,10 @@ SparkWrapper(SparkBase spark, DCMotor motor, SmartMotorControllerConfig config)
 
 ## Supported Hardware
 
-| Hardware | `DCMotor` Model |
-|----------|----------------|
-| `SparkMax` with NEO | `DCMotor.getNEO(1)` |
-| `SparkMax` with NEO 550 | `DCMotor.getNeo550(1)` |
+| Hardware                    | `DCMotor` Model           |
+| --------------------------- | ------------------------- |
+| `SparkMax` with NEO         | `DCMotor.getNEO(1)`       |
+| `SparkMax` with NEO 550     | `DCMotor.getNeo550(1)`    |
 | `SparkFlex` with NEO Vortex | `DCMotor.getNeoVortex(1)` |
 
 ## Example
@@ -41,11 +41,11 @@ SmartMotorController motor = new SparkWrapper(
 
 **Absolute encoder discontinuity point.** When using a `SparkAbsoluteEncoder` as the external encoder, `withExternalEncoderDiscontinuityPoint` must be called in the config:
 
-- `Rotations.of(0.5)` — sensor range is `[-0.5, 0.5)`. Use when the mechanism zero is in the middle of the encoder range.
-- `Rotations.of(1.0)` — sensor range is `[0, 1)`. Use when the full rotation is the intended range.
+* `Rotations.of(0.5)` — sensor range is `[-0.5, 0.5)`. Use when the mechanism zero is in the middle of the encoder range.
+* `Rotations.of(1.0)` — sensor range is `[0, 1)`. Use when the full rotation is the intended range.
 
-{% hint style="warning" %}
-Always call `withExternalEncoderDiscontinuityPoint` when using a `SparkAbsoluteEncoder`. Without it, the encoder reports incorrect positions near the wraparound point.
+{% hint style="info" %}
+It is recommended to call `withExternalEncoderDiscontinuityPoint` when using a `SparkAbsoluteEncoder`. Without it, the encoder reports incorrect positions near the wraparound point.
 {% endhint %}
 
 **Configuration persistence.** YAMS applies the SPARK configuration on construction using `SparkBase.configure()`. Configuration is applied with `ResetMode.kResetSafeParameters` and `PersistMode.kPersistParameters` by default, which burns settings to flash. Parameters survive power cycles.
@@ -58,6 +58,6 @@ Always call `withExternalEncoderDiscontinuityPoint` when using a `SparkAbsoluteE
 
 ## See Also
 
-- [SmartMotorController](smart-motor-controller.md)
-- [SmartMotorControllerConfig](smart-motor-controller-config.md)
-- [TalonFXWrapper](talonfx-wrapper.md)
+* [SmartMotorController](smart-motor-controller.md)
+* [SmartMotorControllerConfig](smart-motor-controller-config.md)
+* [TalonFXWrapper](talonfx-wrapper.md)
