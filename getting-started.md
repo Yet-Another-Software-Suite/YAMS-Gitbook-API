@@ -21,24 +21,31 @@ The vendor dependency will be downloaded and added to your `vendordeps/` folder 
 The snippet below creates a single-motor arm subsystem using YAMS.
 
 ```java
-import frc.robot.Constants;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import yams.mechanisms.Arm;
 import yams.mechanisms.config.ArmConfig;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.local.SparkWrapper;
 
 public class ArmSubsystem extends SubsystemBase {
 
     private final Arm arm;
 
     public ArmSubsystem() {
-        SmartMotorController motor = SmartMotorController.create(
-            new SmartMotorControllerConfig(Constants.ARM_CAN_ID, SmartMotorController.Type.SPARK_MAX)
+        SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+            .withGearing(Constants.ARM_GEARING);
+        SmartMotorController motor = new SparkWrapper(
+            new SparkMax(Constants.ARM_CAN_ID, MotorType.kBrushless),
+            DCMotor.getNEO(1),
+            motorConfig
         );
-        ArmConfig config = new ArmConfig(motor)
-            .withGearing(Constants.ARM_GEARING)
-            .withTolerance(2); // degrees
-        arm = new Arm(config);
+        ArmConfig config = new ArmConfig()
+            .withName("Arm")
+            .withTolerance(Degrees.of(2));
+        arm = new Arm(config, motor);
     }
 
     @Override
@@ -59,15 +66,10 @@ public class ArmSubsystem extends SubsystemBase {
 class ArmSubsystem : public frc2::SubsystemBase {
 public:
     ArmSubsystem() {
-        auto motorConfig = yams::SmartMotorControllerConfig{
-            Constants::kArmCanId,
-            yams::SmartMotorController::Type::SPARK_MAX
-        };
-        auto motor = yams::SmartMotorController::Create(motorConfig);
-        yams::ArmConfig armConfig{motor};
-        armConfig.WithGearing(Constants::kArmGearing)
-                 .WithTolerance(2_deg);
-        arm = std::make_unique<yams::Arm>(armConfig);
+        motorConfig.WithGearing(Constants::kArmGearing);
+        motor.emplace(spark, frc::DCMotor::NEO(1), motorConfig);
+        armConfig.WithName("Arm").WithTolerance(2_deg);
+        arm.emplace(armConfig, &motor.value());
     }
 
     void Periodic() override { arm->Periodic(); }

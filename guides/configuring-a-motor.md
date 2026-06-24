@@ -49,28 +49,40 @@ config.WithMotorInverted(false)
       .WithTelemetry("ShoulderMotor", TelemetryVerbosity::HIGH);
 ```
 
-### 3. Call `SmartMotorController.create()`
+### 3. Construct the concrete motor controller
 
-Pass the vendor hardware object, the WPILib `DCMotor` model, and the config. The factory wires up the config to the underlying controller.
+Pass the vendor hardware object, the WPILib `DCMotor` model, and the config to the appropriate constructor.
 
-**Java:**
+**Java (REV SPARK):**
 
 ```java
-SmartMotorController motor = SmartMotorController.create(
-    new CANSparkMax(1, MotorType.kBrushless),
+SmartMotorController motor = new SparkWrapper(
+    new SparkMax(1, MotorType.kBrushless),
     DCMotor.getNEO(1),
     config
 );
 ```
 
-**C++:**
+**Java (CTRE TalonFX):**
 
-```cpp
-auto motor = motorcontrollers::SmartMotorController::Create(
-    std::make_shared<rev::CANSparkMax>(1, rev::CANSparkMax::MotorType::kBrushless),
-    frc::DCMotor::NEO(1),
+```java
+SmartMotorController motor = new TalonFXWrapper(
+    new TalonFX(1),
+    DCMotor.getKrakenX60(1),
     config
 );
+```
+
+**C++ (REV SPARK):**
+
+```cpp
+SparkWrapper motor{spark, frc::DCMotor::NEO(1), config};
+```
+
+**C++ (CTRE TalonFX):**
+
+```cpp
+TalonFXWrapper motor{&talon, frc::DCMotor::KrakenX60(1), config};
 ```
 
 ### 4. Pass the result to a mechanism or use it directly

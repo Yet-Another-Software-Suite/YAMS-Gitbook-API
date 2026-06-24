@@ -42,13 +42,13 @@ Both parameters are **required**.
 ## Example
 
 ```java
-SmartMotorController leftSMC = SmartMotorController.create(
-    new CANSparkMax(1, MotorType.kBrushless),
+SmartMotorController leftSMC = new SparkWrapper(
+    new SparkMax(1, MotorType.kBrushless),
     DCMotor.getNEO(1),
     leftConfig
 );
-SmartMotorController rightSMC = SmartMotorController.create(
-    new CANSparkMax(2, MotorType.kBrushless),
+SmartMotorController rightSMC = new SparkWrapper(
+    new SparkMax(2, MotorType.kBrushless),
     DCMotor.getNEO(1),
     rightConfig
 );

@@ -3,7 +3,7 @@
 **Package:** `yams.motorcontrollers.local`\
 **Extends:** `SmartMotorController`
 
-`SmartMotorController` implementation for REV SPARK MAX and SPARK FLEX controllers. Construct via `SmartMotorController.create()` or directly via the constructor.
+`SmartMotorController` implementation for REV SPARK MAX and SPARK FLEX controllers.
 
 ## Constructor
 

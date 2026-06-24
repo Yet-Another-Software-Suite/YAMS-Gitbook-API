@@ -2,7 +2,7 @@
 
 **Namespace:** `yams::motorcontrollers`
 
-`SmartMotorController` is the abstract base class for all motor controller implementations. Do not instantiate this class directly. Construct concrete instances using vendor-specific subclass constructors such as `SparkMaxWrapper` or `TalonFXWrapper`.
+`SmartMotorController` is the abstract base class for all motor controller implementations. Do not instantiate this class directly. Construct concrete instances using vendor-specific subclass constructors such as `SparkWrapper` or `TalonFXWrapper`.
 
 **Java equivalent:** [Java SmartMotorController](../../java/motor-controllers/smart-motor-controller.md)
 
@@ -157,6 +157,54 @@ virtual void* GetMotorControllerConfig() = 0;
 | `simulation::DCMotorSimSupplier` | Generic DC motor physics |
 | `simulation::ArmSimSupplier` | Single-jointed arm physics |
 | `simulation::ElevatorSimSupplier` | Linear elevator physics |
+
+---
+
+## CTRE-Specific Notes
+
+### CANdi as External Encoder (TalonFXWrapper / TalonFXSWrapper)
+
+A `CANdi` can be passed via `WithExternalEncoder(candi)` for both `TalonFXWrapper` and `TalonFXSWrapper`. Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the correct feedback sensor source — otherwise the CANdi will not function as an external encoder.
+
+**TalonFXWrapper + CANdi:**
+
+```cpp
+ctre::phoenix6::configs::TalonFXConfiguration talonConfig{};
+// Choose SyncCANdiPWM1 or SyncCANdiPWM2 depending on which port the encoder is wired to.
+talonConfig.Feedback.FeedbackSensorSource =
+    ctre::phoenix6::signals::FeedbackSensorSourceValue::SyncCANdiPWM1;
+talonConfig.Feedback.FeedbackRemoteSensorID = candi.GetDeviceID();
+
+yams::motorcontrollers::SmartMotorControllerConfig config{};
+config.WithVendorConfig(talonConfig)
+      .WithExternalEncoder(candi)
+      .WithUseExternalFeedbackEncoder(true)
+      .WithGearing(yams::MechanismGearing{yams::GearBox::FromRatio(10.0)});
+
+TalonFXWrapper motor{&talon, frc::DCMotor::KrakenX60(1), config};
+```
+
+**TalonFXSWrapper + CANdi:**
+
+```cpp
+ctre::phoenix6::configs::TalonFXSConfiguration talonSConfig{};
+// Choose SyncCANdiPWM1 or SyncCANdiPWM2 depending on which port the encoder is wired to.
+talonSConfig.ExternalFeedback.ExternalFeedbackSensorSource =
+    ctre::phoenix6::signals::ExternalFeedbackSensorSourceValue::SyncCANdiPWM1;
+talonSConfig.ExternalFeedback.ExternalFeedbackRemoteSensorID = candi.GetDeviceID();
+
+yams::motorcontrollers::SmartMotorControllerConfig config{};
+config.WithVendorConfig(talonSConfig)
+      .WithExternalEncoder(candi)
+      .WithUseExternalFeedbackEncoder(true)
+      .WithGearing(yams::MechanismGearing{yams::GearBox::FromRatio(10.0)});
+
+TalonFXSWrapper motor{&talonfxs, frc::DCMotor::KrakenX60(1), config};
+```
+
+{% hint style="warning" %}
+Without a vendor config that explicitly sets the sensor source, YAMS has no way to know which of the two PWM ports the CANdi encoder is connected to and the feedback loop will not work.
+{% endhint %}
 
 ---
 

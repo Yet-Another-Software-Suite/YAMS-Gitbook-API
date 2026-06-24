@@ -20,7 +20,7 @@ SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withStatorCurrentLimit(Amps.of(80))
     .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
 
-SmartMotorController motor = SmartMotorController.create(
+SmartMotorController motor = new TalonFXWrapper(
     new TalonFX(3),
     DCMotor.getKrakenX60(1),
     motorConfig
@@ -66,7 +66,7 @@ public class ShooterSubsystem extends SubsystemBase {
             .withStatorCurrentLimit(Amps.of(80))
             .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
 
-        motor = SmartMotorController.create(
+        motor = new TalonFXWrapper(
             new TalonFX(3),
             DCMotor.getKrakenX60(1),
             motorConfig

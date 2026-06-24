@@ -49,8 +49,8 @@ public class ShoulderSubsystem extends SubsystemBase {
             .withStatorCurrentLimit(Amps.of(40))
             .withTelemetry("ShoulderMotor", TelemetryVerbosity.HIGH);
 
-        motor = SmartMotorController.create(
-            new CANSparkMax(1, MotorType.kBrushless),
+        motor = new SparkWrapper(
+            new SparkMax(1, MotorType.kBrushless),
             DCMotor.getNEO(1),
             motorConfig
         );

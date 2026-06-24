@@ -4,7 +4,7 @@ Package: `yams.exceptions`
 
 YAMS throws typed `RuntimeException` subclasses for configuration and runtime errors. All exceptions extend `RuntimeException` so they are unchecked — you do not need to declare or catch them unless you want to handle configuration problems gracefully.
 
-Most exceptions are thrown during `SmartMotorController.create()` or mechanism construction if required configuration fields are missing.
+Most exceptions are thrown during motor controller or mechanism construction if required configuration fields are missing.
 
 ---
 
@@ -46,8 +46,8 @@ SomeConfigurationException(String message, String result, String remedyFunction)
 
 ```java
 try {
-    SmartMotorController motor = SmartMotorController.create(
-        new CANSparkMax(1, MotorType.kBrushless),
+    SmartMotorController motor = new SparkWrapper(
+        new SparkMax(1, MotorType.kBrushless),
         DCMotor.getNEO(1),
         config
     );

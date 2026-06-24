@@ -2,26 +2,14 @@
 
 **Package:** `yams.motorcontrollers`
 
-Abstract base class for all motor controller wrappers. Do not instantiate directly. Use the static factory method or a concrete wrapper constructor (`SparkWrapper`, `TalonFXWrapper`, `TalonFXSWrapper`). Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
+Abstract base class for all motor controller wrappers. Do not instantiate directly — construct a concrete subclass (`SparkWrapper`, `TalonFXWrapper`, or `TalonFXSWrapper`) and assign it to a `SmartMotorController` variable. Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
 
-## Factory Method
+## Construction
 
-```java
-static SmartMotorController create(Object motorController, DCMotor motorSim, SmartMotorControllerConfig cfg)
-```
-
-| Parameter         | Type                         | Description                                                                                  |
-| ----------------- | ---------------------------- | -------------------------------------------------------------------------------------------- |
-| `motorController` | `Object`                     | Vendor motor controller object: `SparkMax`, `SparkFlex`, `TalonFX`, or `TalonFXS`            |
-| `motorSim`        | `DCMotor`                    | WPILib `DCMotor` model for simulation (e.g., `DCMotor.getNEO(1)`, `DCMotor.getKrakenX60(1)`) |
-| `cfg`             | `SmartMotorControllerConfig` | Configuration applied on construction                                                        |
-
-Returns a `SmartMotorController`. The concrete type is `SparkWrapper` for REV hardware (`SparkMax`, `SparkFlex`) and `TalonFXWrapper` or `TalonFXSWrapper` for CTRE hardware.
-
-## Example
+Instantiate the vendor-specific subclass directly:
 
 ```java
-SmartMotorControllerConfig config = new SmartMotorControllerConfig()
+SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withMotorInverted(false)
     .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
     .withClosedLoopController(0.5, 0.0, 0.0)
@@ -29,9 +17,17 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig()
     .withMechanismUpperLimit(Degrees.of(90))
     .withMechanismLowerLimit(Degrees.of(-90));
 
-SmartMotorController motor = SmartMotorController.create(
+// REV SPARK Max
+SmartMotorController motor = new SparkWrapper(
     new SparkMax(1, MotorType.kBrushless),
     DCMotor.getNEO(1),
+    config
+);
+
+// CTRE TalonFX
+SmartMotorController motor = new TalonFXWrapper(
+    new TalonFX(1),
+    DCMotor.getKrakenX60(1),
     config
 );
 ```

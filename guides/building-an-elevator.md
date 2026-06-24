@@ -25,7 +25,7 @@ SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withStatorCurrentLimit(Amps.of(60))
     .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH);
 
-SmartMotorController motor = SmartMotorController.create(
+SmartMotorController motor = new TalonFXWrapper(
     new TalonFX(2),
     DCMotor.getKrakenX60(1),
     motorConfig
@@ -75,7 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             .withStatorCurrentLimit(Amps.of(60))
             .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH);
 
-        motor = SmartMotorController.create(
+        motor = new TalonFXWrapper(
             new TalonFX(2),
             DCMotor.getKrakenX60(1),
             motorConfig

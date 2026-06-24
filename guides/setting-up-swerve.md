@@ -67,9 +67,9 @@ public class DriveSubsystem extends SubsystemBase {
             .withExternalEncoderDiscontinuityPoint(Rotations.of(0.5))
             .withStatorCurrentLimit(Amps.of(40));
 
-        SmartMotorController driveMotorFL = SmartMotorController.create(
+        SmartMotorController driveMotorFL = new TalonFXWrapper(
             new TalonFX(10), DCMotor.getKrakenX60(1), driveConfigFL);
-        SmartMotorController azimuthMotorFL = SmartMotorController.create(
+        SmartMotorController azimuthMotorFL = new TalonFXWrapper(
             new TalonFX(11), DCMotor.getKrakenX60(1), azimuthConfigFL);
 
         // Repeat for FR, BL, BR with their CAN IDs and encoder offsets...

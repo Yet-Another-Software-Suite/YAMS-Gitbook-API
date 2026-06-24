@@ -3,7 +3,7 @@
 **Package:** `yams.motorcontrollers.remote`\
 **Extends:** `SmartMotorController`
 
-`SmartMotorController` implementations for CTRE TalonFX and TalonFXS controllers. `TalonFXWrapper` targets the TalonFX (Falcon 500, Kraken X60). `TalonFXSWrapper` targets the TalonFXS. Construct via `SmartMotorController.create()` or directly via the constructor.
+`SmartMotorController` implementations for CTRE TalonFX and TalonFXS controllers. `TalonFXWrapper` targets the TalonFX (Falcon 500, Kraken X60). `TalonFXSWrapper` targets the TalonFXS.
 
 ## Constructors
 
@@ -42,7 +42,54 @@ SmartMotorController motor = new TalonFXWrapper(
 
 **CANcoder support.** Pass a `CANcoder` via `withExternalEncoder(CANcoder)`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source. A discontinuity point is optional for `CANcoder`; when set it maps to `AbsoluteSensorDiscontinuityPoint` in the CANcoder configuration. CANcoder does not have the same dead-zone constraint as SPARK absolute encoders.
 
-**CANdi support.** A `CANdi` can also be passed as the external encoder object for TalonFXS.
+**CANdi support.** A `CANdi` can be passed via `withExternalEncoder(CANdi)` for both `TalonFXWrapper` and `TalonFXSWrapper`. Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which one your encoder is wired to automatically. You must pass a vendor config that sets the correct `FeedbackSensorSource` (TalonFX) or `ExternalFeedbackSensorSource` (TalonFXS) — otherwise the CANdi will not function as an external encoder.
+
+**TalonFX + CANdi:**
+
+```java
+TalonFXConfiguration talonConfig = new TalonFXConfiguration();
+// Choose SyncCANdiPWM1 or SyncCANdiPWM2 depending on which port the encoder is wired to.
+talonConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANdiPWM1;
+talonConfig.Feedback.FeedbackRemoteSensorID = candi.getDeviceID();
+
+SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
+    .withVendorConfig(talonConfig)
+    .withExternalEncoder(candi)
+    .withUseExternalFeedbackEncoder(true)
+    .withGearing(new MechanismGearing(GearBox.fromRatio(10.0)));
+
+SmartMotorController motor = new TalonFXWrapper(
+    new TalonFX(5),
+    DCMotor.getKrakenX60(1),
+    config
+);
+```
+
+**TalonFXS + CANdi:**
+
+```java
+TalonFXSConfiguration talonSConfig = new TalonFXSConfiguration();
+// Choose SyncCANdiPWM1 or SyncCANdiPWM2 depending on which port the encoder is wired to.
+talonSConfig.ExternalFeedback.ExternalFeedbackSensorSource =
+    ExternalFeedbackSensorSourceValue.SyncCANdiPWM1;
+talonSConfig.ExternalFeedback.ExternalFeedbackRemoteSensorID = candi.getDeviceID();
+
+SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
+    .withVendorConfig(talonSConfig)
+    .withExternalEncoder(candi)
+    .withUseExternalFeedbackEncoder(true)
+    .withGearing(new MechanismGearing(GearBox.fromRatio(10.0)));
+
+SmartMotorController motor = new TalonFXSWrapper(
+    new TalonFXS(6),
+    DCMotor.getKrakenX60(1),
+    config
+);
+```
+
+{% hint style="warning" %}
+Without a vendor config that explicitly sets the sensor source, YAMS has no way to know which of the two PWM ports the CANdi encoder is connected to and the feedback loop will not work.
+{% endhint %}
 
 **Motion Magic.** When a trapezoidal or exponential profile is configured, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate current-mode variant). When the software PID is active instead, profiling runs on the roboRIO.
 
