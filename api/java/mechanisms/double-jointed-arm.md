@@ -179,6 +179,4 @@ The following methods share the same interface as the single-joint `Arm` class.
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/double_jointed_arm" %}
-Double Jointed Arm example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/double_jointed_arm/java/frc/robot/subsystems/DoubleJointedArmSubsystem.java#L92-L145" %}

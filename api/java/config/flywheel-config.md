@@ -52,6 +52,4 @@ FlyWheelConfig config = new FlyWheelConfig()
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_shooter" %}
-Simple Shooter example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java#L150-L156" %}

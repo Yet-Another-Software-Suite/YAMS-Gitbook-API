@@ -94,9 +94,7 @@ positional::Arm arm{&armConfig, motor};
 frc2::CommandPtr setAngleCmd = arm.RunTo(45_deg);
 ```
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/cpptest" %}
-C++ example — includes ArmSubsystem
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ArmSubsystem.cpp#L61-L74" %}
 
 ---
 

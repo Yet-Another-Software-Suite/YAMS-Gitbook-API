@@ -204,9 +204,7 @@ Call `simIterate()` from your `simulationPeriodic()` method. Call `updateTelemet
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_arm" %}
-Simple Arm example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java#L82-L91" %}
 
 ## See Also
 

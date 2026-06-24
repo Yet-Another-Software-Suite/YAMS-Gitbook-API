@@ -293,10 +293,6 @@ Updates the Mechanism2d visualization for Shuffleboard or AdvantageScope.
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_shooter" %}
-Simple Shooter (FlyWheel) example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java#L150-L156" %}
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/hooded_shooter" %}
-Hooded Shooter — FlyWheel with hood Pivot and vision turret
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/hooded_shooter/java/frc/robot/subsystems/FlywheelSubsystem.java#L102-L109" %}

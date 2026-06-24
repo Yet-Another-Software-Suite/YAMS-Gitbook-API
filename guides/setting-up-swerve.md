@@ -155,13 +155,9 @@ driveSubsystem.swerveDrive.seedAzimuthEncoders();
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/swerve_drive" %}
-Swerve Drive example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive/java/frc/robot/subsystems/SwerveSubsystem.java#L176-L215" %}
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/swerve_drive_pathplanner" %}
-Swerve Drive with PathPlanner autonomous
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java#L163-L190" %}
 
 ---
 

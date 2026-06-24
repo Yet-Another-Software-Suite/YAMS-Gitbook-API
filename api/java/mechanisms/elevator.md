@@ -206,13 +206,9 @@ Call `simIterate()` from your `simulationPeriodic()` method. Call `updateTelemet
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_elevator" %}
-Simple Elevator example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java#L113-L126" %}
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/exponential_elevator" %}
-Elevator with exponential motion profile
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_elevator/java/frc/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java#L134-L146" %}
 
 ## See Also
 

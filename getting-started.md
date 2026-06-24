@@ -14,7 +14,7 @@ Add the YAMS vendordep to your WPILib project by installing it from a URL in VS 
 
 The vendor dependency will be downloaded and added to your `vendordeps/` folder automatically. Gradle will pull the library artifacts on the next build.
 
-{% embed url="https://github.com/yet-another-software-suite/YAMS" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java#L82-L91" %}
 
 ## Minimal Example — Java
 

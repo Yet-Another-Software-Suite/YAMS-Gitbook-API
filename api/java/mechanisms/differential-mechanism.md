@@ -143,6 +143,4 @@ The following methods share the same interface as other YAMS mechanisms.
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/differential_mechanism" %}
-Differential Mechanism example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/differential_mechanism/java/frc/robot/subsystems/DiffyMechSubsystem.java#L114-L121" %}

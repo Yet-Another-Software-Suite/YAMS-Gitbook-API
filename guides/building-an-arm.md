@@ -103,13 +103,9 @@ Trigger atScore = shoulder.arm.isNear(Degrees.of(45),  Degrees.of(2));
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_arm" %}
-Simple Arm example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java#L82-L91" %}
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/exponential_arm" %}
-Arm with exponential motion profile
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java#L157-L171" %}
 
 ---
 

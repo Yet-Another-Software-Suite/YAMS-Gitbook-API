@@ -94,9 +94,7 @@ frc2::CommandPtr spinUp = flywheel.RunTo(3600_deg_per_s, 50_deg_per_s);
 frc2::CommandPtr spinUpLinear = flywheel.RunTo(15_mps, 0.3_mps);
 ```
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/cpptest" %}
-C++ example — includes ShooterSubsystem and DoubleFlyWheelSubsystem
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ShooterSubsystem.cpp#L43-L50" %}
 
 ---
 

@@ -96,9 +96,7 @@ frc2::CommandPtr DriveCommand(std::function<frc::ChassisSpeeds()> speeds) {
 `SwerveDrive<4>` is the most common instantiation. The template parameter must match the number of modules in `SwerveDriveConfig`. Deviating from 4 is rare in FRC.
 {% endhint %}
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/cpptest" %}
-C++ example — includes SwerveSubsystem
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/SwerveSubsystem.cpp#L130-L139" %}
 
 ---
 

@@ -50,6 +50,4 @@ ElevatorConfig config = new ElevatorConfig()
     .withTelemetry("Elevator", TelemetryVerbosity.HIGH);
 ```
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/simple_elevator" %}
-Simple Elevator example
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java#L113-L126" %}

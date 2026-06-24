@@ -144,9 +144,7 @@ SmartMotorController motor = SmartMotorController.create(
 
 ## Examples
 
-{% embed url="https://github.com/Yet-Another-Software-Suite/YAMS/tree/master/examples/advantage_kit" %}
-AdvantageKit example — complex motor configurations for multiple subsystems
-{% endembed %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/advantage_kit/java/frc/robot/subsystems/ArmSubsystem.java#L148-L158" %}
 
 ## See Also
 
