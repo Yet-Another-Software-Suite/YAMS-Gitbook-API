@@ -1,4 +1,4 @@
-# Table of Contents
+# Table of contents
 
 * [Overview](README.md)
 * [Getting Started](getting-started.md)
@@ -23,7 +23,7 @@
   * [SmartMotorController](api/java/motor-controllers/smart-motor-controller.md)
   * [SmartMotorControllerConfig](api/java/motor-controllers/smart-motor-controller-config.md)
   * [SparkWrapper](api/java/motor-controllers/spark-wrapper.md)
-  * [TalonFXWrapper](api/java/motor-controllers/talonfx-wrapper.md)
+  * [Talon Wrapper](api/java/motor-controllers/talonfx-wrapper.md)
 * [Swerve Drive](api/java/swerve/README.md)
   * [SwerveDrive](api/java/swerve/swerve-drive.md)
   * [SwerveModule](api/java/swerve/swerve-module.md)
