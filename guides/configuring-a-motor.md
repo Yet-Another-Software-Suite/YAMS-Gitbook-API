@@ -76,7 +76,7 @@ SmartMotorController motor = new TalonFXWrapper(
 **C++ (REV SPARK):**
 
 ```cpp
-SparkWrapper motor{spark, frc::DCMotor::NEO(1), config};
+SparkWrapper motor{&spark, frc::DCMotor::NEO(1), config};
 ```
 
 **C++ (CTRE TalonFX):**
