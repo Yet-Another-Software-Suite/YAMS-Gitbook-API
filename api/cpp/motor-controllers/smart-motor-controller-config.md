@@ -155,7 +155,6 @@
 | `WithLooselyCoupledFollowers(std::vector<SmartMotorController*> followers)` | Add YAMS-managed follower motors |
 | `WithVendorConfig(std::any cfg)` | Pass a vendor-specific config object directly |
 | `Clone() const` | Returns a deep copy of this config |
-| `ValidateBasicOptions() const` | Throws if required options are missing |
 
 ---
 
@@ -172,10 +171,6 @@ config.WithMotorInverted(false)
       .WithIdleMode(MotorMode::BRAKE)
       .WithTelemetry("ArmMotor", TelemetryVerbosity::HIGH);
 ```
-
-{% hint style="info" %}
-`ValidateBasicOptions()` should be called before passing the config to `ApplyConfig()`. It verifies that at minimum a motor gearing ratio has been set, which is required for unit-safe encoder reads.
-{% endhint %}
 
 ---
 

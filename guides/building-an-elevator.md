@@ -10,18 +10,19 @@
 
 The motor config must account for how rotations convert to linear distance. Either:
 
-- Call `.withGearing(...)` to set the reduction, then provide drum radius in `ElevatorConfig`.
-- Or call `.withMechanismCircumference(distancePerRotation)` where the value equals `2π × drumRadius`.
+- Call `.withMechanismCircumference(distancePerRotation)` where the value equals `2π × drumRadius`.
+- Or call `.withDrumRadius(radius)` which computes the circumference for you.
 
 ```java
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withMotorInverted(false)
-    .withIdleMode(MotorMode.Brake)
+    .withIdleMode(MotorMode.BRAKE)
     .withGearing(new MechanismGearing(GearBox.fromRatio(9.0)))
+    .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
+    .withCascadingElevatorStages(2)                               // 2-stage cascade
     .withClosedLoopController(1.2, 0.0, 0.05)
     .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02))
-    .withMechanismUpperLimit(Meters.of(1.2))
-    .withMechanismLowerLimit(Meters.of(0.0))
+    .withSoftLimits(Meters.of(0.0), Meters.of(1.2))
     .withStatorCurrentLimit(Amps.of(60))
     .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH);
 
@@ -34,19 +35,17 @@ SmartMotorController motor = new TalonFXWrapper(
 
 ### 2. Create an `ElevatorConfig`
 
-Carriage weight and drum radius are required for simulation to model gravity correctly.
+Carriage weight is required for simulation to model gravity correctly. Drum radius and cascade stage count are configured on `SmartMotorControllerConfig` (see step 1).
 
 ```java
 ElevatorConfig elevatorConfig = new ElevatorConfig()
-    .withName("Elevator")
     .withCarriageWeight(Kilograms.of(4.5))
-    .withDrumRadius(Meters.of(0.025))
-    .withNumberOfStages(2)
-    .withTelemetry(TelemetryVerbosity.HIGH);
+    .withHardLimits(Meters.of(0.0), Meters.of(1.2))
+    .withTelemetry("Elevator", TelemetryVerbosity.HIGH);
 ```
 
 {% hint style="info" %}
-Carriage weight and drum radius are required for simulation. Without them, `simIterate()` cannot model gravity and the elevator will behave like a frictionless flywheel in sim.
+Carriage weight is required for simulation. Without it, `simIterate()` cannot model gravity and the elevator will behave like a frictionless flywheel in sim. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
 {% endhint %}
 
 ### 3. Construct the `Elevator`
@@ -66,12 +65,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.Brake)
+            .withIdleMode(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromRatio(9.0)))
+            .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
+            .withCascadingElevatorStages(2)                               // 2-stage cascade
             .withClosedLoopController(1.2, 0.0, 0.05)
             .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02))
-            .withMechanismUpperLimit(Meters.of(1.2))
-            .withMechanismLowerLimit(Meters.of(0.0))
+            .withSoftLimits(Meters.of(0.0), Meters.of(1.2))
             .withStatorCurrentLimit(Amps.of(60))
             .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH);
 
@@ -82,11 +82,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         );
 
         ElevatorConfig elevatorConfig = new ElevatorConfig()
-            .withName("Elevator")
             .withCarriageWeight(Kilograms.of(4.5))
-            .withDrumRadius(Meters.of(0.025))
-            .withNumberOfStages(2)
-            .withTelemetry(TelemetryVerbosity.HIGH);
+            .withHardLimits(Meters.of(0.0), Meters.of(1.2))
+            .withTelemetry("Elevator", TelemetryVerbosity.HIGH);
 
         elevator = new Elevator(elevatorConfig, motor);
     }

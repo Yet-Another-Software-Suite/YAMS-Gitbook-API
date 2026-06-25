@@ -22,13 +22,14 @@ All methods return `ElevatorConfig&` for chaining.
 | Method | Description |
 |--------|-------------|
 | `WithTelemetryName(const std::string& name)` | Name used for SmartDashboard and log entries |
-| `WithMinHeight(units::meter_t height)` | Minimum allowable carriage height |
-| `WithMaxHeight(units::meter_t height)` | Maximum allowable carriage height |
-| `WithCarriageMass(units::kilogram_t mass)` | Mass of the carriage, used in simulation |
-| `WithDrumRadius(units::meter_t radius)` | Radius of the driving drum or spool |
-| `WithElevatorAngle(units::degree_t angle)` | Angle of travel from horizontal (default: `90_deg`, vertical) |
-| `WithNumStages(int stages)` | Number of cascaded stages; multiplies effective travel |
-| `WithSimColor(const frc::Color8Bit& color)` | Color of the simulated elevator |
+| `WithMinimumHeight(units::meter_t height)` | Minimum allowable carriage height |
+| `WithMaximumHeight(units::meter_t height)` | Maximum allowable carriage height |
+| `WithCarriageMass(units::kilogram_t mass)` | **Required for simulation.** Mass of the carriage, used in simulation |
+| `WithIsHorizontal(bool horizontal)` | When `true`, disables gravity simulation. Useful for horizontal linear sliders |
+| `WithSimColor(const frc::Color8Bit& color)` | Color of the simulated elevator (default: orange) |
+| `WithAngle(units::degree_t angle)` | Angle of the elevator ligament in Mechanism2d (default: `90_deg`, vertical) |
+
+> **Note:** Drum radius (spool size) is configured on `SmartMotorControllerConfig` via `.WithDrumRadius()` or `.WithMechanismCircumference()`. Cascading elevator stages are configured via `SmartMotorControllerConfig::WithCascadingElevatorStages(int stages)`.
 
 ---
 
@@ -39,10 +40,9 @@ std::string GetTelemetryName() const;
 std::optional<units::meter_t> GetMinHeight() const;
 std::optional<units::meter_t> GetMaxHeight() const;
 std::optional<units::kilogram_t> GetCarriageMass() const;
-std::optional<units::meter_t> GetDrumRadius() const;
-std::optional<units::degree_t> GetElevatorAngle() const;
-std::optional<int> GetNumStages() const;
+bool IsHorizontal() const;
 frc::Color8Bit GetSimColor() const;
+units::degree_t GetAngle() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.
@@ -61,10 +61,8 @@ Getters for optional fields return `std::nullopt` if the corresponding setter wa
 
 ```cpp
 config::ElevatorConfig elevConfig;
-elevConfig.WithMinHeight(0.0_m)
-          .WithMaxHeight(1.5_m)
+elevConfig.WithMinimumHeight(0.0_m)
+          .WithMaximumHeight(1.5_m)
           .WithCarriageMass(4.5_kg)
-          .WithDrumRadius(0.0254_m)
-          .WithNumStages(2)
           .WithTelemetryName("Elevator");
 ```

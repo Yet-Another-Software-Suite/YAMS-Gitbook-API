@@ -19,13 +19,15 @@ ArmConfig() = default;
 
 All methods return `ArmConfig&` for chaining.
 
-| Method | Description |
-|--------|-------------|
-| `WithTelemetryName(const std::string& name)` | Name used for SmartDashboard and log entries |
-| `WithMinAngle(units::degree_t angle)` | Minimum allowable mechanism angle |
-| `WithMaxAngle(units::degree_t angle)` | Maximum allowable mechanism angle |
-| `WithArmLength(units::meter_t length)` | Arm length from pivot to end effector, used in simulation |
-| `WithSimColor(const frc::Color8Bit& color)` | Color of the simulated arm ligament |
+> **Required for simulation:** `WithArmLength()` must be set for `SingleJointedArmSim` to work correctly. All other methods are optional.
+
+| Method | Required | Description |
+|--------|----------|-------------|
+| `WithArmLength(units::meter_t length)` | **Required for simulation** | Arm length from pivot to end effector. Without this, the physics simulation cannot model the arm. |
+| `WithMinAngle(units::degree_t angle)` | Optional | Minimum allowable mechanism angle |
+| `WithMaxAngle(units::degree_t angle)` | Optional | Maximum allowable mechanism angle |
+| `WithTelemetryName(const std::string& name)` | Optional | Name used for SmartDashboard and log entries |
+| `WithSimColor(const frc::Color8Bit& color)` | Optional | Color of the simulated arm ligament |
 
 ---
 

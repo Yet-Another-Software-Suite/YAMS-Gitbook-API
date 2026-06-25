@@ -2,11 +2,15 @@
 
 **Package:** `yams.mechanisms.config`
 
-`FlyWheelConfig` configures a velocity-controlled spinning mechanism. Simulation requires either `withMOI`, or both `withDiameter` and `withMass` together.
+`FlyWheelConfig` configures a velocity-controlled spinning mechanism.
 
 All builder methods return the `FlyWheelConfig` instance for chaining.
 
 See also: [FlyWheel](../mechanisms/flywheel.md)
+
+{% hint style="info" %}
+**Simulation Note:** Moment of inertia is not configured on `FlyWheelConfig`. Set it via `SmartMotorControllerConfig.withMomentOfInertia(Distance length, Mass mass)`.
+{% endhint %}
 
 ---
 
@@ -23,17 +27,13 @@ FlyWheelConfig clone()  // Deep copy
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withDiameter(Distance diameter)` | `diameter` — wheel outer diameter | Wheel size. Used together with `withMass` to compute moment of inertia for simulation. |
-| `withMass(Mass mass)` | `mass` — wheel mass | Wheel mass for MOI calculation. Used together with `withDiameter`. |
-| `withMOI(Distance radius, Mass mass)` | `radius` — wheel radius, `mass` — wheel mass | Directly computes MOI as `0.5 × mass × radius²`. Alternative to specifying `withDiameter` + `withMass`. |
-| `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity` — maximum simulated velocity | Enables a simulated speedometer sensor capped at `maxVelocity`. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
-| `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Optional. |
+| `withDiameter(Distance diameter)` | `diameter` — wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion and simulation. |
+| `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity` — maximum simulated velocity | Enables a simulated speedometer gauge capped at `maxVelocity`. |
+| `withSpeedometerSimulation()` | _(none)_ | Enables the speedometer with the previously configured max velocity. Throws if max velocity was not set first. |
+| `disableSpeedometerSimulation()` | _(none)_ | Disables the speedometer simulation. |
+| `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
 | `withMechanismPositionConfig(MechanismPositionConfig config)` | `config` — position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
-
-{% hint style="info" %}
-For simulation, supply MOI via one of two paths: `withMOI(radius, mass)` directly, or `withDiameter(d)` + `withMass(m)` together. Providing only one of `withDiameter`/`withMass` is insufficient.
-{% endhint %}
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
 
 ---
 
@@ -48,7 +48,7 @@ All getters return `Optional<>` for configured values. `getSimColor()` and `getM
 ```java
 FlyWheelConfig config = new FlyWheelConfig()
     .withDiameter(Inches.of(4))
-    .withMass(Kilograms.of(0.3))
+    .withSpeedometerSimulation(RPM.of(6000))
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
 

@@ -8,15 +8,16 @@
 
 ### 1. Configure the motor for velocity control
 
-Use `withVelocityPID` for the closed-loop controller and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
+Use `withClosedLoopController` for the closed-loop PID and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
 
 ```java
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withMotorInverted(false)
-    .withIdleMode(MotorMode.Coast)
+    .withIdleMode(MotorMode.COAST)
     .withGearing(new MechanismGearing(GearBox.fromRatio(1.5)))
-    .withVelocityPID(0.0003, 0.0, 0.0)
+    .withClosedLoopController(0.0003, 0.0, 0.0)
     .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))
+    .withMomentOfInertia(Meters.of(0.0508), Kilograms.of(0.18))
     .withStatorCurrentLimit(Amps.of(80))
     .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
 
@@ -29,14 +30,12 @@ SmartMotorController motor = new TalonFXWrapper(
 
 ### 2. Create a `FlyWheelConfig`
 
-Wheel diameter and mass are used to model moment of inertia in simulation.
+Wheel diameter is used for linear velocity conversion. Moment of inertia (for simulation) is set on `SmartMotorControllerConfig` via `withMomentOfInertia`.
 
 ```java
 FlyWheelConfig flywheelConfig = new FlyWheelConfig()
-    .withName("Shooter")
-    .withWheelDiameter(Meters.of(0.1016))
-    .withWheelMass(Kilograms.of(0.18))
-    .withTelemetry(TelemetryVerbosity.HIGH);
+    .withDiameter(Meters.of(0.1016))
+    .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
 
 ### 3. Construct the `FlyWheel`
@@ -59,10 +58,11 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.Coast)
+            .withIdleMode(MotorMode.COAST)
             .withGearing(new MechanismGearing(GearBox.fromRatio(1.5)))
-            .withVelocityPID(0.0003, 0.0, 0.0)
+            .withClosedLoopController(0.0003, 0.0, 0.0)
             .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))
+            .withMomentOfInertia(Meters.of(0.0508), Kilograms.of(0.18))
             .withStatorCurrentLimit(Amps.of(80))
             .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
 
@@ -73,10 +73,8 @@ public class ShooterSubsystem extends SubsystemBase {
         );
 
         FlyWheelConfig flywheelConfig = new FlyWheelConfig()
-            .withName("Shooter")
-            .withWheelDiameter(Meters.of(0.1016))
-            .withWheelMass(Kilograms.of(0.18))
-            .withTelemetry(TelemetryVerbosity.HIGH);
+            .withDiameter(Meters.of(0.1016))
+            .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 
         flyWheel = new FlyWheel(flywheelConfig, motor);
     }

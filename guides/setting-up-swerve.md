@@ -14,32 +14,33 @@ Drive controllers use velocity PID and a `SimpleMotorFeedforward`. Azimuth contr
 
 ### 2. Create a `SwerveModuleConfig` for each module
 
-Provide the wheel radius, the module's location relative to the robot center, and the absolute encoder offset angle.
+Pass the drive and azimuth motor controllers into the `SwerveModuleConfig` constructor. Then set the wheel radius, the module's location relative to the robot center, and the absolute encoder.
 
 ```java
-SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig()
-    .withName("FrontLeft")
+SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(driveMotorFL, azimuthMotorFL)
     .withWheelRadius(Meters.of(0.0508))
-    .withModuleLocation(new Translation2d(0.381, 0.381))
+    .withLocation(new Translation2d(0.381, 0.381))
     .withAbsoluteEncoderOffset(Rotations.of(0.24))
-    .withDriveMotorConfig(driveMotorConfigFL)
-    .withAzimuthMotorConfig(azimuthMotorConfigFL)
-    .withDriveMotor(driveMotorFL)
-    .withAzimuthMotor(azimuthMotorFL);
+    .withTelemetry("FrontLeft", TelemetryVerbosity.HIGH);
 ```
 
 Repeat for `FrontRight`, `BackLeft`, and `BackRight`, adjusting the `Translation2d` signs and encoder offsets.
 
-### 3. Create a `SwerveDriveConfig`
+### 3. Build `SwerveModule` instances and create a `SwerveDriveConfig`
 
-Collect the four module configs, set kinematic limits, and provide a gyro supplier.
+Wrap each `SwerveModuleConfig` in a `SwerveModule`, then collect the four modules into a `SwerveDriveConfig`. Pass the subsystem and all four modules in the constructor, then set kinematic limits and the gyro supplier.
 
 ```java
-SwerveDriveConfig driveConfig = new SwerveDriveConfig()
-    .withModules(frontLeftConfig, frontRightConfig, backLeftConfig, backRightConfig)
-    .withMaxTranslationalSpeed(MetersPerSecond.of(4.5))
-    .withMaxRotationalSpeed(RadiansPerSecond.of(Math.PI * 2))
-    .withGyroSupplier(imu::getRotation2d)
+SwerveModule frontLeft  = new SwerveModule(frontLeftConfig);
+SwerveModule frontRight = new SwerveModule(frontRightConfig);
+SwerveModule backLeft   = new SwerveModule(backLeftConfig);
+SwerveModule backRight  = new SwerveModule(backRightConfig);
+
+SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft, frontRight, backLeft, backRight)
+    .withGyro(imu.getYaw().asSupplier())
+    .withMaximumChassisSpeed(MetersPerSecond.of(4.5), DegreesPerSecond.of(360))
+    .withTranslationController(new PIDController(1.0, 0, 0))
+    .withRotationController(new PIDController(1.0, 0, 0))
     .withTelemetry(TelemetryVerbosity.HIGH);
 ```
 
@@ -50,17 +51,17 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
 
-    public DriveSubsystem(Supplier<Rotation2d> gyroSupplier) {
+    public DriveSubsystem() {
 
         // --- Front Left ---
-        SmartMotorControllerConfig driveConfigFL = new SmartMotorControllerConfig()
+        SmartMotorControllerConfig driveConfigFL = new SmartMotorControllerConfig(this)
             .withIdleMode(MotorMode.Brake)
             .withGearing(new MechanismGearing(GearBox.fromRatio(6.75)))
             .withVelocityPID(0.1, 0.0, 0.0)
             .withFeedforward(new SimpleMotorFeedforward(0.12, 2.2, 0.3))
             .withStatorCurrentLimit(Amps.of(60));
 
-        SmartMotorControllerConfig azimuthConfigFL = new SmartMotorControllerConfig()
+        SmartMotorControllerConfig azimuthConfigFL = new SmartMotorControllerConfig(this)
             .withIdleMode(MotorMode.Brake)
             .withGearing(new MechanismGearing(GearBox.fromRatio(12.8)))
             .withClosedLoopController(7.0, 0.0, 0.3)
@@ -74,23 +75,26 @@ public class DriveSubsystem extends SubsystemBase {
 
         // Repeat for FR, BL, BR with their CAN IDs and encoder offsets...
 
-        SwerveModuleConfig frontLeftModuleConfig = new SwerveModuleConfig()
-            .withName("FrontLeft")
+        SwerveModuleConfig frontLeftModuleConfig = new SwerveModuleConfig(driveMotorFL, azimuthMotorFL)
             .withWheelRadius(Meters.of(0.0508))
-            .withModuleLocation(new Translation2d(0.381, 0.381))
+            .withLocation(new Translation2d(0.381, 0.381))
             .withAbsoluteEncoderOffset(Rotations.of(0.24))
-            .withDriveMotor(driveMotorFL)
-            .withAzimuthMotor(azimuthMotorFL);
+            .withTelemetry("FrontLeft", TelemetryVerbosity.HIGH);
 
         // SwerveModuleConfig frontRightModuleConfig = ...
         // SwerveModuleConfig backLeftModuleConfig  = ...
         // SwerveModuleConfig backRightModuleConfig = ...
 
-        SwerveDriveConfig driveConfig = new SwerveDriveConfig()
-            .withModules(frontLeftModuleConfig /*, frontRightModuleConfig, ... */)
-            .withMaxTranslationalSpeed(MetersPerSecond.of(4.5))
-            .withMaxRotationalSpeed(RadiansPerSecond.of(Math.PI * 2))
-            .withGyroSupplier(gyroSupplier)
+        SwerveModule frontLeft = new SwerveModule(frontLeftModuleConfig);
+        // SwerveModule frontRight = new SwerveModule(frontRightModuleConfig);
+        // SwerveModule backLeft   = new SwerveModule(backLeftModuleConfig);
+        // SwerveModule backRight  = new SwerveModule(backRightModuleConfig);
+
+        SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft /*, frontRight, backLeft, backRight */)
+            .withGyro(gyro.getYaw().asSupplier())
+            .withMaximumChassisSpeed(MetersPerSecond.of(4.5), DegreesPerSecond.of(360))
+            .withTranslationController(new PIDController(1.0, 0, 0))
+            .withRotationController(new PIDController(1.0, 0, 0))
             .withTelemetry(TelemetryVerbosity.HIGH);
 
         swerveDrive = new SwerveDrive(driveConfig);
@@ -98,7 +102,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     /** Field-relative drive command driven by a SwerveInputStream. */
     public Command driveFieldRelativeCommand(SwerveInputStream inputStream) {
-        return swerveDrive.driveFieldRelative(inputStream);
+        return run(() -> swerveDrive.setFieldRelativeChassisSpeeds(inputStream.get()))
+            .withName("Field Oriented Drive");
     }
 
     /** Pass vision pose estimates to the odometry estimator. */
@@ -106,8 +111,8 @@ public class DriveSubsystem extends SubsystemBase {
         swerveDrive.addVisionMeasurement(pose, timestampSeconds);
     }
 
-    public Pose2d getEstimatedPose() {
-        return swerveDrive.getEstimatedPose();
+    public Pose2d getPose() {
+        return swerveDrive.getPose();
     }
 
     @Override
@@ -124,32 +129,26 @@ public class DriveSubsystem extends SubsystemBase {
 
 ### 5. Set up driver input with `SwerveInputStream`
 
-`SwerveInputStream` translates raw joystick axes into swerve chassis speeds, applying deadbands and rate limits.
+`SwerveInputStream` translates raw joystick axes into swerve chassis speeds, applying deadbands and rate limits. Pass the `SwerveDrive` instance as the first argument to `SwerveInputStream.of()`. Rotation is set separately via `.withControllerRotationAxis()`.
 
 ```java
 SwerveInputStream driverInput = SwerveInputStream.of(
-    () -> -driverController.getLeftY(),
-    () -> -driverController.getLeftX(),
-    () -> -driverController.getRightX()
-).withDeadband(0.1)
- .withMaxTranslationalSpeed(MetersPerSecond.of(4.5))
- .withMaxRotationalSpeed(RadiansPerSecond.of(Math.PI * 2));
+    swerveDrive,                          // SwerveDrive instance
+    () -> -driverController.getLeftY(),   // forward/back
+    () -> -driverController.getLeftX()    // strafe
+).withControllerRotationAxis(() -> -driverController.getRightX())
+ .withDeadband(0.1)
+ .withMaximumLinearVelocity(MetersPerSecond.of(4.5))
+ .withMaximumAngularVelocity(DegreesPerSecond.of(360));
 
 driveSubsystem.setDefaultCommand(
     driveSubsystem.driveFieldRelativeCommand(driverInput)
 );
 ```
 
-### 6. Seed azimuth encoders at robot init
+### 6. Azimuth encoder seeding
 
-{% hint style="warning" %}
-Call `seedAzimuthEncoder()` on each swerve module during `robotInit()` — not in the subsystem constructor. The absolute encoder needs the robot to be powered and the CAN bus to be settled before the seed is reliable. Calling it too early can result in incorrect starting angles and the robot crabbing on enable.
-{% endhint %}
-
-```java
-// In Robot.java robotInit():
-driveSubsystem.swerveDrive.seedAzimuthEncoders();
-```
+`seedAzimuthEncoder()` is called automatically on each `SwerveModule` during construction. No additional call is required in `robotInit()`. If you need to re-seed after the CAN bus has fully settled, you can call `seedAzimuthEncoder()` on each `SwerveModule` instance individually.
 
 ---
 

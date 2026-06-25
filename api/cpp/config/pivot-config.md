@@ -19,12 +19,14 @@ PivotConfig() = default;
 
 All methods return `PivotConfig&` for chaining.
 
-| Method | Description |
-|--------|-------------|
-| `WithTelemetryName(const std::string& name)` | Name used for SmartDashboard and log entries |
-| `WithMinAngle(units::degree_t angle)` | Minimum allowable mechanism angle |
-| `WithMaxAngle(units::degree_t angle)` | Maximum allowable mechanism angle |
-| `WithSimColor(const frc::Color8Bit& color)` | Color of the simulated pivot ligament |
+> **All methods are optional.** Unlike `ArmConfig`, `PivotConfig` has no simulation-required parameters — a pivot does not use arm length in its physics model.
+
+| Method | Required | Description |
+|--------|----------|-------------|
+| `WithTelemetryName(const std::string& name)` | Optional | Name used for SmartDashboard and log entries |
+| `WithMinAngle(units::degree_t angle)` | Optional | Minimum allowable mechanism angle |
+| `WithMaxAngle(units::degree_t angle)` | Optional | Maximum allowable mechanism angle |
+| `WithSimColor(const frc::Color8Bit& color)` | Optional | Color of the simulated pivot ligament. Defaults to green if not set. |
 
 ---
 
@@ -37,7 +39,7 @@ std::optional<units::degree_t> GetMaxAngle() const;
 frc::Color8Bit GetSimColor() const;
 ```
 
-Getters for optional fields return `std::nullopt` if the corresponding setter was not called.
+Getters for optional fields return `std::nullopt` if the corresponding setter was not called. `GetSimColor()` always returns a value (defaults to green).
 
 ---
 
@@ -45,7 +47,7 @@ Getters for optional fields return `std::nullopt` if the corresponding setter wa
 
 | Exception | Thrown When |
 |-----------|-------------|
-| `exceptions::PivotConfigurationException` | Required fields are missing or invalid when used to construct a `Pivot` |
+| `exceptions::PivotConfigurationException` | Values are invalid when used to construct a `Pivot` (e.g., min angle greater than max angle) |
 
 ---
 

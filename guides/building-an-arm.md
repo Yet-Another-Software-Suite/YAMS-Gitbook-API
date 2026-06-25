@@ -16,9 +16,8 @@ Follow [Configuring a Motor Controller](configuring-a-motor.md) to build the `Sm
 
 ```java
 ArmConfig armConfig = new ArmConfig()
-    .withName("Shoulder")
     .withLength(Meters.of(0.6))
-    .withTelemetry(TelemetryVerbosity.HIGH);
+    .withTelemetry("Shoulder", TelemetryVerbosity.HIGH);
 ```
 
 ### 3. Construct the `Arm`
@@ -40,12 +39,11 @@ public class ShoulderSubsystem extends SubsystemBase {
     public ShoulderSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.Brake)
+            .withIdleMode(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
             .withClosedLoopController(0.5, 0.0, 0.01)
             .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
-            .withMechanismUpperLimit(Degrees.of(90))
-            .withMechanismLowerLimit(Degrees.of(-90))
+            .withSoftLimits(Degrees.of(-90), Degrees.of(90))
             .withStatorCurrentLimit(Amps.of(40))
             .withTelemetry("ShoulderMotor", TelemetryVerbosity.HIGH);
 
@@ -56,9 +54,8 @@ public class ShoulderSubsystem extends SubsystemBase {
         );
 
         ArmConfig armConfig = new ArmConfig()
-            .withName("Shoulder")
             .withLength(Meters.of(0.6))
-            .withTelemetry(TelemetryVerbosity.HIGH);
+            .withTelemetry("Shoulder", TelemetryVerbosity.HIGH);
 
         arm = new Arm(armConfig, motor);
     }

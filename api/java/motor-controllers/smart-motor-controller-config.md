@@ -46,7 +46,9 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withExternalEncoderInverted(boolean inverted)` | `inverted` | Reverses the external encoder reading direction. |
 | `withIdleMode(MotorMode mode)` | `mode` | Sets coast or brake mode. |
 | `withStatorCurrentLimit(Current limit)` | `limit` | Maximum motor output current. |
+| `withOutputCurrentLimit(Current stallCurrent)` | `stallCurrent` | Alias for `withStatorCurrentLimit`. Use when thinking in terms of output current rather than stator current. |
 | `withSupplyCurrentLimit(Current limit)` | `limit` | Maximum current drawn from the battery. |
+| `withInputCurrentLimit(Current supplyCurrent)` | `supplyCurrent` | Alias for `withSupplyCurrentLimit`. Use when thinking in terms of input current rather than supply current. |
 | `withVoltageCompensation(Voltage voltage)` | `voltage` | Enables voltage compensation; normalizes output to this battery voltage. |
 | `withTemperatureCutoff(Temperature temp)` | `temp` | Disables motor output when temperature exceeds this value. |
 | `withOpenLoopRampRate(Time rate)` | `rate` | Time to ramp from 0 to full output in open-loop mode. |

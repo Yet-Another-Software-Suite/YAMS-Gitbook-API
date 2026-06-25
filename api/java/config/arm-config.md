@@ -19,10 +19,12 @@ ArmConfig clone()  // Deep copy
 
 ## Builder Methods
 
+> **Required for simulation:** `withLength()` must be set for `SingleJointedArmSim` to work correctly. All other methods are optional.
+
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withLength(Distance distance)` | `distance` — arm link length | **Required for simulation.** Sets the physical length of the arm link. Used by `SingleJointedArmSim`. |
-| `withHardLimits(Angle min, Angle max)` | `min` — lower bound, `max` — upper bound | Sets the physical rotation limits. The motor controller will not command positions outside these angles. |
+| `withLength(Distance distance)` | `distance` — arm link length | **Required for simulation.** Sets the physical length of the arm link. Used by `SingleJointedArmSim`. Without this, the physics simulation cannot model the arm. |
+| `withHardLimits(Angle min, Angle max)` | `min` — lower bound, `max` — upper bound | Sets the physical rotation limits. The motor controller will not command positions outside these angles. Optional. |
 | `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
 | `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Defaults to a built-in color if not set. Optional. |
 | `withMechanismPositionConfig(MechanismPositionConfig config)` | `config` — position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
