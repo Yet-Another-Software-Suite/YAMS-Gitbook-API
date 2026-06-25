@@ -4,9 +4,10 @@
 
 ***
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Choose your hardware and import vendor libraries
+#### Choose your hardware and import vendor libraries
 
 Identify which motor controller you are using:
 
@@ -15,7 +16,11 @@ Identify which motor controller you are using:
 
 Add the appropriate vendordep to your project before proceeding.
 
-### 2. Create a `SmartMotorControllerConfig` and chain builder methods
+{% endstep %}
+
+{% step %}
+
+#### Create a `SmartMotorControllerConfig` and chain builder methods
 
 `SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and idle mode.
 
@@ -49,7 +54,11 @@ config.WithMotorInverted(false)
       .WithTelemetry("ShoulderMotor", TelemetryVerbosity::HIGH);
 ```
 
-### 3. Construct the concrete motor controller
+{% endstep %}
+
+{% step %}
+
+#### Construct the concrete motor controller
 
 Pass the vendor hardware object, the WPILib `DCMotor` model, and the config to the appropriate constructor.
 
@@ -86,13 +95,20 @@ TalonFXWrapper motor{&talon, frc::DCMotor::KrakenX60(1), &config};
 TalonFXSWrapper motor{&m_talonFXS, DCMotor::NEO(1), MotorArrangement::NEO, &cfg};
 ```
 
-### 4. Pass the result to a mechanism or use it directly
+{% endstep %}
+
+{% step %}
+
+#### Pass the result to a mechanism or use it directly
 
 The returned `SmartMotorController` is ready to hand to `Arm`, `Elevator`, `FlyWheel`, or `SwerveDrive`. See the relevant how-to guide for the next steps.
 
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
+
+{% endstep %}
+{% endstepper %}
 
 ***
 

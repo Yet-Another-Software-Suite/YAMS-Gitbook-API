@@ -21,9 +21,11 @@
 
 ---
 
-## Steps
+{% stepper %}
 
-### 1. Configure drive and azimuth motor controllers
+{% step %}
+
+#### Configure drive and azimuth motor controllers
 
 Each swerve module needs two `SmartMotorController` instances: one for the drive wheel (velocity control) and one for the azimuth (steering angle, position control).
 
@@ -53,7 +55,11 @@ azimuthConfig
 
 Repeat for each module (FR, BL, BR), adjusting the telemetry name and CAN IDs.
 
-### 2. Construct motor controllers
+{% endstep %}
+
+{% step %}
+
+#### Construct motor controllers
 
 ```cpp
 yams::motorcontrollers::remote::TalonFXWrapper driveMotorFL{
@@ -68,7 +74,11 @@ yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
 };
 ```
 
-### 3. Create a `SwerveModuleConfig` for each module
+{% endstep %}
+
+{% step %}
+
+#### Create a `SwerveModuleConfig` for each module
 
 Pass drive and azimuth motor controllers, then set wheel radius, module location (relative to robot center), and absolute encoder offset.
 
@@ -93,7 +103,11 @@ Repeat for `FrontRight`, `BackLeft`, `BackRight` with their positions and offset
 | Back Left | `{ -0.381_m, +0.381_m }` |
 | Back Right | `{ -0.381_m, -0.381_m }` |
 
-### 4. Construct `SwerveModule` instances
+{% endstep %}
+
+{% step %}
+
+#### Construct `SwerveModule` instances
 
 ```cpp
 yams::mechanisms::swerve::SwerveModule frontLeft{&frontLeftModuleConfig};
@@ -102,7 +116,11 @@ yams::mechanisms::swerve::SwerveModule backLeft{&backLeftModuleConfig};
 yams::mechanisms::swerve::SwerveModule backRight{&backRightModuleConfig};
 ```
 
-### 5. Create a `SwerveDriveConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create a `SwerveDriveConfig`
 
 Collect the four modules, set kinematic limits, and provide a gyro supplier.
 
@@ -119,7 +137,11 @@ driveConfig
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 ```
 
-### 6. Construct `SwerveDrive`
+{% endstep %}
+
+{% step %}
+
+#### Construct `SwerveDrive`
 
 The template parameter must match the number of modules passed to `WithModules`:
 
@@ -127,7 +149,11 @@ The template parameter must match the number of modules passed to `WithModules`:
 yams::mechanisms::swerve::SwerveDrive<4> swerveDrive{&driveConfig};
 ```
 
-### 7. Integrate into a subsystem
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a subsystem
 
 ```cpp
 class DriveSubsystem : public frc2::SubsystemBase {
@@ -159,7 +185,11 @@ private:
 };
 ```
 
-### 8. Set up driver input with `SwerveInputStream`
+{% endstep %}
+
+{% step %}
+
+#### Set up driver input with `SwerveInputStream`
 
 `SwerveInputStream<4>` translates raw joystick axes into `frc::ChassisSpeeds`. Pass the `SwerveDrive` reference as the first argument, then set a rotation axis with `WithControllerRotationAxis`.
 
@@ -183,7 +213,11 @@ driveSubsystem_->SetDefaultCommand(
 );
 ```
 
-### 9. Heading-snap mode (optional)
+{% endstep %}
+
+{% step %}
+
+#### Heading-snap mode (optional)
 
 Clone the input stream to add heading control without affecting the base stream:
 
@@ -197,7 +231,11 @@ yams::mechanisms::swerve::utility::SwerveInputStream<4> headingInput =
     .WithHeadingControl([&] { return driverController_.GetRightStickButton(); });
 ```
 
-### 10. Azimuth encoder seeding
+{% endstep %}
+
+{% step %}
+
+#### Azimuth encoder seeding
 
 Azimuth encoders are seeded automatically during `SwerveModule` construction. If you need to re-seed after the CAN bus has fully settled (e.g., in `Robot::RobotInit`), call `SeedAzimuthEncoder()` on each module:
 
@@ -207,6 +245,10 @@ frontRight.SeedAzimuthEncoder();
 backLeft.SeedAzimuthEncoder();
 backRight.SeedAzimuthEncoder();
 ```
+
+{% endstep %}
+
+{% endstepper %}
 
 ---
 

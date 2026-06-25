@@ -27,7 +27,11 @@ Include the main YAMS header or the specific mechanism headers:
 
 ## Building an Arm
 
-### 1. Configure the `SmartMotorControllerConfig`
+{% stepper %}
+
+{% step %}
+
+#### Configure the `SmartMotorControllerConfig`
 
 Use `WithArmFeedforward` and angular position limits. The motor config must know the gear ratio for accurate position tracking.
 
@@ -46,7 +50,11 @@ motorConfig
     .WithTelemetry("ShoulderMotor");
 ```
 
-### 2. Construct the motor controller
+{% endstep %}
+
+{% step %}
+
+#### Construct the motor controller
 
 ```cpp
 yams::motorcontrollers::local::SparkWrapper motor{
@@ -56,7 +64,11 @@ yams::motorcontrollers::local::SparkWrapper motor{
 };
 ```
 
-### 3. Create an `ArmConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create an `ArmConfig`
 
 `WithArmLength` is required for simulation. All other fields are optional.
 
@@ -69,13 +81,21 @@ armConfig
     .WithTelemetryName("Shoulder");
 ```
 
-### 4. Construct the `Arm`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `Arm`
 
 ```cpp
 yams::mechanisms::positional::Arm arm{&armConfig, &motor};
 ```
 
-### 5. Integrate into a subsystem
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a subsystem
 
 ```cpp
 class ShoulderSubsystem : public frc2::SubsystemBase {
@@ -129,6 +149,10 @@ private:
 };
 ```
 
+{% endstep %}
+
+{% endstepper %}
+
 ### Command Factories & Triggers
 
 | Method | Returns | Description |
@@ -145,7 +169,11 @@ private:
 
 ## Building an Elevator
 
-### 1. Configure the motor for linear travel
+{% stepper %}
+
+{% step %}
+
+#### Configure the motor for linear travel
 
 Drum circumference converts rotations to linear distance. Set it on `SmartMotorControllerConfig`.
 
@@ -165,7 +193,11 @@ motorConfig
 
 > **Note:** `WithCascadingElevatorStages(int stages)` is available on `SmartMotorControllerConfig` for multi-stage elevators. Drum radius and stage count do NOT go on `ElevatorConfig`.
 
-### 2. Create an `ElevatorConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create an `ElevatorConfig`
 
 `WithCarriageMass` is required for simulation. Height limits are optional but recommended.
 
@@ -178,13 +210,21 @@ elevatorConfig
     .WithTelemetryName("Elevator");
 ```
 
-### 3. Construct the `Elevator`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `Elevator`
 
 ```cpp
 yams::mechanisms::positional::Elevator elevator{&elevatorConfig, &motor};
 ```
 
-### 4. Command Factories & Triggers
+{% endstep %}
+
+{% step %}
+
+#### Command Factories & Triggers
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -200,13 +240,21 @@ void Periodic() override { elevator_.UpdateTelemetry(); }
 void SimulationPeriodic() override { elevator_.SimIterate(); }
 ```
 
+{% endstep %}
+
+{% endstepper %}
+
 ---
 
 ## Building a Pivot
 
 A `Pivot` is a single-jointed rotational mechanism (similar to `Arm`) without a load-bearing arm length. Use it for wrist joints, turrets, or any rotation that doesn't require an arm-length-based MOI estimate.
 
-### 1. Configure the motor
+{% stepper %}
+
+{% step %}
+
+#### Configure the motor
 
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
@@ -221,7 +269,11 @@ motorConfig
     .WithTelemetry("WristMotor");
 ```
 
-### 2. Create a `PivotConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create a `PivotConfig`
 
 ```cpp
 yams::mechanisms::config::PivotConfig pivotConfig;
@@ -231,13 +283,21 @@ pivotConfig
     .WithTelemetryName("Wrist");
 ```
 
-### 3. Construct the `Pivot`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `Pivot`
 
 ```cpp
 yams::mechanisms::positional::Pivot pivot{&pivotConfig, &motor};
 ```
 
-### 4. Command Factories & Triggers
+{% endstep %}
+
+{% step %}
+
+#### Command Factories & Triggers
 
 Same interface as `Arm` — `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Max()`, `Min()`.
 
@@ -245,6 +305,10 @@ Same interface as `Arm` — `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `M
 void Periodic() override { pivot_.UpdateTelemetry(); }
 void SimulationPeriodic() override { pivot_.SimIterate(); }
 ```
+
+{% endstep %}
+
+{% endstepper %}
 
 ---
 

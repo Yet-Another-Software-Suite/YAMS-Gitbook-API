@@ -4,9 +4,10 @@
 
 ---
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Provide physical parameters in the mechanism config
+#### Provide physical parameters in the mechanism config
 
 YAMS builds its simulation model from fields in `ArmConfig`, `ElevatorConfig`, or `FlyWheelConfig`. Set the fields that match your mechanism's geometry and mass:
 
@@ -18,7 +19,11 @@ YAMS builds its simulation model from fields in `ArmConfig`, `ElevatorConfig`, o
 
 You do not need to manually construct a sim supplier. YAMS creates `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier` automatically when the required fields are present.
 
-### 2. Optionally override the sim supplier
+{% endstep %}
+
+{% step %}
+
+#### Optionally override the sim supplier
 
 If you need a custom physics model, call `.withSimSupplier(SimSupplier)` on the `SmartMotorControllerConfig`. This overrides YAMS's automatic supplier. For most use cases this is not needed.
 
@@ -27,7 +32,11 @@ If you need a custom physics model, call `.withSimSupplier(SimSupplier)` on the 
 motorConfig.withSimSupplier(myCustomSimSupplier);
 ```
 
-### 3. Call `simIterate()` from `simulationPeriodic()`
+{% endstep %}
+
+{% step %}
+
+#### Call `simIterate()` from `simulationPeriodic()`
 
 `simIterate()` advances the physics model by one 20 ms loop and writes the simulated sensor values back to the motor controller.
 
@@ -38,7 +47,11 @@ public void simulationPeriodic() {
 }
 ```
 
-### 4. Call `updateTelemetry()` from `periodic()`
+{% endstep %}
+
+{% step %}
+
+#### Call `updateTelemetry()` from `periodic()`
 
 `updateTelemetry()` publishes current state — both real and simulated — to NetworkTables so Glass and Shuffleboard reflect simulated values.
 
@@ -49,9 +62,16 @@ public void periodic() {
 }
 ```
 
-### 5. View the Mechanism2d visualization in Glass
+{% endstep %}
+
+{% step %}
+
+#### View the Mechanism2d visualization in Glass
 
 YAMS publishes a `Mechanism2d` object under the subsystem's NetworkTables key. In Glass, open **NetworkTables** and navigate to the mechanism name you set in the config (e.g., `"Shoulder"`). Select **Mechanism2d** to see the live visualization.
+
+{% endstep %}
+{% endstepper %}
 
 ---
 

@@ -4,13 +4,18 @@
 
 ---
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Create and configure the `SmartMotorController`
+#### Create and configure the `SmartMotorController`
 
 Follow [Configuring a Motor Controller](configuring-a-motor.md) to build the `SmartMotorController` for your arm joint. Use `ArmFeedforward` in the config and set mechanism limits that match your physical range of motion.
 
-### 2. Create an `ArmConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create an `ArmConfig`
 
 `ArmConfig` describes the physical arm and its telemetry. Arm length is required for simulation.
 
@@ -20,13 +25,21 @@ ArmConfig armConfig = new ArmConfig()
     .withTelemetry("Shoulder", TelemetryVerbosity.HIGH);
 ```
 
-### 3. Construct the `Arm`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `Arm`
 
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
 
-### 4. Integrate into a `SubsystemBase`
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a `SubsystemBase`
 
 Expose command factories and triggers from the subsystem. `setAngle` moves to a fixed position; `runTo` moves and holds until a tolerance condition is met.
 
@@ -86,7 +99,11 @@ public class ShoulderSubsystem extends SubsystemBase {
 }
 ```
 
-### 5. Wire up triggers
+{% endstep %}
+
+{% step %}
+
+#### Wire up triggers
 
 `Arm` exposes `isNear(angle, tolerance)`, `max()`, and `min()` as `Trigger` factories. Bind them in your `RobotContainer` or use them to gate commands.
 
@@ -95,6 +112,9 @@ public class ShoulderSubsystem extends SubsystemBase {
 Trigger atStow  = shoulder.arm.isNear(Degrees.of(-90), Degrees.of(2));
 Trigger atScore = shoulder.arm.isNear(Degrees.of(45),  Degrees.of(2));
 ```
+
+{% endstep %}
+{% endstepper %}
 
 ---
 
