@@ -55,9 +55,9 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Front Left ---
         SmartMotorControllerConfig driveConfigFL = new SmartMotorControllerConfig(this)
-            .withIdleMode(MotorMode.Brake)
+            .withIdleMode(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromRatio(6.75)))
-            .withVelocityPID(0.1, 0.0, 0.0)
+            .withClosedLoopController(0.1, 0.0, 0.0)
             .withFeedforward(new SimpleMotorFeedforward(0.12, 2.2, 0.3))
             .withStatorCurrentLimit(Amps.of(60));
 
