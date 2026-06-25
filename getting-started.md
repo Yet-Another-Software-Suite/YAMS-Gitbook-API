@@ -60,6 +60,11 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         arm.updateTelemetry();
     }
+
+    @Override
+    public void simulationPeriodic() {
+        arm.simIterate();
+    }
 }
 ```
 
@@ -93,6 +98,7 @@ public:
     }
 
     void Periodic() override { arm->UpdateTelemetry(); }
+    void SimulationPeriodic() override { arm->SimIterate(); }
 
 private:
     rev::spark::SparkMax m_sparkMax{Constants::kArmCanId,
