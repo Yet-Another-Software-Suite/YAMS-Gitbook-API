@@ -90,6 +90,18 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 ---
 
+## Examples
+
+The `simple_arm` example demonstrates physics simulation with `simIterate()` and a `Mechanism2d` display:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java" %}
+
+The `simple_elevator` example shows the same pattern for linear mechanisms:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java" %}
+
+---
+
 ## Related pages
 
 - [ArmConfig](../api/java/config/arm-config.md)

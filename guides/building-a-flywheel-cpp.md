@@ -166,6 +166,14 @@ shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 
 ---
 
+## Examples
+
+Complete C++ implementations from the `cpptest` reference project:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ShooterSubsystem.cpp" %}
+
+---
+
 ## Related Pages
 
 - [FlyWheel (C++)](../api/cpp/mechanisms/flywheel.md)

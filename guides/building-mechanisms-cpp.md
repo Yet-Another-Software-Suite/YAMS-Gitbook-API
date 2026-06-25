@@ -260,6 +260,18 @@ void SimulationPeriodic() override { pivot_.SimIterate(); }
 
 ---
 
+## Examples
+
+Complete C++ implementations from the `cpptest` reference project:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ArmSubsystem.cpp" %}
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ElevatorSubsystem.cpp" %}
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/TurretSubsystem.cpp" %}
+
+---
+
 ## Related Pages
 
 - [Arm (C++)](../api/cpp/mechanisms/arm.md)

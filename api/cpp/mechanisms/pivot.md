@@ -98,6 +98,8 @@ positional::Pivot pivot{&pivotConfig, motor};
 frc2::CommandPtr aimCmd = pivot.RunTo(30_deg);
 ```
 
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/TurretSubsystem.cpp" %}
+
 ---
 
 ## See Also
