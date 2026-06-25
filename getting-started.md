@@ -36,21 +36,29 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-            .withGearing(Constants.ARM_GEARING);
+            .withIdleMode(MotorMode.BRAKE)
+            .withGearing(Constants.ARM_GEARING)
+            .withClosedLoopController(0.5, 0.0, 0.01)
+            .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
+            .withSoftLimits(Degrees.of(-90), Degrees.of(90))
+            .withMomentOfInertia(Meters.of(0.6), Kilograms.of(2.0))
+            .withStatorCurrentLimit(Amps.of(40))
+            .withClosedLoopTolerance(Degrees.of(2));
         SmartMotorController motor = new SparkWrapper(
             new SparkMax(Constants.ARM_CAN_ID, MotorType.kBrushless),
             DCMotor.getNEO(1),
             motorConfig
         );
         ArmConfig config = new ArmConfig()
-            .withName("Arm")
-            .withTolerance(Degrees.of(2));
+            .withLength(Meters.of(0.6))
+            .withHardLimits(Degrees.of(-90), Degrees.of(90))
+            .withTelemetry("Arm", TelemetryVerbosity.HIGH);
         arm = new Arm(config, motor);
     }
 
     @Override
     public void periodic() {
-        arm.periodic();
+        arm.updateTelemetry();
     }
 }
 ```
@@ -67,13 +75,24 @@ public class ArmSubsystem extends SubsystemBase {
 class ArmSubsystem : public frc2::SubsystemBase {
 public:
     ArmSubsystem() {
-        motorConfig.WithSubsystem(this).WithGearing(Constants::kArmGearing);
+        motorConfig
+            .WithSubsystem(this)
+            .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+            .WithMotorGearing(Constants::kArmGearing)
+            .WithFeedback(0.5, 0.0, 0.01)
+            .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)
+            .WithMechanismLimits(-90_deg, 90_deg)
+            .WithMOI(0.6_m, 2.0_kg)
+            .WithStatorCurrentLimit(40_A);
         motor.emplace(&m_sparkMax, frc::DCMotor::NEO(1), &motorConfig);
-        armConfig.WithName("Arm").WithTolerance(2_deg);
+        armConfig.WithArmLength(0.6_m)
+                 .WithMinAngle(-90_deg)
+                 .WithMaxAngle(90_deg)
+                 .WithTelemetryName("Arm");
         arm.emplace(&armConfig, &motor.value());
     }
 
-    void Periodic() override { arm->Periodic(); }
+    void Periodic() override { arm->UpdateTelemetry(); }
 
 private:
     rev::spark::SparkMax m_sparkMax{Constants::kArmCanId,
