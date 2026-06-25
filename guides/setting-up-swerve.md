@@ -4,15 +4,20 @@
 
 ---
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Configure drive and azimuth motor controllers for each module
+#### Configure drive and azimuth motor controllers for each module
 
 Each swerve module needs two `SmartMotorController` instances: one for drive (velocity) and one for azimuth (position). Follow [Configuring a Motor Controller](configuring-a-motor.md) for each.
 
 Drive controllers use velocity PID and a `SimpleMotorFeedforward`. Azimuth controllers use position PID and optionally a `SimpleMotorFeedforward` for friction compensation.
 
-### 2. Create a `SwerveModuleConfig` for each module
+{% endstep %}
+
+{% step %}
+
+#### Create a `SwerveModuleConfig` for each module
 
 Pass the drive and azimuth motor controllers into the `SwerveModuleConfig` constructor. Then set the wheel radius, the module's location relative to the robot center, and the absolute encoder.
 
@@ -26,7 +31,11 @@ SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(driveMotorFL, azimut
 
 Repeat for `FrontRight`, `BackLeft`, and `BackRight`, adjusting the `Translation2d` signs and encoder offsets.
 
-### 3. Build `SwerveModule` instances and create a `SwerveDriveConfig`
+{% endstep %}
+
+{% step %}
+
+#### Build `SwerveModule` instances and create a `SwerveDriveConfig`
 
 Wrap each `SwerveModuleConfig` in a `SwerveModule`, then collect the four modules into a `SwerveDriveConfig`. Pass the subsystem and all four modules in the constructor, then set kinematic limits and the gyro supplier.
 
@@ -44,7 +53,11 @@ SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft, frontRigh
     .withTelemetry(TelemetryVerbosity.HIGH);
 ```
 
-### 4. Construct `SwerveDrive` and wire command factories
+{% endstep %}
+
+{% step %}
+
+#### Construct `SwerveDrive` and wire command factories
 
 ```java
 public class DriveSubsystem extends SubsystemBase {
@@ -127,7 +140,11 @@ public class DriveSubsystem extends SubsystemBase {
 }
 ```
 
-### 5. Set up driver input with `SwerveInputStream`
+{% endstep %}
+
+{% step %}
+
+#### Set up driver input with `SwerveInputStream`
 
 `SwerveInputStream` translates raw joystick axes into swerve chassis speeds, applying deadbands and rate limits. Pass the `SwerveDrive` instance as the first argument to `SwerveInputStream.of()`. Rotation is set separately via `.withControllerRotationAxis()`.
 
@@ -146,17 +163,24 @@ driveSubsystem.setDefaultCommand(
 );
 ```
 
-### 6. Azimuth encoder seeding
+{% endstep %}
+
+{% step %}
+
+#### Azimuth encoder seeding
 
 `seedAzimuthEncoder()` is called automatically on each `SwerveModule` during construction. No additional call is required in `robotInit()`. If you need to re-seed after the CAN bus has fully settled, you can call `seedAzimuthEncoder()` on each `SwerveModule` instance individually.
+
+{% endstep %}
+{% endstepper %}
 
 ---
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive/java/frc/robot/subsystems/SwerveSubsystem.java#L176-L215" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive/java/frc/robot/subsystems/SwerveSubsystem.java" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java#L163-L190" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java" %}
 
 ---
 

@@ -207,3 +207,9 @@ Call `simIterate()` from your `simulationPeriodic()` method. Call `updateTelemet
 - [PivotConfig](../config/pivot-config.md)
 - [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md)
 - [C++ Pivot](../../cpp/mechanisms/pivot.md)
+
+## Examples
+
+The `simple_robot` example includes a Turret subsystem implemented with `Pivot`:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_robot/src/main/java/frc/robot/subsystems/TurretSubsystem.java" %}

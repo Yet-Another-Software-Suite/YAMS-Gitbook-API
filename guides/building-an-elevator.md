@@ -4,9 +4,10 @@
 
 ---
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Configure the motor for linear travel
+#### Configure the motor for linear travel
 
 The motor config must account for how rotations convert to linear distance. Either:
 
@@ -33,7 +34,11 @@ SmartMotorController motor = new TalonFXWrapper(
 );
 ```
 
-### 2. Create an `ElevatorConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create an `ElevatorConfig`
 
 Carriage weight is required for simulation to model gravity correctly. Drum radius and cascade stage count are configured on `SmartMotorControllerConfig` (see step 1).
 
@@ -48,13 +53,21 @@ ElevatorConfig elevatorConfig = new ElevatorConfig()
 Carriage weight is required for simulation. Without it, `simIterate()` cannot model gravity and the elevator will behave like a frictionless flywheel in sim. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
 {% endhint %}
 
-### 3. Construct the `Elevator`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `Elevator`
 
 ```java
 Elevator elevator = new Elevator(elevatorConfig, motor);
 ```
 
-### 4. Integrate into a `SubsystemBase`
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a `SubsystemBase`
 
 ```java
 public class ElevatorSubsystem extends SubsystemBase {
@@ -115,7 +128,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 }
 ```
 
-### 5. Wire up triggers
+{% endstep %}
+
+{% step %}
+
+#### Wire up triggers
 
 `Elevator` exposes `gte(height)` and `lte(height)` triggers. Use them to gate game piece actions.
 
@@ -124,13 +141,16 @@ Trigger atBottom = elevatorSubsystem.elevator.lte(Meters.of(0.05));
 Trigger atScore  = elevatorSubsystem.elevator.gte(Meters.of(1.0));
 ```
 
+{% endstep %}
+{% endstepper %}
+
 ---
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java#L113-L126" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_elevator/java/frc/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java#L134-L146" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_elevator/java/frc/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java" %}
 
 ---
 

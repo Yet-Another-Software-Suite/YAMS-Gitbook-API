@@ -18,9 +18,11 @@
 
 ---
 
-## Steps
+{% stepper %}
 
-### 1. Configure the motor for velocity control
+{% step %}
+
+#### Configure the motor for velocity control
 
 Use `WithFeedback` for velocity PID and `WithSimpleFeedforward` for steady-state tracking. Set the idle mode to `COAST` so the wheel decelerates freely.
 
@@ -39,7 +41,11 @@ motorConfig
 
 > **Simulation note:** `WithMOI(radius, mass)` sets the moment of inertia for physics simulation. It belongs on `SmartMotorControllerConfig`, not on `FlyWheelConfig`.
 
-### 2. Construct the motor controller
+{% endstep %}
+
+{% step %}
+
+#### Construct the motor controller
 
 ```cpp
 yams::motorcontrollers::remote::TalonFXWrapper motor{
@@ -49,7 +55,11 @@ yams::motorcontrollers::remote::TalonFXWrapper motor{
 };
 ```
 
-### 3. Create a `FlyWheelConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create a `FlyWheelConfig`
 
 `WithRollerDiameter` enables surface speed calculations. All fields are optional.
 
@@ -64,13 +74,21 @@ flywheelConfig
 Moment of inertia is set on `SmartMotorControllerConfig` via `WithMOI()`, not on `FlyWheelConfig`. `FlyWheelConfig` only holds the roller diameter, telemetry name, and sim color.
 {% endhint %}
 
-### 4. Construct the `FlyWheel`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `FlyWheel`
 
 ```cpp
 yams::mechanisms::velocity::FlyWheel flyWheel{&flywheelConfig, &motor};
 ```
 
-### 5. Integrate into a subsystem
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a subsystem
 
 ```cpp
 class ShooterSubsystem : public frc2::SubsystemBase {
@@ -128,7 +146,11 @@ private:
 };
 ```
 
-### 6. Command Factories & Triggers
+{% endstep %}
+
+{% step %}
+
+#### Command Factories & Triggers
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -139,7 +161,11 @@ private:
 | `Gte(degrees_per_second_t velocity)` | `Trigger` | True when speed ≥ threshold |
 | `Lte(degrees_per_second_t velocity)` | `Trigger` | True when speed ≤ threshold |
 
-### 7. Sequencing shooter commands
+{% endstep %}
+
+{% step %}
+
+#### Sequencing shooter commands
 
 Use `RunTo` to block until the wheel is at speed before feeding:
 
@@ -154,6 +180,10 @@ Or bind the `ReadyToShoot()` trigger to allow feeding whenever the wheel is up:
 shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 ```
 
+{% endstep %}
+
+{% endstepper %}
+
 ---
 
 ## Notes
@@ -163,6 +193,14 @@ shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 
 `IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance — use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready.
 {% endhint %}
+
+---
+
+## Examples
+
+Complete C++ implementations from the `cpptest` reference project:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ShooterSubsystem.cpp" %}
 
 ---
 

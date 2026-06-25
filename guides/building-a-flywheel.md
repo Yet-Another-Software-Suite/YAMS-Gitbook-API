@@ -4,9 +4,10 @@
 
 ---
 
-## Steps
+{% stepper %}
+{% step %}
 
-### 1. Configure the motor for velocity control
+#### Configure the motor for velocity control
 
 Use `withClosedLoopController` for the closed-loop PID and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
 
@@ -28,7 +29,11 @@ SmartMotorController motor = new TalonFXWrapper(
 );
 ```
 
-### 2. Create a `FlyWheelConfig`
+{% endstep %}
+
+{% step %}
+
+#### Create a `FlyWheelConfig`
 
 Wheel diameter is used for linear velocity conversion. Moment of inertia (for simulation) is set on `SmartMotorControllerConfig` via `withMomentOfInertia`.
 
@@ -38,13 +43,21 @@ FlyWheelConfig flywheelConfig = new FlyWheelConfig()
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
 
-### 3. Construct the `FlyWheel`
+{% endstep %}
+
+{% step %}
+
+#### Construct the `FlyWheel`
 
 ```java
 FlyWheel flyWheel = new FlyWheel(flywheelConfig, motor);
 ```
 
-### 4. Integrate into a `SubsystemBase`
+{% endstep %}
+
+{% step %}
+
+#### Integrate into a `SubsystemBase`
 
 ```java
 public class ShooterSubsystem extends SubsystemBase {
@@ -106,7 +119,11 @@ public class ShooterSubsystem extends SubsystemBase {
 }
 ```
 
-### 5. Sequence shooter commands
+{% endstep %}
+
+{% step %}
+
+#### Sequence shooter commands
 
 Use `runTo` to block until the wheel is at speed before feeding a game piece:
 
@@ -121,6 +138,9 @@ Or bind the `readyToShoot()` trigger to allow feeding at any time once the wheel
 shooter.readyToShoot().whileTrue(indexer.feedCommand());
 ```
 
+{% endstep %}
+{% endstepper %}
+
 ---
 
 ## Notes
@@ -133,9 +153,9 @@ shooter.readyToShoot().whileTrue(indexer.feedCommand());
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java#L150-L156" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/hooded_shooter/java/frc/robot/subsystems/FlywheelSubsystem.java#L102-L109" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/hooded_shooter/java/frc/robot/subsystems/FlywheelSubsystem.java" %}
 
 ---
 

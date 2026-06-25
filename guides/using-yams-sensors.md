@@ -288,6 +288,12 @@ The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Re
 
 ---
 
+## Examples
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java" %}
+
+---
+
 ## Related Pages
 
 - [SensorConfig (Java)](../api/java/config/sensor-config.md)
