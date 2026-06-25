@@ -45,6 +45,8 @@
 * [Units & Utilities](api/java/units/README.md)
   * [YUnits](api/java/units/yunits.md)
   * [EasyCRT](api/java/units/easy-crt.md)
+* [Simulation](api/java/simulation/sensor.md)
+  * [Sensor](api/java/simulation/sensor.md)
 * [Exceptions](api/java/exceptions.md)
 
 ## C++ API
@@ -81,6 +83,8 @@
   * [DerivativeTimeFilter](api/cpp/math/derivative-time-filter.md)
 * [Units & Utilities](api/cpp/units/README.md)
   * [EasyCRT](api/cpp/units/easy-crt.md)
+* [Simulation](api/cpp/simulation/sensor.md)
+  * [Sensor](api/cpp/simulation/sensor.md)
 * [Exceptions](api/cpp/exceptions.md)
 
 ## Guides
@@ -94,4 +98,5 @@
 * [Building Positional Mechanisms (C++)](guides/building-mechanisms-cpp.md)
 * [Building a Flywheel Subsystem (C++)](guides/building-a-flywheel-cpp.md)
 * [Setting Up Swerve Drive (C++)](guides/setting-up-swerve-cpp.md)
+* [Using YAMS Sensors](guides/using-yams-sensors.md)
 * [Simulation](guides/simulation.md)
