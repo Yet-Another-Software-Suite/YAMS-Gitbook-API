@@ -43,7 +43,8 @@ public class ArmSubsystem extends SubsystemBase {
             .withSoftLimits(Degrees.of(-90), Degrees.of(90))
             .withMomentOfInertia(Meters.of(0.6), Kilograms.of(2.0))
             .withStatorCurrentLimit(Amps.of(40))
-            .withClosedLoopTolerance(Degrees.of(2));
+            .withClosedLoopTolerance(Degrees.of(2))
+            .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH);
         SmartMotorController motor = new SparkWrapper(
             new SparkMax(Constants.ARM_CAN_ID, MotorType.kBrushless),
             DCMotor.getNEO(1),
@@ -88,7 +89,8 @@ public:
             .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)
             .WithMechanismLimits(-90_deg, 90_deg)
             .WithMOI(0.6_m, 2.0_kg)
-            .WithStatorCurrentLimit(40_A);
+            .WithStatorCurrentLimit(40_A)
+            .WithTelemetry("ArmMotor", yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
         motor.emplace(&m_sparkMax, frc::DCMotor::NEO(1), &motorConfig);
         armConfig.WithArmLength(0.6_m)
                  .WithMinAngle(-90_deg)
