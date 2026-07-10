@@ -33,16 +33,18 @@ Include the main YAMS header or the specific mechanism headers:
 
 #### Configure the `SmartMotorControllerConfig`
 
-Use `WithArmFeedforward` and angular position limits. The motor config must know the gear ratio for accurate position tracking.
+Use `WithFeedforward(const frc::ArmFeedforward&)` and angular position limits. The motor config must know the gear ratio for accurate position tracking.
 
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
     .WithMotorInverted(false)
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth(14, 72)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
     .WithFeedback(0.5, 0.0, 0.01)
-    .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)   // kS, kV, kA, kG
+    .WithFeedforward(frc::ArmFeedforward{           // kS, kG, kV, kA
+        0.1_V, 0.0_V, units::unit_t<frc::ArmFeedforward::kv_unit>{0.5},
+        units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}})
     .WithMechanismLimits(-90_deg, 90_deg)
     .WithStatorCurrentLimit(40_A)
     .WithMOI(0.6_m, 2.0_kg)                     // arm length, arm mass — required for simulation
@@ -60,7 +62,7 @@ motorConfig
 yams::motorcontrollers::local::SparkWrapper motor{
     new rev::spark::SparkMax(1, rev::spark::SparkLowLevel::MotorType::kBrushless),
     frc::DCMotor::NEO(1),
-    motorConfig
+    &motorConfig
 };
 ```
 
@@ -104,9 +106,11 @@ public:
         motorConfig_
             .WithMotorInverted(false)
             .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-            .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth(14, 72)))
+            .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
             .WithFeedback(0.5, 0.0, 0.01)
-            .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)
+            .WithFeedforward(frc::ArmFeedforward{
+                0.1_V, 0.0_V, units::unit_t<frc::ArmFeedforward::kv_unit>{0.5},
+                units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}})
             .WithMechanismLimits(-90_deg, 90_deg)
             .WithStatorCurrentLimit(40_A)
             .WithMOI(0.6_m, 2.0_kg)
@@ -142,7 +146,7 @@ private:
     yams::motorcontrollers::local::SparkWrapper motor_{
         new rev::spark::SparkMax(1, rev::spark::SparkLowLevel::MotorType::kBrushless),
         frc::DCMotor::NEO(1),
-        motorConfig_
+        &motorConfig_
     };
     yams::mechanisms::config::ArmConfig armConfig_;
     yams::mechanisms::positional::Arm arm_{&armConfig_, &motor_};
@@ -181,17 +185,19 @@ Drum circumference converts rotations to linear distance. Set it on `SmartMotorC
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(9.0)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(9.0))
     .WithMechanismCircumference(units::meter_t{2 * std::numbers::pi * 0.025})  // 2π × drum radius
     .WithFeedback(1.2, 0.0, 0.05)
-    .WithElevatorFeedforward(0.1, 0.4, 0.02)   // kS, kV, kA
+    .WithFeedforward(frc::ElevatorFeedforward{      // kS, kG, kV, kA
+        0.1_V, 0.0_V, units::unit_t<frc::ElevatorFeedforward::kv_unit>{0.4},
+        units::unit_t<frc::ElevatorFeedforward::ka_unit>{0.02}})
     .WithMeasurementLimits(0.0_m, 1.2_m)
     .WithStatorCurrentLimit(60_A)
     .WithSubsystem(this)
     .WithTelemetry("ElevatorMotor");
 ```
 
-> **Note:** `WithCascadingElevatorStages(int stages)` is available on `SmartMotorControllerConfig` for multi-stage elevators. Drum radius and stage count do NOT go on `ElevatorConfig`.
+> **Note:** Drum radius does NOT go on `ElevatorConfig` — it's set on `SmartMotorControllerConfig` via `WithMechanismCircumference`.
 
 {% endstep %}
 
@@ -260,9 +266,10 @@ A `Pivot` is a single-jointed rotational mechanism (similar to `Arm`) without a 
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(60.0)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(60.0))
     .WithFeedback(4.0, 0.0, 0.1)
-    .WithSimpleFeedforward(0.05, 0.1)
+    .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
+        0.05_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.1}})
     .WithMechanismLimits(0_deg, 180_deg)
     .WithStatorCurrentLimit(30_A)
     .WithSubsystem(this)

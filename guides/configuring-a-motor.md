@@ -48,7 +48,9 @@ config.WithMotorInverted(false)
       .WithMotorGearing(gearing::MechanismGearing{
           gearing::GearBox::FromTeeth({14, 72})})
       .WithFeedback(0.5, 0.0, 0.01)
-      .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)
+      .WithFeedforward(frc::ArmFeedforward{0.1_V, 0.0_V,
+                                           units::unit_t<frc::ArmFeedforward::kv_unit>{0.5},
+                                           units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}})
       .WithMechanismLimits(-90_deg, 90_deg)
       .WithStatorCurrentLimit(40_A)
       .WithTelemetry("ShoulderMotor", TelemetryVerbosity::HIGH);
