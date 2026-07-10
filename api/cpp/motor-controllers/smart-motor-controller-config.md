@@ -46,16 +46,9 @@
 | Method | Description |
 |--------|-------------|
 | `WithFeedback(double kP, double kI, double kD, ClosedLoopControllerSlot slot = SLOT_0)` | Set position PID gains |
-| `WithKp(double kP, ClosedLoopControllerSlot slot)` | Set proportional gain |
-| `WithKi(double kI, ClosedLoopControllerSlot slot)` | Set integral gain |
-| `WithKd(double kD, ClosedLoopControllerSlot slot)` | Set derivative gain |
-| `WithArmFeedforward(double kS, double kV, double kA, double kG, ClosedLoopControllerSlot slot)` | Arm feedforward (gravity as a function of angle) |
-| `WithElevatorFeedforward(double kS, double kV, double kA, ClosedLoopControllerSlot slot)` | Elevator feedforward (constant gravity load) |
-| `WithSimpleFeedforward(double kS, double kV, double kA = 0.0, ClosedLoopControllerSlot slot)` | Simple motor feedforward |
-| `WithKs(double kS, ClosedLoopControllerSlot slot)` | Set static feedforward gain |
-| `WithKv(double kV, ClosedLoopControllerSlot slot)` | Set velocity feedforward gain |
-| `WithKa(double kA, ClosedLoopControllerSlot slot)` | Set acceleration feedforward gain |
-| `WithKg(double kG, ClosedLoopControllerSlot slot)` | Set gravity feedforward gain |
+| `WithFeedforward(const frc::ArmFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)` | Arm feedforward (gravity as a function of angle) |
+| `WithFeedforward(const frc::ElevatorFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)` | Elevator feedforward (constant gravity load) |
+| `WithFeedforward(const frc::SimpleMotorFeedforward<units::turns>& ff, ClosedLoopControllerSlot slot = SLOT_0)` | Simple motor feedforward |
 | `WithLQR(const math::LQRConfig& lqrConfig, ClosedLoopControllerSlot slot)` | LQR controller in place of PID |
 
 ---
@@ -166,7 +159,10 @@ config.WithMotorInverted(false)
       .WithMotorGearing(gearing::MechanismGearing{
           gearing::GearBox::FromTeeth({14, 72})})
       .WithFeedback(0.5, 0.0, 0.0)
-      .WithArmFeedforward(0.1, 0.5, 0.01, 0.0, ClosedLoopControllerSlot::SLOT_0)
+      .WithFeedforward(frc::ArmFeedforward{0.1_V, 0.0_V,
+                                          units::unit_t<frc::ArmFeedforward::kv_unit>{0.5},
+                                          units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}},
+                       ClosedLoopControllerSlot::SLOT_0)
       .WithMechanismLimits(-90_deg, 90_deg)
       .WithIdleMode(MotorMode::BRAKE)
       .WithTelemetry("ArmMotor", TelemetryVerbosity::HIGH);

@@ -24,7 +24,7 @@
 
 #### Configure the motor for velocity control
 
-Use `WithFeedback` for velocity PID and `WithSimpleFeedforward` for steady-state tracking. Set the idle mode to `COAST` so the wheel decelerates freely.
+Use `WithFeedback` for velocity PID and `WithFeedforward(const frc::SimpleMotorFeedforward<units::turns>&)` for steady-state tracking. Set the idle mode to `COAST` so the wheel decelerates freely.
 
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
@@ -32,7 +32,9 @@ motorConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
     .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(1.5)))
     .WithFeedback(0.0003, 0.0, 0.0)
-    .WithSimpleFeedforward(0.1, 0.002, 0.0)    // kS, kV, kA
+    .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
+        0.1_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.002},
+        units::unit_t<frc::SimpleMotorFeedforward<units::turns>::ka_unit>{0.0}})    // kS, kV, kA
     .WithMOI(0.0508_m, 0.18_kg)                // roller radius, mass — required for simulation
     .WithStatorCurrentLimit(80_A)
     .WithSubsystem(this)
@@ -101,7 +103,9 @@ public:
             .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
             .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(1.5)))
             .WithFeedback(0.0003, 0.0, 0.0)
-            .WithSimpleFeedforward(0.1, 0.002, 0.0)
+            .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
+                0.1_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.002},
+                units::unit_t<frc::SimpleMotorFeedforward<units::turns>::ka_unit>{0.0}})
             .WithMOI(0.0508_m, 0.18_kg)
             .WithStatorCurrentLimit(80_A)
             .WithSubsystem(this)

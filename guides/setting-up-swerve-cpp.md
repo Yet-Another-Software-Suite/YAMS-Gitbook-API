@@ -36,7 +36,9 @@ driveConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(6.75)))
     .WithFeedback(0.1, 0.0, 0.0)
-    .WithSimpleFeedforward(0.12, 2.2, 0.3)   // kS, kV, kA
+    .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
+        0.12_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{2.2},
+        units::unit_t<frc::SimpleMotorFeedforward<units::turns>::ka_unit>{0.3}})   // kS, kV, kA
     .WithStatorCurrentLimit(60_A)
     .WithSubsystem(this)
     .WithTelemetry("DriveFL");

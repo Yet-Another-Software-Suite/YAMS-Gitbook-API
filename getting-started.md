@@ -78,7 +78,9 @@ public:
             .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
             .WithMotorGearing(Constants::kArmGearing)
             .WithFeedback(0.5, 0.0, 0.01)
-            .WithArmFeedforward(0.1, 0.5, 0.01, 0.0)
+            .WithFeedforward(frc::ArmFeedforward{0.1_V, 0.0_V,
+                                                 units::unit_t<frc::ArmFeedforward::kv_unit>{0.5},
+                                                 units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}})
             .WithMechanismLimits(-90_deg, 90_deg)
             .WithMOI(0.6_m, 2.0_kg)
             .WithStatorCurrentLimit(40_A)
