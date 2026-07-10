@@ -30,7 +30,7 @@ Use `WithFeedback` for velocity PID and `WithFeedforward(const frc::SimpleMotorF
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(1.5)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
     .WithFeedback(0.0003, 0.0, 0.0)
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
         0.1_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.002},
@@ -53,7 +53,7 @@ motorConfig
 yams::motorcontrollers::remote::TalonFXWrapper motor{
     new ctre::phoenix6::hardware::TalonFX(3),
     frc::DCMotor::KrakenX60(1),
-    motorConfig
+    &motorConfig
 };
 ```
 
@@ -101,7 +101,7 @@ public:
     ShooterSubsystem() {
         motorConfig_
             .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
-            .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(1.5)))
+            .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
             .WithFeedback(0.0003, 0.0, 0.0)
             .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
                 0.1_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.002},
@@ -143,7 +143,7 @@ private:
     yams::motorcontrollers::remote::TalonFXWrapper motor_{
         new ctre::phoenix6::hardware::TalonFX(3),
         frc::DCMotor::KrakenX60(1),
-        motorConfig_
+        &motorConfig_
     };
     yams::mechanisms::config::FlyWheelConfig flywheelConfig_;
     yams::mechanisms::velocity::FlyWheel flyWheel_{&flywheelConfig_, &motor_};

@@ -34,7 +34,7 @@ Each swerve module needs two `SmartMotorController` instances: one for the drive
 yams::motorcontrollers::SmartMotorControllerConfig driveConfig;
 driveConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(6.75)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(6.75))
     .WithFeedback(0.1, 0.0, 0.0)
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
         0.12_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{2.2},
@@ -47,7 +47,7 @@ driveConfig
 yams::motorcontrollers::SmartMotorControllerConfig azimuthConfig;
 azimuthConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
-    .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromRatio(12.8)))
+    .WithMotorGearing(yams::gearing::MechanismGearing(12.8))
     .WithFeedback(7.0, 0.0, 0.3)
     .WithExternalEncoderDiscontinuityPoint(0.5_tr)
     .WithStatorCurrentLimit(40_A)
@@ -67,12 +67,12 @@ Repeat for each module (FR, BL, BR), adjusting the telemetry name and CAN IDs.
 yams::motorcontrollers::remote::TalonFXWrapper driveMotorFL{
     new ctre::phoenix6::hardware::TalonFX(10),
     frc::DCMotor::KrakenX60(1),
-    driveConfig
+    &driveConfig
 };
 yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
     new ctre::phoenix6::hardware::TalonFX(11),
     frc::DCMotor::KrakenX60(1),
-    azimuthConfig
+    &azimuthConfig
 };
 ```
 
