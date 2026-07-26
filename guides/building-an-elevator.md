@@ -1,18 +1,17 @@
-# Building an Elevator
+# Building an Elevator Subsystem
 
 **Goal:** Create an `Elevator` subsystem with height-based position control and physics simulation.
 
----
+***
 
 {% stepper %}
 {% step %}
-
 #### Configure the motor for linear travel
 
 The motor config must account for how rotations convert to linear distance. Either:
 
-- Call `.withMechanismCircumference(distancePerRotation)` where the value equals `2π × drumRadius`.
-- Or call `.withDrumRadius(radius)` which computes the circumference for you.
+* Call `.withMechanismCircumference(distancePerRotation)` where the value equals `2π × drumRadius`.
+* Or call `.withDrumRadius(radius)` which computes the circumference for you.
 
 ```java
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
@@ -33,11 +32,9 @@ SmartMotorController motor = new TalonFXWrapper(
     motorConfig
 );
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create an `ElevatorConfig`
 
 Carriage weight is required for simulation to model gravity correctly. Drum radius and cascade stage count are configured on `SmartMotorControllerConfig` (see step 1).
@@ -52,21 +49,17 @@ ElevatorConfig elevatorConfig = new ElevatorConfig()
 {% hint style="info" %}
 Carriage weight is required for simulation. Without it, `simIterate()` cannot model gravity and the elevator will behave like a frictionless flywheel in sim. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
 {% endhint %}
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `Elevator`
 
 ```java
 Elevator elevator = new Elevator(elevatorConfig, motor);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a `SubsystemBase`
 
 ```java
@@ -127,11 +120,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 }
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Wire up triggers
 
 `Elevator` exposes `gte(height)` and `lte(height)` triggers. Use them to gate game piece actions.
@@ -140,11 +131,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 Trigger atBottom = elevatorSubsystem.elevator.lte(Meters.of(0.05));
 Trigger atScore  = elevatorSubsystem.elevator.gte(Meters.of(1.0));
 ```
-
 {% endstep %}
 {% endstepper %}
 
----
+***
 
 ## Examples
 
@@ -152,11 +142,11 @@ Trigger atScore  = elevatorSubsystem.elevator.gte(Meters.of(1.0));
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_elevator/java/frc/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java" %}
 
----
+***
 
 ## Related pages
 
-- [Elevator](../api/java/mechanisms/elevator.md)
-- [ElevatorConfig](../api/java/config/elevator-config.md)
-- [Configuring a Motor Controller](configuring-a-motor.md)
-- [Simulation](simulation.md)
+* [Elevator](../java-reference/mechanisms/elevator.md)
+* [ElevatorConfig](../java-reference/config/elevator-config.md)
+* [Configuring a Motor Controller](configuring-a-motor.md)
+* [Simulation](simulation.md)

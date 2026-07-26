@@ -6,7 +6,6 @@
 
 {% stepper %}
 {% step %}
-
 #### Choose your hardware and import vendor libraries
 
 Identify which motor controller you are using:
@@ -15,11 +14,9 @@ Identify which motor controller you are using:
 * **CTRE TalonFX / TalonFXS** — requires the Phoenix 6 vendordep.
 
 Add the appropriate vendordep to your project before proceeding.
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `SmartMotorControllerConfig` and chain builder methods
 
 `SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and idle mode.
@@ -55,11 +52,9 @@ config.WithMotorInverted(false)
       .WithStatorCurrentLimit(40_A)
       .WithTelemetry("ShoulderMotor", TelemetryVerbosity::HIGH);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the concrete motor controller
 
 Pass the vendor hardware object, the WPILib `DCMotor` model, and the config to the appropriate constructor.
@@ -96,11 +91,9 @@ SparkWrapper motor{&spark, frc::DCMotor::NEO(1), &config};
 TalonFXWrapper motor{&talon, frc::DCMotor::KrakenX60(1), &config};
 TalonFXSWrapper motor{&m_talonFXS, DCMotor::NEO(1), MotorArrangement::NEO, &cfg};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Pass the result to a mechanism or use it directly
 
 The returned `SmartMotorController` is ready to hand to `Arm`, `Elevator`, `FlyWheel`, or `SwerveDrive`. See the relevant how-to guide for the next steps.
@@ -108,7 +101,6 @@ The returned `SmartMotorController` is ready to hand to `Arm`, `Elevator`, `FlyW
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
-
 {% endstep %}
 {% endstepper %}
 
@@ -124,5 +116,5 @@ If you are using a SPARK MAX with an **absolute encoder**, you should call `.wit
 
 ## Related pages
 
-* [SmartMotorControllerConfig](../api/java/motor-controllers/smart-motor-controller-config.md)
-* [MechanismGearing](../api/java/gearing/mechanism-gearing.md)
+* [SmartMotorControllerConfig](../java-reference/motor-controllers/smart-motor-controller-config.md)
+* [MechanismGearing](../java-reference/gearing/mechanism-gearing.md)

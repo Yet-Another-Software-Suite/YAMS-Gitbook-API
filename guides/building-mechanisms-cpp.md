@@ -2,7 +2,7 @@
 
 **Goal:** Create `Arm`, `Elevator`, and `Pivot` subsystems in C++ with position control and physics simulation.
 
----
+***
 
 ## Prerequisites
 
@@ -23,14 +23,12 @@ Include the main YAMS header or the specific mechanism headers:
 #include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>
 ```
 
----
+***
 
 ## Building an Arm
 
 {% stepper %}
-
 {% step %}
-
 #### Configure the `SmartMotorControllerConfig`
 
 Use `WithFeedforward(const frc::ArmFeedforward&)` and angular position limits. The motor config must know the gear ratio for accurate position tracking.
@@ -51,11 +49,9 @@ motorConfig
     .WithSubsystem(this)
     .WithTelemetry("ShoulderMotor");
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the motor controller
 
 ```cpp
@@ -65,11 +61,9 @@ yams::motorcontrollers::local::SparkWrapper motor{
     &motorConfig
 };
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create an `ArmConfig`
 
 `WithArmLength` is required for simulation. All other fields are optional.
@@ -82,21 +76,17 @@ armConfig
     .WithMaxAngle(90_deg)
     .WithTelemetryName("Shoulder");
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `Arm`
 
 ```cpp
 yams::mechanisms::positional::Arm arm{&armConfig, &motor};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a subsystem
 
 ```cpp
@@ -152,31 +142,27 @@ private:
     yams::mechanisms::positional::Arm arm_{&armConfig_, &motor_};
 };
 ```
-
 {% endstep %}
-
 {% endstepper %}
 
 ### Command Factories & Triggers
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `Run(degree_t angle)` | `CommandPtr` | Move to angle and hold indefinitely |
+| Method                                      | Returns      | Description                                 |
+| ------------------------------------------- | ------------ | ------------------------------------------- |
+| `Run(degree_t angle)`                       | `CommandPtr` | Move to angle and hold indefinitely         |
 | `RunTo(degree_t angle, degree_t tolerance)` | `CommandPtr` | Move to angle, finish when within tolerance |
-| `IsNear(degree_t angle, degree_t within)` | `Trigger` | True while within tolerance of angle |
-| `Gte(degree_t angle)` | `Trigger` | True when current angle ≥ threshold |
-| `Lte(degree_t angle)` | `Trigger` | True when current angle ≤ threshold |
-| `Max()` | `Trigger` | True when at or past upper soft limit |
-| `Min()` | `Trigger` | True when at or past lower soft limit |
+| `IsNear(degree_t angle, degree_t within)`   | `Trigger`    | True while within tolerance of angle        |
+| `Gte(degree_t angle)`                       | `Trigger`    | True when current angle ≥ threshold         |
+| `Lte(degree_t angle)`                       | `Trigger`    | True when current angle ≤ threshold         |
+| `Max()`                                     | `Trigger`    | True when at or past upper soft limit       |
+| `Min()`                                     | `Trigger`    | True when at or past lower soft limit       |
 
----
+***
 
 ## Building an Elevator
 
 {% stepper %}
-
 {% step %}
-
 #### Configure the motor for linear travel
 
 Drum circumference converts rotations to linear distance. Set it on `SmartMotorControllerConfig`.
@@ -198,11 +184,9 @@ motorConfig
 ```
 
 > **Note:** Drum radius does NOT go on `ElevatorConfig` — it's set on `SmartMotorControllerConfig` via `WithMechanismCircumference`.
-
 {% endstep %}
 
 {% step %}
-
 #### Create an `ElevatorConfig`
 
 `WithCarriageMass` is required for simulation. Height limits are optional but recommended.
@@ -215,51 +199,43 @@ elevatorConfig
     .WithMaximumHeight(1.2_m)
     .WithTelemetryName("Elevator");
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `Elevator`
 
 ```cpp
 yams::mechanisms::positional::Elevator elevator{&elevatorConfig, &motor};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Command Factories & Triggers
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `Run(meter_t height)` | `CommandPtr` | Move to height and hold indefinitely |
+| Method                                     | Returns      | Description                                  |
+| ------------------------------------------ | ------------ | -------------------------------------------- |
+| `Run(meter_t height)`                      | `CommandPtr` | Move to height and hold indefinitely         |
 | `RunTo(meter_t height, meter_t tolerance)` | `CommandPtr` | Move to height, finish when within tolerance |
-| `IsNear(meter_t height, meter_t within)` | `Trigger` | True while within tolerance of height |
-| `Gte(meter_t height)` | `Trigger` | True when current height ≥ threshold |
-| `Lte(meter_t height)` | `Trigger` | True when current height ≤ threshold |
+| `IsNear(meter_t height, meter_t within)`   | `Trigger`    | True while within tolerance of height        |
+| `Gte(meter_t height)`                      | `Trigger`    | True when current height ≥ threshold         |
+| `Lte(meter_t height)`                      | `Trigger`    | True when current height ≤ threshold         |
 
 ```cpp
 // In periodic:
 void Periodic() override { elevator_.UpdateTelemetry(); }
 void SimulationPeriodic() override { elevator_.SimIterate(); }
 ```
-
 {% endstep %}
-
 {% endstepper %}
 
----
+***
 
 ## Building a Pivot
 
 A `Pivot` is a single-jointed rotational mechanism (similar to `Arm`) without a load-bearing arm length. Use it for wrist joints, turrets, or any rotation that doesn't require an arm-length-based MOI estimate.
 
 {% stepper %}
-
 {% step %}
-
 #### Configure the motor
 
 ```cpp
@@ -275,11 +251,9 @@ motorConfig
     .WithSubsystem(this)
     .WithTelemetry("WristMotor");
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `PivotConfig`
 
 ```cpp
@@ -289,21 +263,17 @@ pivotConfig
     .WithMaxAngle(180_deg)
     .WithTelemetryName("Wrist");
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `Pivot`
 
 ```cpp
 yams::mechanisms::positional::Pivot pivot{&pivotConfig, &motor};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Command Factories & Triggers
 
 Same interface as `Arm` — `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Max()`, `Min()`.
@@ -312,12 +282,10 @@ Same interface as `Arm` — `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `M
 void Periodic() override { pivot_.UpdateTelemetry(); }
 void SimulationPeriodic() override { pivot_.SimIterate(); }
 ```
-
 {% endstep %}
-
 {% endstepper %}
 
----
+***
 
 ## Notes
 
@@ -329,7 +297,7 @@ void SimulationPeriodic() override { pivot_.SimIterate(); }
 `WithSubsystem(this)` must be set on `SmartMotorControllerConfig` before constructing the motor controller. Without it, command scheduling will not work correctly.
 {% endhint %}
 
----
+***
 
 ## Examples
 
@@ -341,15 +309,15 @@ Complete C++ implementations from the `cpptest` reference project:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/TurretSubsystem.cpp" %}
 
----
+***
 
 ## Related Pages
 
-- [Arm (C++)](../api/cpp/mechanisms/arm.md)
-- [Elevator (C++)](../api/cpp/mechanisms/elevator.md)
-- [Pivot (C++)](../api/cpp/mechanisms/pivot.md)
-- [ArmConfig (C++)](../api/cpp/config/arm-config.md)
-- [ElevatorConfig (C++)](../api/cpp/config/elevator-config.md)
-- [SmartMotorControllerConfig (C++)](../api/cpp/motor-controllers/smart-motor-controller-config.md)
-- [Java equivalent: Building an Arm](building-an-arm.md)
-- [Java equivalent: Building an Elevator](building-an-elevator.md)
+* [Arm (C++)](../c++-reference/mechanisms/arm.md)
+* [Elevator (C++)](../c++-reference/mechanisms/elevator.md)
+* [Pivot (C++)](../c++-reference/mechanisms/pivot.md)
+* [ArmConfig (C++)](../c++-reference/config/arm-config.md)
+* [ElevatorConfig (C++)](../c++-reference/config/elevator-config.md)
+* [SmartMotorControllerConfig (C++)](../c++-reference/motor-controllers/smart-motor-controller-config.md)
+* [Java equivalent: Building an Arm](building-an-arm.md)
+* [Java equivalent: Building an Elevator](building-an-elevator.md)

@@ -1,20 +1,17 @@
-# Building an Arm
+# Building an Arm Subsystem
 
 **Goal:** Create an `Arm` subsystem with position control and physics simulation.
 
----
+***
 
 {% stepper %}
 {% step %}
-
 #### Create and configure the `SmartMotorController`
 
 Follow [Configuring a Motor Controller](configuring-a-motor.md) to build the `SmartMotorController` for your arm joint. Use `ArmFeedforward` in the config and set mechanism limits that match your physical range of motion.
-
 {% endstep %}
 
 {% step %}
-
 #### Create an `ArmConfig`
 
 `ArmConfig` describes the physical arm and its telemetry. Arm length is required for simulation.
@@ -24,21 +21,17 @@ ArmConfig armConfig = new ArmConfig()
     .withLength(Meters.of(0.6))
     .withTelemetry("Shoulder", TelemetryVerbosity.HIGH);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `Arm`
 
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a `SubsystemBase`
 
 Expose command factories and triggers from the subsystem. `setAngle` moves to a fixed position; `runTo` moves and holds until a tolerance condition is met.
@@ -98,11 +91,9 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
 }
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Wire up triggers
 
 `Arm` exposes `isNear(angle, tolerance)`, `max()`, and `min()` as `Trigger` factories. Bind them in your `RobotContainer` or use them to gate commands.
@@ -112,11 +103,10 @@ public class ShoulderSubsystem extends SubsystemBase {
 Trigger atStow  = shoulder.arm.isNear(Degrees.of(-90), Degrees.of(2));
 Trigger atScore = shoulder.arm.isNear(Degrees.of(45),  Degrees.of(2));
 ```
-
 {% endstep %}
 {% endstepper %}
 
----
+***
 
 ## Examples
 
@@ -124,11 +114,11 @@ Trigger atScore = shoulder.arm.isNear(Degrees.of(45),  Degrees.of(2));
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java#L157-L171" %}
 
----
+***
 
 ## Related pages
 
-- [Arm](../api/java/mechanisms/arm.md)
-- [ArmConfig](../api/java/config/arm-config.md)
-- [Configuring a Motor Controller](configuring-a-motor.md)
-- [Simulation](simulation.md)
+* [Arm](../java-reference/mechanisms/arm.md)
+* [ArmConfig](../java-reference/config/arm-config.md)
+* [Configuring a Motor Controller](configuring-a-motor.md)
+* [Simulation](simulation.md)

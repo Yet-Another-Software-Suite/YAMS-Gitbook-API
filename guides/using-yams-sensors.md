@@ -2,7 +2,7 @@
 
 **Goal:** Wire real hardware sensors into the YAMS simulation framework so the same subsystem code runs identically in simulation and on a physical robot — with no `#ifdef` guards, no separate simulation paths, and optional automated test-value injection.
 
----
+***
 
 ## What YAMS Sensors solve
 
@@ -10,7 +10,7 @@ WPILib's simulation layer lets you override hardware values in the **Glass** GUI
 
 Additionally, YAMS Sensors support **trigger-based value injection**: you can declare "from match time 10 s to 12 s, make this limit switch read `true`" directly in your subsystem constructor. This makes automated simulation regression testing possible without touching Glass at all.
 
----
+***
 
 ## Java
 
@@ -142,7 +142,7 @@ double pos = sensor.getAsDouble("PositionDegrees");
 boolean atTop = sensor.getAsBoolean("AtUpperLimit");
 ```
 
----
+***
 
 ## C++
 
@@ -259,18 +259,18 @@ double pos   = sensor.GetAsDouble("PositionDegrees");
 bool  atTop  = sensor.GetAsBoolean("AtUpperLimit");
 ```
 
----
+***
 
 ## Using Glass to Override Values Manually
 
-When running simulation, any `Sensor` appears in Glass under **Other Devices → Sensor[name]**. Each field shows as an editable widget. You can:
+When running simulation, any `Sensor` appears in Glass under **Other Devices → Sensor\[name]**. Each field shows as an editable widget. You can:
 
-- Read the current value (driven by the supplier or trigger)
-- Type in a new value to override it for manual testing
+* Read the current value (driven by the supplier or trigger)
+* Type in a new value to override it for manual testing
 
 Trigger-based overrides take priority over Glass edits: if a trigger is active, it writes its value back to Glass each loop, overriding your manual edit until the trigger condition becomes false.
 
----
+***
 
 ## Notes
 
@@ -286,18 +286,18 @@ YAMS Sensors do not depend on any `SmartMotorController` — they work as standa
 The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Register boolean hardware with a `BooleanSupplier` / `std::function<bool()>`, and always read it with `getAsBoolean` / `GetAsBoolean`.
 {% endhint %}
 
----
+***
 
 ## Examples
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java" %}
 
----
+***
 
 ## Related Pages
 
-- [SensorConfig (Java)](../api/java/config/sensor-config.md)
-- [SimSensorConfig (C++)](../api/cpp/config/sim-sensor-config.md)
-- [SensorConfig (C++)](../api/cpp/config/sensor-config.md) — absolute encoder seeding (different from simulation sensors)
-- [Sensor API Reference (Java)](../api/java/simulation/sensor.md)
-- [Sensor API Reference (C++)](../api/cpp/simulation/sensor.md)
+* [SensorConfig (Java)](../java-reference/config/sensor-config.md)
+* [SimSensorConfig (C++)](../c++-reference/config/sim-sensor-config.md)
+* [SensorConfig (C++)](../api/cpp/config/sensor-config.md) — absolute encoder seeding (different from simulation sensors)
+* [Sensor API Reference (Java)](../java-reference/sensor/)
+* [Sensor API Reference (C++)](../c++-reference/sensor/)

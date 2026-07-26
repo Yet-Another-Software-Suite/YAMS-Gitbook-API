@@ -2,7 +2,7 @@
 
 **Goal:** Create a fully functional `SwerveDrive` subsystem in C++ with field-relative driving, odometry, and simulation.
 
----
+***
 
 ## Prerequisites
 
@@ -19,12 +19,10 @@
 #include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>
 ```
 
----
+***
 
 {% stepper %}
-
 {% step %}
-
 #### Configure drive and azimuth motor controllers
 
 Each swerve module needs two `SmartMotorController` instances: one for the drive wheel (velocity control) and one for the azimuth (steering angle, position control).
@@ -56,11 +54,9 @@ azimuthConfig
 ```
 
 Repeat for each module (FR, BL, BR), adjusting the telemetry name and CAN IDs.
-
 {% endstep %}
 
 {% step %}
-
 #### Construct motor controllers
 
 ```cpp
@@ -75,11 +71,9 @@ yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
     &azimuthConfig
 };
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `SwerveModuleConfig` for each module
 
 Pass drive and azimuth motor controllers, then set wheel radius, module location (relative to robot center), and absolute encoder offset.
@@ -98,17 +92,15 @@ frontLeftModuleConfig
 
 Repeat for `FrontRight`, `BackLeft`, `BackRight` with their positions and offsets:
 
-| Module | Location |
-|--------|----------|
-| Front Left | `{ +0.381_m, +0.381_m }` |
+| Module      | Location                 |
+| ----------- | ------------------------ |
+| Front Left  | `{ +0.381_m, +0.381_m }` |
 | Front Right | `{ +0.381_m, -0.381_m }` |
-| Back Left | `{ -0.381_m, +0.381_m }` |
-| Back Right | `{ -0.381_m, -0.381_m }` |
-
+| Back Left   | `{ -0.381_m, +0.381_m }` |
+| Back Right  | `{ -0.381_m, -0.381_m }` |
 {% endstep %}
 
 {% step %}
-
 #### Construct `SwerveModule` instances
 
 ```cpp
@@ -117,11 +109,9 @@ yams::mechanisms::swerve::SwerveModule frontRight{&frontRightModuleConfig};
 yams::mechanisms::swerve::SwerveModule backLeft{&backLeftModuleConfig};
 yams::mechanisms::swerve::SwerveModule backRight{&backRightModuleConfig};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `SwerveDriveConfig`
 
 Collect the four modules, set kinematic limits, and provide a gyro supplier.
@@ -138,11 +128,9 @@ driveConfig
     .WithTelemetry(
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct `SwerveDrive`
 
 The template parameter must match the number of modules passed to `WithModules`:
@@ -150,11 +138,9 @@ The template parameter must match the number of modules passed to `WithModules`:
 ```cpp
 yams::mechanisms::swerve::SwerveDrive<4> swerveDrive{&driveConfig};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a subsystem
 
 ```cpp
@@ -186,11 +172,9 @@ private:
     yams::mechanisms::swerve::SwerveDrive<4> swerveDrive_{&driveConfig_};
 };
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Set up driver input with `SwerveInputStream`
 
 `SwerveInputStream<4>` translates raw joystick axes into `frc::ChassisSpeeds`. Pass the `SwerveDrive` reference as the first argument, then set a rotation axis with `WithControllerRotationAxis`.
@@ -214,11 +198,9 @@ driveSubsystem_->SetDefaultCommand(
     driveSubsystem_->DriveFieldRelativeCommand(driverInput)
 );
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Heading-snap mode (optional)
 
 Clone the input stream to add heading control without affecting the base stream:
@@ -232,11 +214,9 @@ yams::mechanisms::swerve::utility::SwerveInputStream<4> headingInput =
     )
     .WithHeadingControl([&] { return driverController_.GetRightStickButton(); });
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Azimuth encoder seeding
 
 Azimuth encoders are seeded automatically during `SwerveModule` construction. If you need to re-seed after the CAN bus has fully settled (e.g., in `Robot::RobotInit`), call `SeedAzimuthEncoder()` on each module:
@@ -247,29 +227,27 @@ frontRight.SeedAzimuthEncoder();
 backLeft.SeedAzimuthEncoder();
 backRight.SeedAzimuthEncoder();
 ```
-
 {% endstep %}
-
 {% endstepper %}
 
----
+***
 
 ## Key SwerveDrive Methods
 
-| Method | Description |
-|--------|-------------|
-| `SetFieldRelativeChassisSpeeds(ChassisSpeeds)` | Field-relative drive |
-| `SetRobotRelativeChassisSpeeds(ChassisSpeeds)` | Robot-relative drive |
-| `Drive(std::function<ChassisSpeeds()>)` | Returns a run `CommandPtr` for continuous driving |
-| `LockPose()` | X-pattern to resist pushing |
-| `GetPose()` | Current field-relative pose from odometry |
-| `ResetOdometry(Pose2d)` | Reset odometry to a known pose |
-| `ZeroGyro()` | Zero the gyro heading |
-| `AddVisionMeasurement(Pose2d, second_t)` | Fuse vision pose into odometry |
-| `UpdateTelemetry()` | Call in `Periodic()` |
-| `SimIterate()` | Call in `SimulationPeriodic()` |
+| Method                                         | Description                                       |
+| ---------------------------------------------- | ------------------------------------------------- |
+| `SetFieldRelativeChassisSpeeds(ChassisSpeeds)` | Field-relative drive                              |
+| `SetRobotRelativeChassisSpeeds(ChassisSpeeds)` | Robot-relative drive                              |
+| `Drive(std::function<ChassisSpeeds()>)`        | Returns a run `CommandPtr` for continuous driving |
+| `LockPose()`                                   | X-pattern to resist pushing                       |
+| `GetPose()`                                    | Current field-relative pose from odometry         |
+| `ResetOdometry(Pose2d)`                        | Reset odometry to a known pose                    |
+| `ZeroGyro()`                                   | Zero the gyro heading                             |
+| `AddVisionMeasurement(Pose2d, second_t)`       | Fuse vision pose into odometry                    |
+| `UpdateTelemetry()`                            | Call in `Periodic()`                              |
+| `SimIterate()`                                 | Call in `SimulationPeriodic()`                    |
 
----
+***
 
 ## Notes
 
@@ -281,7 +259,7 @@ backRight.SeedAzimuthEncoder();
 `SwerveInputStream::Of()` takes translation axes only. Add rotation later with `WithControllerRotationAxis()` or switch to heading control with `WithControllerHeadingAxis()` + `WithHeadingControl()`.
 {% endhint %}
 
----
+***
 
 ## Examples
 
@@ -289,12 +267,12 @@ Complete C++ implementations from the `cpptest` reference project:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/SwerveSubsystem.cpp" %}
 
----
+***
 
 ## Related Pages
 
-- [SwerveDrive (C++)](../api/cpp/swerve/swerve-drive.md)
-- [SwerveModule (C++)](../api/cpp/swerve/swerve-module.md)
-- [SwerveInputStream (C++)](../api/cpp/swerve/swerve-input-stream.md)
-- [SmartMotorControllerConfig (C++)](../api/cpp/motor-controllers/smart-motor-controller-config.md)
-- [Java equivalent: Setting Up Swerve Drive](setting-up-swerve.md)
+* [SwerveDrive (C++)](../c++-reference/swerve/swerve-drive.md)
+* [SwerveModule (C++)](../c++-reference/swerve/swerve-module.md)
+* [SwerveInputStream (C++)](../c++-reference/swerve/swerve-input-stream.md)
+* [SmartMotorControllerConfig (C++)](../c++-reference/motor-controllers/smart-motor-controller-config.md)
+* [Java equivalent: Setting Up Swerve Drive](setting-up-swerve.md)

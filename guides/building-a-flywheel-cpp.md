@@ -2,7 +2,7 @@
 
 **Goal:** Create a `FlyWheel` subsystem in C++ with velocity control and physics simulation.
 
----
+***
 
 ## Prerequisites
 
@@ -16,12 +16,10 @@
 #include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>
 ```
 
----
+***
 
 {% stepper %}
-
 {% step %}
-
 #### Configure the motor for velocity control
 
 Use `WithFeedback` for velocity PID and `WithFeedforward(const frc::SimpleMotorFeedforward<units::turns>&)` for steady-state tracking. Set the idle mode to `COAST` so the wheel decelerates freely.
@@ -42,11 +40,9 @@ motorConfig
 ```
 
 > **Simulation note:** `WithMOI(radius, mass)` sets the moment of inertia for physics simulation. It belongs on `SmartMotorControllerConfig`, not on `FlyWheelConfig`.
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the motor controller
 
 ```cpp
@@ -56,11 +52,9 @@ yams::motorcontrollers::remote::TalonFXWrapper motor{
     &motorConfig
 };
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `FlyWheelConfig`
 
 `WithRollerDiameter` enables surface speed calculations. All fields are optional.
@@ -75,21 +69,17 @@ flywheelConfig
 {% hint style="info" %}
 Moment of inertia is set on `SmartMotorControllerConfig` via `WithMOI()`, not on `FlyWheelConfig`. `FlyWheelConfig` only holds the roller diameter, telemetry name, and sim color.
 {% endhint %}
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `FlyWheel`
 
 ```cpp
 yams::mechanisms::velocity::FlyWheel flyWheel{&flywheelConfig, &motor};
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a subsystem
 
 ```cpp
@@ -149,26 +139,22 @@ private:
     yams::mechanisms::velocity::FlyWheel flyWheel_{&flywheelConfig_, &motor_};
 };
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Command Factories & Triggers
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `Run(degrees_per_second_t velocity)` | `CommandPtr` | Spin at velocity, hold indefinitely |
-| `Run(meters_per_second_t surfaceSpeed)` | `CommandPtr` | Spin at surface speed (requires `WithRollerDiameter`) |
-| `RunTo(degrees_per_second_t velocity, tolerance)` | `CommandPtr` | Spin up, finish when within tolerance |
-| `IsNear(degrees_per_second_t velocity, within)` | `Trigger` | True while within tolerance of velocity |
-| `Gte(degrees_per_second_t velocity)` | `Trigger` | True when speed ≥ threshold |
-| `Lte(degrees_per_second_t velocity)` | `Trigger` | True when speed ≤ threshold |
-
+| Method                                            | Returns      | Description                                           |
+| ------------------------------------------------- | ------------ | ----------------------------------------------------- |
+| `Run(degrees_per_second_t velocity)`              | `CommandPtr` | Spin at velocity, hold indefinitely                   |
+| `Run(meters_per_second_t surfaceSpeed)`           | `CommandPtr` | Spin at surface speed (requires `WithRollerDiameter`) |
+| `RunTo(degrees_per_second_t velocity, tolerance)` | `CommandPtr` | Spin up, finish when within tolerance                 |
+| `IsNear(degrees_per_second_t velocity, within)`   | `Trigger`    | True while within tolerance of velocity               |
+| `Gte(degrees_per_second_t velocity)`              | `Trigger`    | True when speed ≥ threshold                           |
+| `Lte(degrees_per_second_t velocity)`              | `Trigger`    | True when speed ≤ threshold                           |
 {% endstep %}
 
 {% step %}
-
 #### Sequencing shooter commands
 
 Use `RunTo` to block until the wheel is at speed before feeding:
@@ -183,12 +169,10 @@ Or bind the `ReadyToShoot()` trigger to allow feeding whenever the wheel is up:
 ```cpp
 shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 ```
-
 {% endstep %}
-
 {% endstepper %}
 
----
+***
 
 ## Notes
 
@@ -198,7 +182,7 @@ shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 `IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance — use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready.
 {% endhint %}
 
----
+***
 
 ## Examples
 
@@ -206,12 +190,12 @@ Complete C++ implementations from the `cpptest` reference project:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ShooterSubsystem.cpp" %}
 
----
+***
 
 ## Related Pages
 
-- [FlyWheel (C++)](../api/cpp/mechanisms/flywheel.md)
-- [FlyWheelConfig (C++)](../api/cpp/config/flywheel-config.md)
-- [SmartMotorControllerConfig (C++)](../api/cpp/motor-controllers/smart-motor-controller-config.md)
-- [TalonFXWrapper (C++)](../api/cpp/motor-controllers/talonfx-wrapper.md)
-- [Java equivalent: Building a Flywheel](building-a-flywheel.md)
+* [FlyWheel (C++)](../c++-reference/mechanisms/flywheel.md)
+* [FlyWheelConfig (C++)](../c++-reference/config/flywheel-config.md)
+* [SmartMotorControllerConfig (C++)](../c++-reference/motor-controllers/smart-motor-controller-config.md)
+* [TalonFXWrapper (C++)](../c++-reference/motor-controllers/talonfx-wrapper.md)
+* [Java equivalent: Building a Flywheel](building-a-flywheel.md)

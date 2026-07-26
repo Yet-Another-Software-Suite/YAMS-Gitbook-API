@@ -1,12 +1,11 @@
-# Building a FlyWheel
+# Building a Flywheel Subsystem
 
 **Goal:** Create a `FlyWheel` subsystem with velocity control and physics simulation.
 
----
+***
 
 {% stepper %}
 {% step %}
-
 #### Configure the motor for velocity control
 
 Use `withClosedLoopController` for the closed-loop PID and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
@@ -28,11 +27,9 @@ SmartMotorController motor = new TalonFXWrapper(
     motorConfig
 );
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Create a `FlyWheelConfig`
 
 Wheel diameter is used for linear velocity conversion. Moment of inertia (for simulation) is set on `SmartMotorControllerConfig` via `withMomentOfInertia`.
@@ -42,21 +39,17 @@ FlyWheelConfig flywheelConfig = new FlyWheelConfig()
     .withDiameter(Meters.of(0.1016))
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Construct the `FlyWheel`
 
 ```java
 FlyWheel flyWheel = new FlyWheel(flywheelConfig, motor);
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Integrate into a `SubsystemBase`
 
 ```java
@@ -118,11 +111,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 }
 ```
-
 {% endstep %}
 
 {% step %}
-
 #### Sequence shooter commands
 
 Use `runTo` to block until the wheel is at speed before feeding a game piece:
@@ -137,11 +128,10 @@ Or bind the `readyToShoot()` trigger to allow feeding at any time once the wheel
 ```java
 shooter.readyToShoot().whileTrue(indexer.feedCommand());
 ```
-
 {% endstep %}
 {% endstepper %}
 
----
+***
 
 ## Notes
 
@@ -149,7 +139,7 @@ shooter.readyToShoot().whileTrue(indexer.feedCommand());
 `runTo(velocity, tolerance)` ends once the wheel reaches the target. Use it in command sequences where the next step should not begin until the wheel is up to speed. `isNear(velocity, tolerance)` (exposed as a `Trigger`) stays true as long as the wheel remains within tolerance — use it for continuously gated logic like a conveyor that feeds whenever the shooter is ready.
 {% endhint %}
 
----
+***
 
 ## Examples
 
@@ -157,11 +147,11 @@ shooter.readyToShoot().whileTrue(indexer.feedCommand());
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/hooded_shooter/java/frc/robot/subsystems/FlywheelSubsystem.java" %}
 
----
+***
 
 ## Related pages
 
-- [FlyWheel](../api/java/mechanisms/flywheel.md)
-- [FlyWheelConfig](../api/java/config/flywheel-config.md)
-- [Configuring a Motor Controller](configuring-a-motor.md)
-- [Simulation](simulation.md)
+* [FlyWheel](../java-reference/mechanisms/flywheel.md)
+* [FlyWheelConfig](../java-reference/config/flywheel-config.md)
+* [Configuring a Motor Controller](configuring-a-motor.md)
+* [Simulation](simulation.md)
