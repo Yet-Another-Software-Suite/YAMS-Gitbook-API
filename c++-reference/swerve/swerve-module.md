@@ -53,7 +53,14 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 
 ***
 
+## Telemetry & DataLog
+
+`UpdateTelemetry()` publishes this module's state and absolute encoder angle to NetworkTables. To additionally record the absolute encoder angle to a WPILib DataLog, set `SwerveModuleConfig::WithDataLogName(const std::string&)` — see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry). For field-level control (or a DataLog name) on the drive/azimuth motors themselves, configure each motor's own `SmartMotorControllerConfig::WithTelemetry(name, SmartMotorControllerTelemetryConfig)`.
+
+***
+
 ## See Also
 
 * [Java SwerveModule](../../java-reference/swerve/swerve-module.md)
+* [SwerveModuleConfig](swerve-module-config.md)
 * [SwerveDrive\<N>](swerve-drive.md)

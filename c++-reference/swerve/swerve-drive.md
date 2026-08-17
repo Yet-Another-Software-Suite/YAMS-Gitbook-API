@@ -78,6 +78,12 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 
 ***
 
+## Telemetry & DataLog
+
+`UpdateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig::WithTelemetry(TelemetryVerbosity)`. To additionally record those fields to a WPILib DataLog (for offline review in AdvantageScope), set `SwerveDriveConfig::WithDataLogName(const std::string&)` — see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
+
+***
+
 ## Example
 
 ```cpp
@@ -103,5 +109,6 @@ frc2::CommandPtr DriveCommand(std::function<frc::ChassisSpeeds()> speeds) {
 ## See Also
 
 * [Java SwerveDrive](../../java-reference/swerve/swerve-drive.md)
+* [SwerveDriveConfig](swerve-drive-config.md)
 * [SwerveModule](swerve-module.md)
 * [SwerveInputStream](swerve-input-stream.md)

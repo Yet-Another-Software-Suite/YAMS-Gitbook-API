@@ -77,6 +77,8 @@
 * [Swerve Drive](c++-reference/swerve/README.md)
   * [SwerveDrive](c++-reference/swerve/swerve-drive.md)
   * [SwerveModule](c++-reference/swerve/swerve-module.md)
+  * [SwerveDriveConfig](c++-reference/swerve/swerve-drive-config.md)
+  * [SwerveModuleConfig](c++-reference/swerve/swerve-module-config.md)
   * [SwerveInputStream](c++-reference/swerve/swerve-input-stream.md)
 * [Gearing](c++-reference/gearing/README.md)
   * [GearBox](c++-reference/gearing/gearbox.md)

@@ -48,6 +48,12 @@ SwerveDrive(SwerveDriveConfig config)
 
 ***
 
+## Telemetry & DataLog
+
+`updateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig.withTelemetry(TelemetryVerbosity)`. To additionally record those fields to a WPILib DataLog (for offline review in AdvantageScope), set `SwerveDriveConfig.withDataLogName(String)` — see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
+
+***
+
 ## Example Usage
 
 ```java
