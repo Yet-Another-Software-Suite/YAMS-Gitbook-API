@@ -105,6 +105,10 @@ Fields that are not applicable to the current motor controller or configuration 
 `WithTelemetryVerbosity()` is cumulative: combining it with individual `With*()` methods produces the union of all requested fields.
 {% endhint %}
 
+{% hint style="warning" %}
+The Java port additionally exposes a `withCustom(...)` escape hatch for enabling/disabling arbitrary `BooleanTelemetryField`/`DoubleTelemetryField` values (including arrays of fields at once). This is not yet ported to C++ — see [SmartMotorControllerTelemetryConfig (Java)](../../java-reference/motor-controllers/smart-motor-controller-telemetry-config.md#builder-methods-custom-escape-hatch).
+{% endhint %}
+
 ## Related Pages
 
 * [SmartMotorController (C++)](smart-motor-controller.md)

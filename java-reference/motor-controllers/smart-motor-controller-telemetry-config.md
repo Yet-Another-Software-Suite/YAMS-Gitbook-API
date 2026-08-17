@@ -64,6 +64,33 @@ Each method enables a single numeric (double) field.
 | `withRotorPosition()`       | Raw rotor position (rotations).                                                                                       |
 | `withRotorVelocity()`       | Raw rotor velocity (rotations/s).                                                                                     |
 
+## Builder Methods — Custom / Escape Hatch
+
+`withCustom(...)` is an escape hatch for enabling or disabling any `BooleanTelemetryField` or `DoubleTelemetryField` by value, without a dedicated `with*()` method. It's useful for fields that don't have a named builder method, or for bulk enabling/disabling several fields at once with an array. Both enums live on `SmartMotorControllerTelemetry` (`SmartMotorControllerTelemetry.BooleanTelemetryField`, `SmartMotorControllerTelemetry.DoubleTelemetryField`).
+
+| Method                                                          | Description                                                             |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `withCustom(BooleanTelemetryField field, boolean value)`        | Enables (`true`) or disables (`false`) a single boolean field.          |
+| `withCustom(DoubleTelemetryField field, boolean value)`         | Enables (`true`) or disables (`false`) a single numeric field.          |
+| `withCustom(BooleanTelemetryField[] fields, boolean value)`     | Enables or disables every boolean field in the array with one call.     |
+| `withCustom(DoubleTelemetryField[] fields, boolean value)`      | Enables or disables every numeric field in the array with one call.     |
+
+```java
+import yams.telemetry.SmartMotorControllerTelemetry.BooleanTelemetryField;
+import yams.telemetry.SmartMotorControllerTelemetry.DoubleTelemetryField;
+
+SmartMotorControllerTelemetryConfig telemetryCfg =
+    new SmartMotorControllerTelemetryConfig()
+        .withTelemetryVerbosity(TelemetryVerbosity.LOW)
+        // enable one field that isn't part of LOW
+        .withCustom(DoubleTelemetryField.SupplyCurrent, true)
+        // disable a batch of fields at once
+        .withCustom(new BooleanTelemetryField[]{
+            BooleanTelemetryField.MotorInversion,
+            BooleanTelemetryField.EncoderInversion
+        }, false);
+```
+
 ## Example
 
 ```java
@@ -91,6 +118,10 @@ Fields that are not applicable to the current motor controller or configuration 
 
 {% hint style="info" %}
 `withTelemetryVerbosity()` is cumulative: calling it multiple times or combining it with individual field methods results in the union of all requested fields.
+{% endhint %}
+
+{% hint style="warning" %}
+`withCustom(...)` is currently Java-only; the C++ port does not yet expose a `WithCustom(...)` escape hatch.
 {% endhint %}
 
 ## Related Pages
