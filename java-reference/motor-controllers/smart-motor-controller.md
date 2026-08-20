@@ -130,6 +130,8 @@ SmartMotorController motor = new TalonFXWrapper(
 | `getSimSupplier()`                     | `Optional<SimSupplier>` | Returns the attached simulation supplier.                                        |
 | `setSimSupplier(SimSupplier supplier)` | `void`                  | Attaches or replaces the simulation supplier.                                    |
 
+`simIterate()` also reports this controller's simulated current draw into [`BatterySim`](../sensor/battery-sim.md) under a UUID unique to this instance (`m_batterySimUUID`), which combines the draw of every simulated `SmartMotorController` on the robot into one shared, loaded battery voltage.
+
 ## Introspection
 
 | Method                       | Returns   | Description                                                         |
@@ -147,4 +149,5 @@ SmartMotorController motor = new TalonFXWrapper(
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
 * [TalonFXWrapper](talonfx-wrapper.md)
+* [BatterySim](../sensor/battery-sim.md)
 * [C++ SmartMotorController](../../c++-reference/motor-controllers/smart-motor-controller.md)

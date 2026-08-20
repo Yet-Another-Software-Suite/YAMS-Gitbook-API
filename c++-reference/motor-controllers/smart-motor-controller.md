@@ -158,6 +158,8 @@ virtual void* GetMotorControllerConfig() = 0;
 | `simulation::ArmSimSupplier`      | Single-jointed arm physics |
 | `simulation::ElevatorSimSupplier` | Linear elevator physics    |
 
+Each built-in `SimSupplier`, along with `SparkWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`, reports its simulated current draw into [`BatterySim`](../sensor/battery-sim.md) every loop, using its own instance address as a stable identity. `BatterySim` combines the draw of every registered mechanism into one shared, loaded voltage written to `frc::sim::RoboRioSim::SetVInVoltage(...)`.
+
 ***
 
 ## CTRE-Specific Notes
@@ -211,4 +213,5 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 ## See Also
 
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
+* [BatterySim](../sensor/battery-sim.md)
 * [Java SmartMotorController](../../java-reference/motor-controllers/smart-motor-controller.md)

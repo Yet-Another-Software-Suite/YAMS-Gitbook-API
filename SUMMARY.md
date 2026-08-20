@@ -52,6 +52,7 @@
   * [EasyCRT](java-reference/units/easy-crt.md)
 * [Simulation](java-reference/sensor/README.md)
   * [Sensor](java-reference/sensor/README.md)
+  * [BatterySim](java-reference/sensor/battery-sim.md)
 * [Exceptions](java-reference/exceptions.md)
 
 ## C++ Reference
@@ -92,6 +93,7 @@
   * [EasyCRT](c++-reference/units/easy-crt.md)
 * [Simulation](c++-reference/sensor/README.md)
   * [Sensor](c++-reference/sensor/README.md)
+  * [BatterySim](c++-reference/sensor/battery-sim.md)
 * [Exceptions](c++-reference/exceptions.md)
 
 ## Guides
