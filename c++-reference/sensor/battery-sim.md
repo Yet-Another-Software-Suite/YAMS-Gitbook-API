@@ -9,6 +9,10 @@
 This class is entirely static and requires no setup for basic voltage sag under combined load — every built-in sim supplier and hardware wrapper registers with it automatically.
 {% endhint %}
 
+{% hint style="info" %}
+The current draw registered here comes directly out of each mechanism's physics simulation, which derives current from the torque needed to produce a given acceleration. An unrealistic moment of inertia understates that current — and therefore the voltage sag `BatterySim` computes. Set a real MOI via [`SmartMotorControllerConfig::WithMOI(...)`](../motor-controllers/smart-motor-controller-config.md) for more realistic results.
+{% endhint %}
+
 ## Static Fields
 
 | Field                | Type              | Description                                                                              |
