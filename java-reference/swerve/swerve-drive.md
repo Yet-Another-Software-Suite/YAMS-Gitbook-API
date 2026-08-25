@@ -36,6 +36,17 @@ SwerveDrive(SwerveDriveConfig config)
 | `getChassisSpeeds()`                                  | `ChassisSpeeds`          | Returns the current robot-relative chassis speeds derived from module states.  |
 | `getModuleStates()`                                   | `SwerveModuleState[]`    | Returns the current state (speed and angle) of each module.                    |
 | `getModulePositions()`                                | `SwerveModulePosition[]` | Returns the integrated position of each module.                                |
+| `getDesiredChassisSpeeds()`                           | `ChassisSpeeds`          | Returns the last-commanded robot-relative setpoint (not a measurement).        |
+| `getPoseEstimator()`                                  | `SwerveDrivePoseEstimator` | Returns the pose estimator backing odometry. See warning below.              |
+| `getField2d()`                                        | `Field2d`                | Returns the `Field2d` widget the drive already publishes to SmartDashboard.    |
+
+{% hint style="warning" %}
+`getDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion — it is whatever was last passed to `setRobotRelativeChassisSpeeds(...)` (directly, or via `setFieldRelativeChassisSpeeds(...)`/`drive(...)`), cached and republished every `updateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `ChassisSpeeds`. For the drive's actual measured speed, use `getRobotRelativeSpeed()` / `getFieldRelativeSpeed()` instead.
+{% endhint %}
+
+{% hint style="danger" %}
+Do not call `update(...)`, `resetPosition(...)`, or `resetPose(...)` directly on the `SwerveDrivePoseEstimator` returned by `getPoseEstimator()`. `SwerveDrive` already calls `update(...)` on it every loop from `updateTelemetry()` — calling it yourself feeds duplicate or out-of-order samples and corrupts the pose estimate. Use `resetOdometry(Pose2d)` instead of resetting the estimator directly, so the drive's gyro offset stays consistent with it. Calling `addVisionMeasurement(...)` on the returned estimator (or via `SwerveDrive.addVisionMeasurement(...)`) is safe. The returned reference is not thread-safe — only mutate it from the thread that calls `updateTelemetry()` (normally the main robot loop).
+{% endhint %}
 
 ***
 

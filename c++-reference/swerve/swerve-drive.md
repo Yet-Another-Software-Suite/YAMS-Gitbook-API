@@ -54,6 +54,17 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 | `GetDistanceFromPose`        | `units::meter_t GetDistanceFromPose(frc::Pose2d pose)`                   | Translational distance from current pose to `pose`.       |
 | `GetAngleDifferenceFromPose` | `units::degree_t GetAngleDifferenceFromPose(frc::Pose2d pose)`           | Heading difference to face `pose`.                        |
 | `GetModule`                  | `std::optional<SwerveModule*> GetModule(const std::string& name)`        | Returns a specific module by name, or empty if not found. |
+| `GetDesiredChassisSpeeds`    | `frc::ChassisSpeeds GetDesiredChassisSpeeds()`                           | Last-commanded robot-relative setpoint (not a measurement). |
+| `GetPoseEstimator`           | `frc::SwerveDrivePoseEstimator<NumModules>& GetPoseEstimator()`          | Returns the pose estimator backing odometry. See warning below. |
+| `GetField2d`                 | `frc::Field2d& GetField2d()`                                             | Returns the `Field2d` widget the drive already publishes to SmartDashboard. |
+
+{% hint style="warning" %}
+`GetDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion — it is whatever was last passed to `SetRobotRelativeChassisSpeeds(...)` (directly, or via `SetFieldRelativeChassisSpeeds(...)`/`Drive(...)`), cached and republished every `UpdateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `frc::ChassisSpeeds`. For the drive's actual measured speed, use `GetRobotRelativeSpeed()` / `GetFieldRelativeSpeed()` instead.
+{% endhint %}
+
+{% hint style="danger" %}
+Do not call `Update(...)`, `ResetPosition(...)`, or `ResetPose(...)` directly on the `frc::SwerveDrivePoseEstimator` returned by `GetPoseEstimator()`. `SwerveDrive` already calls `Update(...)` on it every loop from `UpdateTelemetry()` — calling it yourself feeds duplicate or out-of-order samples and corrupts the pose estimate. Use `ResetOdometry(frc::Pose2d)` instead of resetting the estimator directly, so the drive's gyro offset stays consistent with it. Calling `AddVisionMeasurement(...)` on the returned estimator (or via `SwerveDrive::AddVisionMeasurement(...)`) is safe. The returned reference is not thread-safe — only mutate it from the thread that calls `UpdateTelemetry()` (normally the main robot loop).
+{% endhint %}
 
 ***
 
