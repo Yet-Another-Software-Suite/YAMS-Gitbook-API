@@ -52,7 +52,7 @@ Do not call `update(...)`, `resetPosition(...)`, or `resetPose(...)` directly on
 {% endhint %}
 
 {% hint style="info" %}
-`getSimPose()` returns a separate, ground-truth `Pose2d` that assumes every module reached its last-commanded `SwerveModuleState` perfectly — it is **not** the same as `getPose()` (the noisy, gyro/odometry-fused estimate). It's only updated in simulation, by `simIterate()`, by integrating a `Twist2d` built from the desired module states; on a real robot it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera. It does **not** get reset by `resetOdometry(Pose2d)` — if you reset odometry mid-simulation, `getSimPose()` will keep integrating from wherever it was and can drift out of sync with `getPose()`.
+`getSimPose()` returns a separate, ground-truth `Pose2d` that assumes every module reached its last-commanded `SwerveModuleState` perfectly — it is **not** the same as `getPose()` (the noisy, gyro/odometry-fused estimate). It's updated in simulation by `simIterate()`, by integrating a `Twist2d` built from the desired module states, and is also snapped to the given pose by `resetOdometry(Pose2d)` so it stays in sync with the fused estimate. On a real robot it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera.
 {% endhint %}
 
 ***
