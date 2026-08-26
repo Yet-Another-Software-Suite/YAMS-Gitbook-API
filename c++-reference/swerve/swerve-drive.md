@@ -55,6 +55,9 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 | `GetAngleDifferenceFromPose` | `units::degree_t GetAngleDifferenceFromPose(frc::Pose2d pose)`           | Heading difference to face `pose`.                        |
 | `GetModule`                  | `std::optional<SwerveModule*> GetModule(const std::string& name)`        | Returns a specific module by name, or empty if not found. |
 | `GetDesiredChassisSpeeds`    | `frc::ChassisSpeeds GetDesiredChassisSpeeds()`                           | Last-commanded robot-relative setpoint (not a measurement). |
+| `GetDesiredModuleStates`     | `wpi::array<frc::SwerveModuleState, NumModules> GetDesiredModuleStates()` | Last-commanded module states (not a measurement). |
+| `GetRobotRelativeChassisSpeedsFromState` | `frc::ChassisSpeeds GetRobotRelativeChassisSpeedsFromState(const wpi::array<frc::SwerveModuleState, NumModules>&)` | Converts an arbitrary set of module states back into robot-relative chassis speeds. |
+| `GetSimPose`                 | `frc::Pose2d GetSimPose()`                                               | Returns the simulated ground-truth pose. See below.        |
 | `GetPoseEstimator`           | `frc::SwerveDrivePoseEstimator<NumModules>& GetPoseEstimator()`          | Returns the pose estimator backing odometry. See warning below. |
 | `GetField2d`                 | `frc::Field2d& GetField2d()`                                             | Returns the `Field2d` widget the drive already publishes to SmartDashboard. |
 
@@ -64,6 +67,10 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 
 {% hint style="danger" %}
 Do not call `Update(...)`, `ResetPosition(...)`, or `ResetPose(...)` directly on the `frc::SwerveDrivePoseEstimator` returned by `GetPoseEstimator()`. `SwerveDrive` already calls `Update(...)` on it every loop from `UpdateTelemetry()` — calling it yourself feeds duplicate or out-of-order samples and corrupts the pose estimate. Use `ResetOdometry(frc::Pose2d)` instead of resetting the estimator directly, so the drive's gyro offset stays consistent with it. Calling `AddVisionMeasurement(...)` on the returned estimator (or via `SwerveDrive::AddVisionMeasurement(...)`) is safe. The returned reference is not thread-safe — only mutate it from the thread that calls `UpdateTelemetry()` (normally the main robot loop).
+{% endhint %}
+
+{% hint style="info" %}
+`GetSimPose()` returns a separate, ground-truth `frc::Pose2d` that assumes every module reached its last-commanded `frc::SwerveModuleState` perfectly — it is **not** the same as `GetPose()` (the noisy, gyro/odometry-fused estimate). It's only updated in simulation, by `SimIterate()`, by integrating a `frc::Twist2d` built from the desired module states; on real hardware it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera. It does **not** get reset by `ResetOdometry(frc::Pose2d)` — if you reset odometry mid-simulation, `GetSimPose()` will keep integrating from wherever it was and can drift out of sync with `GetPose()`.
 {% endhint %}
 
 ***

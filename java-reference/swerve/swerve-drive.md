@@ -37,6 +37,9 @@ SwerveDrive(SwerveDriveConfig config)
 | `getModuleStates()`                                   | `SwerveModuleState[]`    | Returns the current state (speed and angle) of each module.                    |
 | `getModulePositions()`                                | `SwerveModulePosition[]` | Returns the integrated position of each module.                                |
 | `getDesiredChassisSpeeds()`                           | `ChassisSpeeds`          | Returns the last-commanded robot-relative setpoint (not a measurement).        |
+| `getDesiredModuleStates()`                            | `SwerveModuleState[]`    | Returns the last-commanded module states (not a measurement).                  |
+| `getRobotRelativeChassisSpeedsFromState(SwerveModuleState[])` | `ChassisSpeeds`   | Converts an arbitrary set of module states back into robot-relative chassis speeds. |
+| `getSimPose()`                                        | `Pose2d`                 | Returns the simulated ground-truth pose. See below.                            |
 | `getPoseEstimator()`                                  | `SwerveDrivePoseEstimator` | Returns the pose estimator backing odometry. See warning below.              |
 | `getField2d()`                                        | `Field2d`                | Returns the `Field2d` widget the drive already publishes to SmartDashboard.    |
 
@@ -46,6 +49,10 @@ SwerveDrive(SwerveDriveConfig config)
 
 {% hint style="danger" %}
 Do not call `update(...)`, `resetPosition(...)`, or `resetPose(...)` directly on the `SwerveDrivePoseEstimator` returned by `getPoseEstimator()`. `SwerveDrive` already calls `update(...)` on it every loop from `updateTelemetry()` — calling it yourself feeds duplicate or out-of-order samples and corrupts the pose estimate. Use `resetOdometry(Pose2d)` instead of resetting the estimator directly, so the drive's gyro offset stays consistent with it. Calling `addVisionMeasurement(...)` on the returned estimator (or via `SwerveDrive.addVisionMeasurement(...)`) is safe. The returned reference is not thread-safe — only mutate it from the thread that calls `updateTelemetry()` (normally the main robot loop).
+{% endhint %}
+
+{% hint style="info" %}
+`getSimPose()` returns a separate, ground-truth `Pose2d` that assumes every module reached its last-commanded `SwerveModuleState` perfectly — it is **not** the same as `getPose()` (the noisy, gyro/odometry-fused estimate). It's only updated in simulation, by `simIterate()`, by integrating a `Twist2d` built from the desired module states; on a real robot it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera. It does **not** get reset by `resetOdometry(Pose2d)` — if you reset odometry mid-simulation, `getSimPose()` will keep integrating from wherever it was and can drift out of sync with `getPose()`.
 {% endhint %}
 
 ***

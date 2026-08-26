@@ -244,6 +244,7 @@ backRight.SeedAzimuthEncoder();
 | `ResetOdometry(Pose2d)`                        | Reset odometry to a known pose                    |
 | `ZeroGyro()`                                   | Zero the gyro heading                             |
 | `AddVisionMeasurement(Pose2d, second_t)`       | Fuse vision pose into odometry                    |
+| `GetSimPose()`                                 | Ground-truth simulated pose, useful for feeding a simulated vision system |
 | `UpdateTelemetry()`                            | Call in `Periodic()`                              |
 | `SimIterate()`                                 | Call in `SimulationPeriodic()`                    |
 
