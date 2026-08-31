@@ -80,7 +80,7 @@ Drives both joints to the target angles simultaneously. Runs indefinitely until 
 | `lower` | `Angle` | Target angle for the lower (shoulder) joint |
 | `upper` | `Angle` | Target angle for the upper (elbow) joint |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ---
 
@@ -97,7 +97,7 @@ Uses inverse kinematics to move the end-effector to `target` in Cartesian space.
 | `target` | `Translation2d` | Desired end-effector position |
 | `allowMirror` | `boolean` | When `true`, the IK solver may choose either elbow-up or elbow-down configuration; when `false`, only the primary configuration is used |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ---
 
@@ -115,7 +115,7 @@ Uses inverse kinematics to move to `target`, ending when the end-effector is wit
 | `allowMirror` | `boolean` | When `true`, the IK solver may choose either elbow-up or elbow-down configuration; when `false`, only the primary configuration is used |
 | `tolerance` | `Distance` | Maximum acceptable distance between current and target position for the command to end |
 
-**Returns:** `Command` — ends when within tolerance.
+**Returns:** `Command`: ends when within tolerance.
 
 ---
 

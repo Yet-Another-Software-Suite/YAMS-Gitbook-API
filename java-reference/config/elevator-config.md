@@ -21,13 +21,13 @@ ElevatorConfig clone()  // Deep copy
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withCarriageWeight(Mass mass)` | `mass` — carriage mass | **Required for simulation.** Used by `ElevatorSim` to model gravity. |
-| `withHardLimits(Distance min, Distance max)` | `min` — bottom limit, `max` — top limit | Sets the physical height range. The motor will not command positions outside these bounds. |
-| `withAngle(Angle angle)` | `angle` — angle from horizontal | Elevator mounting angle. Defaults to 90° (vertical). Optional. |
+| `withCarriageWeight(Mass mass)` | `mass`: carriage mass | **Required for simulation.** Used by `ElevatorSim` to model gravity. |
+| `withHardLimits(Distance min, Distance max)` | `min`: bottom limit, `max`: top limit | Sets the physical height range. The motor will not command positions outside these bounds. |
+| `withAngle(Angle angle)` | `angle`: angle from horizontal | Elevator mounting angle. Defaults to 90° (vertical). Optional. |
 | `withHorizontalElevator()` | _(none)_ | Disables gravity simulation. Useful for horizontal linear sliders. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
-| `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Optional. |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config` — position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
+| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional. |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
 
 > **Note:** Drum radius (spool size) is configured on `SmartMotorControllerConfig` via `.withDrumRadius(Distance chainPitch, int teeth)` or `.withMechanismCircumference(Distance)`. Cascading elevator stages are configured via `SmartMotorControllerConfig.withCascadingElevatorStages(int stages)`.
 

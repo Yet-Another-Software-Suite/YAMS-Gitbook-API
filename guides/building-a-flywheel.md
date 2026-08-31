@@ -90,7 +90,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return flyWheel.run(velocity);
     }
 
-    /** Spin up and finish once within tolerance — use to gate shooting. */
+    /** Spin up and finish once within tolerance; use to gate shooting. */
     public Command spinUpAndWait(AngularVelocity velocity) {
         return flyWheel.runTo(velocity, SPEED_TOLERANCE);
     }
@@ -136,7 +136,7 @@ shooter.readyToShoot().whileTrue(indexer.feedCommand());
 ## Notes
 
 {% hint style="info" %}
-`runTo(velocity, tolerance)` ends once the wheel reaches the target. Use it in command sequences where the next step should not begin until the wheel is up to speed. `isNear(velocity, tolerance)` (exposed as a `Trigger`) stays true as long as the wheel remains within tolerance — use it for continuously gated logic like a conveyor that feeds whenever the shooter is ready.
+`runTo(velocity, tolerance)` ends once the wheel reaches the target. Use it in command sequences where the next step should not begin until the wheel is up to speed. `isNear(velocity, tolerance)` (exposed as a `Trigger`) stays true as long as the wheel remains within tolerance; use it for continuously gated logic like a conveyor that feeds whenever the shooter is ready.
 {% endhint %}
 
 ***

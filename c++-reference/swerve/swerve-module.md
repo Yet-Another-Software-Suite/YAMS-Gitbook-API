@@ -23,6 +23,7 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 | `GetPosition` | `frc::SwerveModulePosition GetPosition() const`       | Integrated drive distance and azimuth angle. |
 | `GetName`     | `std::string GetName() const`                         | Module name from config.                     |
 | `GetConfig`   | `const config::SwerveModuleConfig& GetConfig() const` | Module configuration.                        |
+| `GetRawAbsoluteEncoderAngle` | `units::degree_t GetRawAbsoluteEncoderAngle() const` | Absolute encoder angle with no offset applied: the raw reading captured at construction. |
 
 ***
 
@@ -55,7 +56,11 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 
 ## Telemetry & DataLog
 
-`UpdateTelemetry()` publishes this module's state and absolute encoder angle to NetworkTables. To additionally record the absolute encoder angle to a WPILib DataLog, set `SwerveModuleConfig::WithDataLogName(const std::string&)` — see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry). For field-level control (or a DataLog name) on the drive/azimuth motors themselves, configure each motor's own `SmartMotorControllerConfig::WithTelemetry(name, SmartMotorControllerTelemetryConfig)`.
+`SetupTelemetry(const std::string& mechName)` wires up this module's telemetry under `Mechanisms/<mechName>/modules/<moduleName>`; `SwerveDrive<N>` calls it automatically for every module during its own construction, so you don't normally call it yourself. `UpdateTelemetry()` then publishes this module's `SwerveModuleState` and absolute encoder angle to NetworkTables at the verbosity from `SwerveModuleConfig::GetTelemetryVerbosity()`, or from an explicit `telemetry::SwerveModuleTelemetryConfig` passed via `SwerveModuleConfig::WithTelemetry(name, SwerveModuleTelemetryConfig)`; see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry) for how to additionally record fields to a WPILib DataLog. For field-level control (or a DataLog name) on the drive/azimuth motors themselves, configure each motor's own `SmartMotorControllerConfig::WithTelemetry(name, SmartMotorControllerTelemetryConfig)`.
+
+{% hint style="warning" %}
+`SwerveModuleConfig` has no `WithDataLogName(const std::string&)` method: `SetupTelemetry(...)` only consults the `SwerveModuleTelemetryConfig`'s own, separate DataLog name. Use `SwerveModuleConfig::WithTelemetry(name, telemetry::SwerveModuleTelemetryConfig{}.WithDataLogName(...))` instead; see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry).
+{% endhint %}
 
 ***
 

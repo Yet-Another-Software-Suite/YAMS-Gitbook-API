@@ -4,10 +4,10 @@ The YAMS Java API is organized into six top-level areas: mechanisms (`yams.mecha
 
 **Top-level packages**
 
-- `yams.mechanisms` — Arm, Elevator, Pivot, FlyWheel, DoubleJointedArm, DifferentialMechanism
-- `yams.mechanisms.config` — ArmConfig, ElevatorConfig, PivotConfig, FlyWheelConfig, DifferentialMechanismConfig
-- `yams.motorcontrollers` — SmartMotorController, SmartMotorControllerConfig, SparkWrapper, TalonFXWrapper
-- `yams.swerve` — SwerveDrive, SwerveModule, SwerveDriveConfig, SwerveModuleConfig, SwerveInputStream
-- `yams.gearing` — GearBox, Sprocket, MechanismGearing
-- `yams.math` — SmartMath, ExponentialProfilePIDController, LQRConfig, LQRController, DerivativeTimeFilter
-- `yams.units` — YUnits, EasyCRT
+- `yams.mechanisms`: Arm, Elevator, Pivot, FlyWheel, DoubleJointedArm, DifferentialMechanism
+- `yams.mechanisms.config`: ArmConfig, ElevatorConfig, PivotConfig, FlyWheelConfig, DifferentialMechanismConfig
+- `yams.motorcontrollers`: SmartMotorController, SmartMotorControllerConfig, SparkWrapper, TalonFXWrapper
+- `yams.swerve`: SwerveDrive, SwerveModule, SwerveDriveConfig, SwerveModuleConfig, SwerveInputStream
+- `yams.gearing`: GearBox, Sprocket, MechanismGearing
+- `yams.math`: SmartMath, ExponentialProfilePIDController, LQRConfig, LQRController, DerivativeTimeFilter
+- `yams.units`: YUnits, EasyCRT

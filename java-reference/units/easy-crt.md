@@ -2,7 +2,7 @@
 
 Package: `yams.units`
 
-`EasyCRT` (Easy Chinese Remainder Theorem) computes the absolute mechanism position from two absolute encoders with coprime gear ratios. This solves the problem of absolute encoders that only read 0–1 rotation — by using two encoders with slightly different gear reductions, the combined reading uniquely identifies position over a larger range.
+`EasyCRT` (Easy Chinese Remainder Theorem) computes the absolute mechanism position from two absolute encoders with coprime gear ratios. This solves the problem of absolute encoders that only read 0–1 rotation: by using two encoders with slightly different gear reductions, the combined reading uniquely identifies position over a larger range.
 
 ***
 
@@ -94,7 +94,7 @@ if (position.isPresent()) {
 ```
 
 {% hint style="warning" %}
-The two output sprocket tooth counts (`outputTeeth1` and `outputTeeth2`) must be coprime — their greatest common divisor must be 1. Common coprime pairs: 19 & 21, 17 & 19, 18 & 19. Using non-coprime pairs causes `AMBIGUOUS` or `NO_SOLUTION` results.
+The two output sprocket tooth counts (`outputTeeth1` and `outputTeeth2`) must be coprime: their greatest common divisor must be 1. Common coprime pairs: 19 & 21, 17 & 19, 18 & 19. Using non-coprime pairs causes `AMBIGUOUS` or `NO_SOLUTION` results.
 {% endhint %}
 
 ***

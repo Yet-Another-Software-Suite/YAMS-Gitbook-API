@@ -61,25 +61,32 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 | `GetField2d`                 | `frc::Field2d& GetField2d()`                                             | Returns the `Field2d` widget the drive already publishes to SmartDashboard. |
 
 {% hint style="warning" %}
-`GetDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion — it is whatever was last passed to `SetRobotRelativeChassisSpeeds(...)` (directly, or via `SetFieldRelativeChassisSpeeds(...)`/`Drive(...)`), cached and republished every `UpdateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `frc::ChassisSpeeds`. For the drive's actual measured speed, use `GetRobotRelativeSpeed()` / `GetFieldRelativeSpeed()` instead.
+`GetDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion: it is whatever was last passed to `SetRobotRelativeChassisSpeeds(...)` (directly, or via `SetFieldRelativeChassisSpeeds(...)`/`Drive(...)`), cached and republished every `UpdateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `frc::ChassisSpeeds`. For the drive's actual measured speed, use `GetRobotRelativeSpeed()` / `GetFieldRelativeSpeed()` instead.
 {% endhint %}
 
 {% hint style="info" %}
-There is no direct accessor for the underlying `frc::SwerveDrivePoseEstimator` — `SwerveDrive` owns it exclusively to avoid callers accidentally calling `Update(...)`/`ResetPosition(...)`/`ResetPose(...)` on it directly (which would corrupt the pose estimate by feeding it duplicate or out-of-order samples, or desyncing it from the drive's gyro offset). Use `GetPose()`, `ResetOdometry(frc::Pose2d)`, and `AddVisionMeasurement(...)` instead — they cover the estimator interactions `SwerveDrive` supports.
+There is no direct accessor for the underlying `frc::SwerveDrivePoseEstimator`. `SwerveDrive` owns it exclusively to avoid callers accidentally calling `Update(...)`/`ResetPosition(...)`/`ResetPose(...)` on it directly (which would corrupt the pose estimate by feeding it duplicate or out-of-order samples, or desyncing it from the drive's gyro offset). Use `GetPose()`, `ResetOdometry(frc::Pose2d)`, and `AddVisionMeasurement(...)` instead; they cover the estimator interactions `SwerveDrive` supports.
 {% endhint %}
 
 {% hint style="info" %}
-`GetSimPose()` returns a separate, ground-truth `frc::Pose2d` that assumes every module reached its last-commanded `frc::SwerveModuleState` perfectly — it is **not** the same as `GetPose()` (the noisy, gyro/odometry-fused estimate). It's updated in simulation by `SimIterate()`, by integrating a `frc::Twist2d` built from the desired module states, and is also snapped to the given pose by `ResetOdometry(frc::Pose2d)` so it stays in sync with the fused estimate. On real hardware it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera.
+`GetSimPose()` returns a separate, ground-truth `frc::Pose2d` that assumes every module reached its last-commanded `frc::SwerveModuleState` perfectly; it is **not** the same as `GetPose()` (the noisy, gyro/odometry-fused estimate). It's updated in simulation by `SimIterate()`, by integrating a `frc::Twist2d` built from the desired module states, and is also snapped to the given pose by `ResetOdometry(frc::Pose2d)` so it stays in sync with the fused estimate. On real hardware it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera.
 {% endhint %}
 
 ***
 
-## PID Reset
+## Auto-Align (Drive to Pose) & PID Control
 
 | Method                | Signature                    | Description                                  |
 | --------------------- | ---------------------------- | -------------------------------------------- |
-| `ResetAzimuthPID`     | `void ResetAzimuthPID()`     | Resets the azimuth PID controller state.     |
+| `DriveToPoseSetpoint` | `frc::ChassisSpeeds DriveToPoseSetpoint(frc::Pose2d targetPose)` | Computes one loop's robot-relative `ChassisSpeeds` toward `targetPose` using the configured PID controllers. Lower-level building block behind `DriveToPose(...)`; call `ResetTranslationPID()`/`ResetRotationPID()` yourself before looping on this. |
+| `SetTranslationPID`   | `void SetTranslationPID(frc::PIDController controller)` | Replaces the translation controller used by `DriveToPose(...)`. Only resets the controller (clearing its integrator) if P, I, or D actually changed, so live-tuning doesn't wipe accumulated state every loop. |
+| `SetRotationPID`      | `void SetRotationPID(frc::PIDController controller)` | Replaces the rotation controller used by `DriveToPose(...)`, with the same change-detection guard as `SetTranslationPID`. |
+| `ResetRotationPID`    | `void ResetRotationPID()`    | Resets the rotation PID controller state. |
 | `ResetTranslationPID` | `void ResetTranslationPID()` | Resets the translation PID controller state. |
+
+{% hint style="info" %}
+`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose` (see [Telemetry & DataLog](#telemetry--datalog) below). Running it resets both PID controllers and repeatedly calls `DriveToPoseSetpoint(...)` against a tunable `TargetPose` published to NetworkTables, useful for tuning `WithTranslationController`/`WithRotationController` gains without redeploying code.
+{% endhint %}
 
 ***
 
@@ -97,7 +104,9 @@ There is no direct accessor for the underlying `frc::SwerveDrivePoseEstimator` �
 
 ## Telemetry & DataLog
 
-`UpdateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig::WithTelemetry(TelemetryVerbosity)`. To additionally record those fields to a WPILib DataLog (for offline review in AdvantageScope), set `SwerveDriveConfig::WithDataLogName(const std::string&)` — see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
+`UpdateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig::WithTelemetry(const std::string& name, TelemetryVerbosity)`. It also calls `SwerveModule::UpdateTelemetry()` for each module in the drive.
+
+For full control over exactly which fields are published (including the auto-align PID gains `TranslationP/I/D`, `RotationP/I/D`, and the tunable `TargetPose` field used by the live-tuning dashboard command), pass a `telemetry::SwerveDriveTelemetryConfig` to `SwerveDriveConfig::WithTelemetry(name, SwerveDriveTelemetryConfig)`. To additionally record fields to a WPILib DataLog (for offline review in AdvantageScope), call `.WithDataLogName(const std::string&)` on that `SwerveDriveTelemetryConfig`; see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
 
 ***
 

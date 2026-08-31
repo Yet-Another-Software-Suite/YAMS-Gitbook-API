@@ -3,7 +3,7 @@
 **Package:** `yams.mechanisms.velocity`\
 **Extends:** `SmartVelocityMechanism`
 
-`FlyWheel` controls a continuously spinning wheel or roller at a target angular velocity. It is not position-controlled — hard limits do not apply.
+`FlyWheel` controls a continuously spinning wheel or roller at a target angular velocity. It is not position-controlled; hard limits do not apply.
 
 **See also:** [FlyWheelConfig](../config/flywheel-config.md) | [C++ FlyWheel](../../c++-reference/mechanisms/flywheel.md)
 
@@ -34,9 +34,9 @@ Returns the current wheel velocity from the encoder.
 
 | Name | Type | Description   |
 | ---- | ---- | ------------- |
-| —    | —    | No parameters |
+| N/A  | N/A  | No parameters |
 
-**Returns:** `AngularVelocity` — current wheel velocity.
+**Returns:** `AngularVelocity`: current wheel velocity.
 
 ***
 
@@ -54,7 +54,7 @@ Spins the wheel at `target` indefinitely using closed-loop velocity control.
 | -------- | ----------------- | ---------------------- |
 | `target` | `AngularVelocity` | Desired wheel velocity |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ***
 
@@ -71,7 +71,7 @@ Spins to `target` and ends when the wheel speed is within `tolerance` of the tar
 | `target`    | `AngularVelocity` | Desired wheel velocity                           |
 | `tolerance` | `AngularVelocity` | Acceptable speed error for the command to finish |
 
-**Returns:** `Command` — ends when within tolerance.
+**Returns:** `Command`: ends when within tolerance.
 
 ***
 
@@ -87,7 +87,7 @@ Runs the flywheel open-loop at the specified duty cycle indefinitely.
 | ----------- | -------- | -------------------------------------- |
 | `dutycycle` | `double` | Motor output in the range \[-1.0, 1.0] |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ***
 
@@ -103,7 +103,7 @@ Runs the flywheel open-loop with a duty cycle supplier; the supplier is re-evalu
 | ----------- | ------------------ | --------------------------------------------------------- |
 | `dutycycle` | `Supplier<Double>` | Supplier returning motor output in the range \[-1.0, 1.0] |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ***
 
@@ -119,7 +119,7 @@ Runs the flywheel open-loop at a fixed voltage indefinitely.
 | ------- | --------- | --------------------- |
 | `volts` | `Voltage` | Applied motor voltage |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ***
 
@@ -135,7 +135,7 @@ Runs the flywheel open-loop with a voltage supplier; the supplier is re-evaluate
 | ------- | ------------------- | ---------------------------------------- |
 | `volts` | `Supplier<Voltage>` | Supplier returning applied motor voltage |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ***
 
@@ -231,7 +231,7 @@ public Trigger max()
 
 Not applicable to velocity mechanisms. Throws `UnsupportedOperationException`.
 
-**Returns:** `Trigger` — always throws; do not use.
+**Returns:** `Trigger`: always throws; do not use.
 
 ***
 
@@ -243,7 +243,7 @@ public Trigger min()
 
 Not applicable to velocity mechanisms. Throws `UnsupportedOperationException`.
 
-**Returns:** `Trigger` — always throws; do not use.
+**Returns:** `Trigger`: always throws; do not use.
 
 ***
 

@@ -11,10 +11,10 @@ Use [SimSensorConfig](../config/sim-sensor-config.md) to build a `Sensor` declar
 
 Each field's value is resolved in this order every loop iteration:
 
-1. **Real robot** — always returns the live hardware supplier value immediately.
-2. **Active trigger** — if any registered `AddSimTrigger` condition returns `true`, the associated override value is written to Glass and returned.
-3. **Glass value** — if no trigger fired, returns whatever Glass has set for the field.
-4. **Supplier fallback** — if no Glass value is available, returns the hardware supplier value.
+1. **Real robot:** always returns the live hardware supplier value immediately.
+2. **Active trigger:** if any registered `AddSimTrigger` condition returns `true`, the associated override value is written to Glass and returned.
+3. **Glass value:** if no trigger fired, returns whatever Glass has set for the field.
+4. **Supplier fallback:** if no Glass value is available, returns the hardware supplier value.
 
 ## Constructors
 
@@ -23,7 +23,7 @@ Sensor(std::string sensorName, std::vector<SensorData> fields)
 explicit Sensor(const yams::mechanisms::config::SimSensorConfig& cfg)
 ```
 
-The `SimSensorConfig` overload is the preferred way to create sensors — see [SimSensorConfig](../config/sim-sensor-config.md).
+The `SimSensorConfig` overload is the preferred way to create sensors; see [SimSensorConfig](../config/sim-sensor-config.md).
 
 | Parameter    | Description                                                             |
 | ------------ | ----------------------------------------------------------------------- |
@@ -145,6 +145,6 @@ The typed `GetAs*` accessors throw if the field was registered with a different 
 ## Related Pages
 
 * [SimSensorConfig (C++)](../config/sim-sensor-config.md)
-* [SensorConfig (C++)](../../api/cpp/config/sensor-config.md) — absolute encoder config (not simulation)
+* [SensorConfig (C++)](../../api/cpp/config/sensor-config.md): absolute encoder config (not simulation)
 * [Sensor (Java)](../../java-reference/sensor/)
 * [Tutorial: Using YAMS Sensors](../../guides/using-yams-sensors.md)

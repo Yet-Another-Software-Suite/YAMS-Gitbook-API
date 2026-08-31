@@ -77,8 +77,8 @@ Both parameters are non-owning pointers. The `PivotConfig` and `SmartMotorContro
 
 `Pivot` and `Arm` have identical APIs. The distinction is the plane of rotation and the underlying physics model used for simulation and feedforward:
 
-* `Arm` — rotates in the XZ plane, models gravity acting against the arm length
-* `Pivot` — rotates in the XY plane, no gravity component along the rotation axis
+* `Arm`: rotates in the XZ plane, models gravity acting against the arm length
+* `Pivot`: rotates in the XY plane, no gravity component along the rotation axis
 
 Use `PivotConfig` with `Pivot` and `ArmConfig` with `Arm`.
 
@@ -106,4 +106,4 @@ frc2::CommandPtr aimCmd = pivot.RunTo(30_deg);
 
 * [Java Pivot](../../java-reference/mechanisms/pivot.md)
 * [C++ PivotConfig](../config/pivot-config.md)
-* [Arm](arm.md) — rotation in the XZ plane
+* [Arm](arm.md): rotation in the XZ plane

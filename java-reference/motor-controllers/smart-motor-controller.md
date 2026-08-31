@@ -2,7 +2,7 @@
 
 **Package:** `yams.motorcontrollers`
 
-Abstract base class for all motor controller wrappers. Do not instantiate directly — construct a concrete subclass (`SparkWrapper`, `TalonFXWrapper`, or `TalonFXSWrapper`) and assign it to a `SmartMotorController` variable. Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
+Abstract base class for all motor controller wrappers. Do not instantiate directly; construct a concrete subclass (`SparkWrapper`, `TalonFXWrapper`, or `TalonFXSWrapper`) and assign it to a `SmartMotorController` variable. Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
 
 ## Construction
 

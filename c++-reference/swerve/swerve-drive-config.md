@@ -4,7 +4,7 @@
 **Header:** `yams/mechanisms/swerve/SwerveDriveConfig.hpp`\
 **Java equivalent:** [Java SwerveDriveConfig](../../java-reference/swerve/swerve-drive-config.md)
 
-Configures a complete `SwerveDrive<N>`. Uses a fluent builder pattern — every `With*` method returns `*this` for chaining.
+Configures a complete `SwerveDrive<N>`. Uses a fluent builder pattern: every `With*` method returns `*this` for chaining.
 
 ***
 
@@ -52,18 +52,20 @@ All methods return `SwerveDriveConfig&` for chaining.
 | `WithRotationController` | `frc::PIDController controller` | PID controller (radians) used by `DriveToPose`. Continuous input over `[-π, π]` is enabled automatically. |
 | `WithSimTranslationController` | `frc::PIDController controller` | Translation controller used only in simulation. Falls back to `WithTranslationController` if unset. |
 | `WithSimRotationController` | `frc::PIDController controller` | Rotation controller used only in simulation. Falls back to `WithRotationController` if unset. |
-| `WithTelemetry` | `TelemetryVerbosity verbosity` | Sets the telemetry verbosity for drive-level fields (pose, gyro, chassis speeds, module states). |
-| `WithDataLogName` | `const std::string& dataLogName` | Logs the drive's telemetry to a WPILib DataLog under this name prefix, in addition to NetworkTables. See below. |
+| `WithTelemetry` | `const std::string& name, TelemetryVerbosity verbosity` | Sets the telemetry name (NetworkTables/DataLog prefix, defaults to `"swerve"`) and verbosity for drive-level fields (pose, gyro, chassis speeds, module states, auto-align PID gains) in one call. |
+| `WithTelemetry` | `const std::string& name, telemetry::SwerveDriveTelemetryConfig telemetryConfig` | Sets the telemetry name and configures telemetry with an explicit `SwerveDriveTelemetryConfig`, taking precedence over the verbosity-based overload. |
 
 {% hint style="info" %}
 `WithGyro` is required. Omitting it causes `GetGyroAngle()` to throw and prevents field-relative control and odometry from functioning correctly.
+
+Both `WithTelemetry` overloads require a name; there is no name-less `WithTelemetry(...)` or standalone `WithTelemetryName(...)` on `SwerveDriveConfig` (unlike, say, `SmartMotorControllerConfig`). `SwerveDriveConfig` also has no `WithDataLogName(...)`/`GetDataLogName()` of its own: DataLog output is configured on a `SwerveDriveTelemetryConfig` instead. See below.
 {% endhint %}
 
 ***
 
 ## DataLog Telemetry
 
-`WithDataLogName(name)` logs this drive's pose, gyro angle, and chassis speeds/module states (whatever `WithTelemetry`'s verbosity publishes) to a WPILib `DataLog`, in addition to NetworkTables — it does not replace NT4 publishing, and there is no swerve-level equivalent of `SmartMotorControllerTelemetryConfig::WithoutNetworkTables()`.
+`SwerveDriveConfig` has no `WithDataLogName(...)` method: DataLog output is configured on a [`SwerveDriveTelemetryConfig`](../../c++-reference/swerve/swerve-drive.md#telemetry--datalog) and wired in via `WithTelemetry(name, SwerveDriveTelemetryConfig)`:
 
 ```cpp
 SwerveDriveConfig driveConfig;
@@ -72,12 +74,15 @@ driveConfig.WithSubsystem(this)
     .WithGyro([gyroPtr = &gyro]() -> units::degree_t {
       return units::degree_t{units::turn_t{gyroPtr->GetYaw().GetValue()}};
     })
-    .WithTelemetry(SwerveDriveConfig::TelemetryVerbosity::HIGH)
-    .WithDataLogName("swerve");  // logs pose, gyro, chassis speeds, module states
+    .WithTelemetry("swerve",
+        yams::telemetry::SwerveDriveTelemetryConfig{SwerveDriveConfig::TelemetryVerbosity::HIGH}
+            .WithDataLogName("swerve"));  // logs pose, gyro, chassis speeds, module states
 ```
 
+`SwerveDriveTelemetryConfig{TelemetryVerbosity}` is shorthand for `SwerveDriveTelemetryConfig{}.WithTelemetryVerbosity(verbosity)`.
+
 {% hint style="warning" %}
-`WithDataLogName` on `SwerveDriveConfig` does **not** cascade to the modules passed to `WithModules()`, or to those modules' drive/azimuth motors. Each `SwerveModuleConfig` needs its own `WithDataLogName(...)` (see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry)), and each motor's `SmartMotorControllerConfig` needs its own `WithTelemetry(name, SmartMotorControllerTelemetryConfig)` for field-level control and its own DataLog name.
+`WithTelemetry(name, SwerveDriveTelemetryConfig)` replaces the default field selection entirely; call `WithTelemetryVerbosity(...)` (or the individual `With*()` field methods) on it yourself, since a default-constructed `SwerveDriveTelemetryConfig` has every field disabled. This DataLog name does **not** cascade to the modules passed to `WithModules()`, or to those modules' drive/azimuth motors. Each `SwerveModuleConfig` needs its own telemetry setup (see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry)), and each motor's `SmartMotorControllerConfig` needs its own `WithTelemetry(name, SmartMotorControllerTelemetryConfig)` for field-level control and its own DataLog name.
 {% endhint %}
 
 ***
@@ -94,7 +99,8 @@ driveConfig.WithSubsystem(this)
 | `GetMaximumModuleLinearVelocity` | `std::optional<units::meters_per_second_t> GetMaximumModuleLinearVelocity() const` | Optional max module speed. |
 | `GetCenterOfRotation` | `std::optional<frc::Translation2d> GetCenterOfRotation() const` | Optional center-of-rotation override. |
 | `GetTelemetryVerbosity` | `std::optional<TelemetryVerbosity> GetTelemetryVerbosity() const` | Configured telemetry verbosity, if any. |
-| `GetDataLogName` | `std::optional<std::string> GetDataLogName() const` | Configured DataLog name prefix, if any. |
+| `GetTelemetryName` | `const std::string& GetTelemetryName() const` | Telemetry name prefix for the drive (defaults to `"swerve"`). |
+| `GetSwerveDriveTelemetryConfig` | `std::optional<telemetry::SwerveDriveTelemetryConfig> GetSwerveDriveTelemetryConfig()` | The explicit config passed to `WithTelemetry(name, SwerveDriveTelemetryConfig)`, if any. Moves it out; intended to be called exactly once, by `SwerveDrive` itself. |
 | `GetGyroOffset` | `units::degree_t GetGyroOffset() const` | Stored gyro offset (zero if never set). |
 | `GetGyroAngle` | `units::degree_t GetGyroAngle() const` | Gyro angle with inversion and offset applied. Throws if no gyro supplier was configured. |
 | `GetTranslationPID` | `frc::PIDController& GetTranslationPID()` | Active translation controller (sim variant if simulating and configured). |
@@ -116,8 +122,9 @@ config.WithSubsystem(this)
     .WithStartingPose(frc::Pose2d{units::meter_t{0}, units::meter_t{0}, frc::Rotation2d{}})
     .WithTranslationController(frc::PIDController{1, 0, 0})
     .WithRotationController(frc::PIDController{1, 0, 0})
-    .WithTelemetry(SwerveDriveConfig::TelemetryVerbosity::HIGH)
-    .WithDataLogName("swerve");
+    .WithTelemetry("swerve",
+        yams::telemetry::SwerveDriveTelemetryConfig{SwerveDriveConfig::TelemetryVerbosity::HIGH}
+            .WithDataLogName("swerve"));
 
 swerve::SwerveDrive<4> m_drive{&config};
 ```

@@ -142,7 +142,7 @@ TalonFXSWrapper(ctre::phoenix6::hardware::TalonFXS* talon,
 
 `TalonFXSWrapper` exposes the same [`SmartMotorController`](smart-motor-controller.md) interface as `TalonFXWrapper`. The sections above (Open-Loop Outputs, Closed-Loop Setpoints, Encoder Reads, Motor Status, Live Configuration Setters) apply equally.
 
-> **Note:** `SetEncoderInverted` has no effect on TalonFXS — encoder direction follows motor output direction.
+> **Note:** `SetEncoderInverted` has no effect on TalonFXS: encoder direction follows motor output direction.
 
 #### Advanced Accessors
 

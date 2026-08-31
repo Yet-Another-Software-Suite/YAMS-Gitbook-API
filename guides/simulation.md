@@ -25,7 +25,7 @@ You do not need to manually construct a sim supplier. YAMS creates `ArmSimSuppli
 If you need a custom physics model, call `.withSimSupplier(SimSupplier)` on the `SmartMotorControllerConfig`. This overrides YAMS's automatic supplier. For most use cases this is not needed.
 
 ```java
-// Custom override — only if automatic supplier is insufficient.
+// Custom override, only if automatic supplier is insufficient.
 motorConfig.withSimSupplier(myCustomSimSupplier);
 ```
 {% endstep %}
@@ -46,7 +46,7 @@ public void simulationPeriodic() {
 {% step %}
 #### Call `updateTelemetry()` from `periodic()`
 
-`updateTelemetry()` publishes current state — both real and simulated — to NetworkTables so Glass and Shuffleboard reflect simulated values.
+`updateTelemetry()` publishes current state (both real and simulated) to NetworkTables so Glass and Shuffleboard reflect simulated values.
 
 ```java
 @Override
@@ -68,11 +68,11 @@ YAMS publishes a `Mechanism2d` object under the subsystem's NetworkTables key. I
 ## Notes
 
 {% hint style="info" %}
-The three sim suppliers YAMS provides internally are `ArmSimSupplier`, `ElevatorSimSupplier`, and `DCMotorSimSupplier`. For most use cases, you do not construct these directly — YAMS instantiates them automatically when the mechanism config contains the physical parameters it needs (arm length, carriage weight, MOI, etc.).
+The three sim suppliers YAMS provides internally are `ArmSimSupplier`, `ElevatorSimSupplier`, and `DCMotorSimSupplier`. For most use cases, you do not construct these directly; YAMS instantiates them automatically when the mechanism config contains the physical parameters it needs (arm length, carriage weight, MOI, etc.).
 {% endhint %}
 
 {% hint style="warning" %}
-Without `.withLength()` on `ArmConfig`, or without `.withCarriageWeight()` and `.withDrumRadius()` on `ElevatorConfig`, YAMS cannot model gravity. The mechanism will behave like a frictionless flywheel in simulation — it will not fall under gravity, and your feedforward tuning will not transfer to the real robot.
+Without `.withLength()` on `ArmConfig`, or without `.withCarriageWeight()` and `.withDrumRadius()` on `ElevatorConfig`, YAMS cannot model gravity. The mechanism will behave like a frictionless flywheel in simulation: it will not fall under gravity, and your feedforward tuning will not transfer to the real robot.
 {% endhint %}
 
 ***

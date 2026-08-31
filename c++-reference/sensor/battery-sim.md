@@ -3,14 +3,14 @@
 **Namespace:** `yams::motorcontrollers::simulation`\
 **Header:** `yams/motorcontrollers/simulation/BatterySim.hpp`
 
-`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` — via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`TalonFXWrapper`/`TalonFXSWrapper` — registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which is written to `frc::sim::RoboRioSim::SetVInVoltage(...)`, so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
+`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which is written to `frc::sim::RoboRioSim::SetVInVoltage(...)`, so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 
 {% hint style="info" %}
-This class is entirely static and requires no setup for basic voltage sag under combined load — every built-in sim supplier and hardware wrapper registers with it automatically.
+This class is entirely static and requires no setup for basic voltage sag under combined load: every built-in sim supplier and hardware wrapper registers with it automatically.
 {% endhint %}
 
 {% hint style="info" %}
-The current draw registered here comes directly out of each mechanism's physics simulation, which derives current from the torque needed to produce a given acceleration. An unrealistic moment of inertia understates that current — and therefore the voltage sag `BatterySim` computes. Set a real MOI via [`SmartMotorControllerConfig::WithMOI(...)`](../motor-controllers/smart-motor-controller-config.md) for more realistic results.
+The current draw registered here comes directly out of each mechanism's physics simulation, which derives current from the torque needed to produce a given acceleration. An unrealistic moment of inertia understates that current, and therefore the voltage sag `BatterySim` computes. Set a real MOI via [`SmartMotorControllerConfig::WithMOI(...)`](../motor-controllers/smart-motor-controller-config.md) for more realistic results.
 {% endhint %}
 
 ## Static Fields
@@ -26,11 +26,11 @@ The current draw registered here comes directly out of each mechanism's physics 
 static units::volt_t CalculateVoltage(const void* id, units::ampere_t current);
 ```
 
-Registers `current` under `id` and returns the resulting loaded battery voltage across every registered id. `id` should be a stable identity for the calling mechanism — YAMS's built-in sim suppliers and hardware wrappers pass their own `SimSupplier` instance address (`this` / `m_simSupplier.get()`).
+Registers `current` under `id` and returns the resulting loaded battery voltage across every registered id. `id` should be a stable identity for the calling mechanism; YAMS's built-in sim suppliers and hardware wrappers pass their own `SimSupplier` instance address (`this` / `m_simSupplier.get()`).
 
 ## Discharge Simulation
 
-By default, `BatterySim` holds a constant nominal voltage and resistance — enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `frc::Timer::GetFPGATimestamp()`), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
+By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `frc::Timer::GetFPGATimestamp()`), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
 
 ```cpp
 static void EnableDischarge(double batteryCapacityAmpHours, units::volt_t nominalVoltage,
@@ -53,7 +53,7 @@ Discharge simulation only affects `CalculateVoltage(...)`. It has no effect on a
 
 ## Custom Discharge Curves
 
-`EnableDischarge(...)` sags voltage along a built-in curve that models a typical FRC sealed lead-acid battery — roughly flat through most of the charge, then dropping off quickly near depletion. Not every battery behaves that way. Call `ReplaceSOCInterpolation(...)` **before** `EnableDischarge(...)` to swap in a curve that matches the battery you're actually trying to model.
+`EnableDischarge(...)` sags voltage along a built-in curve that models a typical FRC sealed lead-acid battery: roughly flat through most of the charge, then dropping off quickly near depletion. Not every battery behaves that way. Call `ReplaceSOCInterpolation(...)` **before** `EnableDischarge(...)` to swap in a curve that matches the battery you're actually trying to model.
 
 ```cpp
 static void ReplaceSOCInterpolation(const std::map<double, double>& socToVoltage);
@@ -61,7 +61,7 @@ static void ReplaceSOCInterpolation(const std::map<double, double>& socToVoltage
 
 Reach for this when:
 
-* **You're modeling a well-used competition battery.** An old battery sags earlier and harder than a fresh one — a flatter, lower curve reproduces that instead of assuming every match starts with a fresh battery.
+* **You're modeling a well-used competition battery.** An old battery sags earlier and harder than a fresh one; a flatter, lower curve reproduces that instead of assuming every match starts with a fresh battery.
 * **You measured a real curve.** If you've put a battery on a load tester and have actual voltage-vs-state-of-charge data, feeding that in directly gives the most accurate brownout predictions possible.
 
 ```cpp
@@ -81,7 +81,7 @@ yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
 ```
 
 {% hint style="info" %}
-Keys and values should span the full `[0, 1]` state-of-charge range — querying outside the range you defined returns the nearest endpoint's voltage instead of extrapolating, so a table missing the low or high end will not sag realistically there.
+Keys and values should span the full `[0, 1]` state-of-charge range. Querying outside the range you defined returns the nearest endpoint's voltage instead of extrapolating, so a table missing the low or high end will not sag realistically there.
 {% endhint %}
 
 ## Example

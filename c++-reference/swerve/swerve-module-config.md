@@ -4,7 +4,7 @@
 **Header:** `yams/mechanisms/config/SwerveModuleConfig.hpp`\
 **Java equivalent:** [Java SwerveModuleConfig](../../java-reference/swerve/swerve-module-config.md)
 
-Configures one swerve module. Takes pointers to the drive and azimuth `SmartMotorController`s. Uses a fluent builder pattern — every `With*` method returns `*this` for chaining.
+Configures one swerve module. Takes pointers to the drive and azimuth `SmartMotorController`s. Uses a fluent builder pattern: every `With*` method returns `*this` for chaining.
 
 ***
 
@@ -53,8 +53,8 @@ All methods return `SwerveModuleConfig&` for chaining.
 | `WithWheelDiameter` | `units::meter_t diameter` | Wheel diameter; derives the circumference used for linear-distance conversion. |
 | `WithMinimumVelocity` | `units::meters_per_second_t speed` | Below this speed, the module holds its current azimuth instead of tracking. |
 | `WithOptimization` | `bool enable` | Enables/disables `SwerveModuleState` optimization (flip by 180° to minimize rotation). Default `true`. |
-| `WithTelemetry` | `const std::string& name, TelemetryVerbosity verbosity` | Sets the telemetry name and verbosity for this module's own fields (absolute encoder angle). |
-| `WithDataLogName` | `const std::string& dataLogName` | Logs this module's telemetry (currently just the absolute encoder field) to a WPILib DataLog under this name, in addition to NetworkTables. See below. |
+| `WithTelemetry` | `const std::string& name, TelemetryVerbosity verbosity` | Sets the telemetry name and verbosity for this module's own fields (absolute encoder angle, `SwerveModuleState`). |
+| `WithTelemetry` | `const std::string& name, telemetry::SwerveModuleTelemetryConfig telemetryConfig` | Sets the telemetry name plus an explicit `SwerveModuleTelemetryConfig`, taking precedence over `WithTelemetry(name, TelemetryVerbosity)`. |
 
 {% hint style="info" %}
 `WithAbsoluteEncoderOffset` must be calibrated per module. An incorrect offset causes the module to drive at an angle on startup until `SeedAzimuthEncoder()` corrects it.
@@ -64,18 +64,21 @@ All methods return `SwerveModuleConfig&` for chaining.
 
 ## DataLog Telemetry
 
-`WithDataLogName(name)` sends this module's absolute-encoder field to a WPILib `DataLog` under the given prefix, in addition to NetworkTables:
+`SwerveModuleConfig` has no `WithDataLogName(...)` method: DataLog output is configured on a [`telemetry::SwerveModuleTelemetryConfig`](../../c++-reference/swerve/swerve-module.md#telemetry--datalog) and wired in via `WithTelemetry(name, SwerveModuleTelemetryConfig)`:
 
 ```cpp
 SwerveModuleConfig frontLeftConfig{&driveMotorFL, &azimuthMotorFL};
 frontLeftConfig.WithWheelRadius(units::meter_t{0.0508})
     .WithLocation(units::meter_t{0.381}, units::meter_t{0.381})
-    .WithTelemetry("FrontLeft", SwerveModuleConfig::TelemetryVerbosity::HIGH)
-    .WithDataLogName("swerve/frontLeft");  // logs this module's absolute encoder angle only
+    .WithTelemetry("FrontLeft",
+        yams::telemetry::SwerveModuleTelemetryConfig{SwerveModuleConfig::TelemetryVerbosity::HIGH}
+            .WithDataLogName("swerve/frontLeft"));  // logs this module's absolute encoder angle and state
 ```
 
+`SwerveModuleTelemetryConfig{TelemetryVerbosity}` is shorthand for `SwerveModuleTelemetryConfig{}.WithTelemetryVerbosity(verbosity)`.
+
 {% hint style="warning" %}
-`WithDataLogName` on `SwerveModuleConfig` is independent of `SwerveDriveConfig::WithDataLogName` (neither cascades to the other) and does **not** cascade to this module's drive/azimuth motors. To get field-level DataLog control (or a DataLog name) on the drive or azimuth motor itself, configure that motor's own `SmartMotorControllerConfig::WithTelemetry(name, SmartMotorControllerTelemetryConfig)` before constructing the `SwerveModule` — see [SmartMotorControllerTelemetryConfig](../motor-controllers/smart-motor-controller-telemetry-config.md).
+This DataLog name is independent of the drive-level one configured via `SwerveDriveConfig::WithTelemetry(name, SwerveDriveTelemetryConfig)` (neither cascades to the other) and does **not** cascade to this module's drive/azimuth motors. To get field-level DataLog control (or a DataLog name) on the drive or azimuth motor itself, configure that motor's own `SmartMotorControllerConfig::WithTelemetry(name, SmartMotorControllerTelemetryConfig)` before constructing the `SwerveModule`; see [SmartMotorControllerTelemetryConfig](../motor-controllers/smart-motor-controller-telemetry-config.md).
 {% endhint %}
 
 ***
@@ -93,7 +96,7 @@ frontLeftConfig.WithWheelRadius(units::meter_t{0.0508})
 | `GetAbsoluteEncoderAngle` | `units::degree_t GetAbsoluteEncoderAngle() const` | Current absolute encoder angle with gearing and offset applied. Falls back to the azimuth motor's mechanism position if no encoder supplier is set. |
 | `GetRawAbsoluteEncoderAngle` | `std::function<units::degree_t()> GetRawAbsoluteEncoderAngle() const` | Absolute encoder angle supplier without offsets applied. Falls back to the azimuth motor's mechanism position (plus its external encoder zero offset, on a real robot) if no encoder supplier is set. |
 | `GetAbsoluteEncoderSupplier` | `std::optional<std::function<units::degree_t()>> GetAbsoluteEncoderSupplier() const` | The absolute encoder supplier, if configured via `WithAbsoluteEncoder()`. |
-| `GetDataLogName` | `std::optional<std::string> GetDataLogName() const` | Configured DataLog name prefix, if any. |
+| `GetSwerveModuleTelemetryConfig` | `std::optional<telemetry::SwerveModuleTelemetryConfig> GetSwerveModuleTelemetryConfig()` | The explicit config passed to `WithTelemetry(name, SwerveModuleTelemetryConfig)`, if any. Moves it out; intended to be called exactly once, by `SwerveModule` itself. |
 | `GetOptimizedState` | `frc::SwerveModuleState GetOptimizedState(frc::SwerveModuleState state) const` | Applies all enabled optimizations (min-velocity clamp, state optimization, cosine compensation) to `state`. |
 
 ***
@@ -108,8 +111,9 @@ frontLeftConfig
     })
     .WithLocation(units::inch_t{24}, units::inch_t{24})
     .WithOptimization(true)
-    .WithTelemetry("FrontLeft", SwerveModuleConfig::TelemetryVerbosity::HIGH)
-    .WithDataLogName("swerve/frontLeft");
+    .WithTelemetry("FrontLeft",
+        yams::telemetry::SwerveModuleTelemetryConfig{SwerveModuleConfig::TelemetryVerbosity::HIGH}
+            .WithDataLogName("swerve/frontLeft"));
 ```
 
 ***

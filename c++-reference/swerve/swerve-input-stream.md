@@ -98,7 +98,7 @@ All builder methods return `SwerveInputStream&` for chaining.
 | Method       | Signature                         | Description                                                                                                    |
 | ------------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `Get`        | `frc::ChassisSpeeds Get()`        | Computes and returns the current field-relative (or robot-relative) `ChassisSpeeds`. Call once per robot loop. |
-| `operator()` | `frc::ChassisSpeeds operator()()` | Same as `Get()` — allows using the stream as a `std::function<frc::ChassisSpeeds()>` directly.                 |
+| `operator()` | `frc::ChassisSpeeds operator()()` | Same as `Get()`, allows using the stream as a `std::function<frc::ChassisSpeeds()>` directly.                 |
 
 ***
 

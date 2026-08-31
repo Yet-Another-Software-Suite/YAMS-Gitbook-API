@@ -12,15 +12,15 @@ Package: `yams.units`
 
 | Constant | Symbol | Metric Equivalent |
 |----------|--------|------------------|
-| `Hands` | — | 0.1016 m (4 inches) |
+| `Hands` | N/A | 0.1016 m (4 inches) |
 | `Yards` | yd | 0.9144 m |
-| `Cubits` | — | 0.4572 m (18 inches) |
-| `Fathoms` | — | 1.8288 m |
-| `Chains` | — | 20.1168 m |
-| `Furlongs` | — | 201.168 m |
+| `Cubits` | N/A | 0.4572 m (18 inches) |
+| `Fathoms` | N/A | 1.8288 m |
+| `Chains` | N/A | 20.1168 m |
+| `Furlongs` | N/A | 201.168 m |
 | `Miles` | mi | 1609.344 m |
-| `Leagues` | — | 4828.032 m |
-| `FootlongSandwich` | — | 0.3048 m |
+| `Leagues` | N/A | 4828.032 m |
+| `FootlongSandwich` | N/A | 0.3048 m |
 
 ## Time Units
 

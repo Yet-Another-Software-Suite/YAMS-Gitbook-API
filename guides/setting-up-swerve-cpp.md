@@ -28,7 +28,7 @@
 Each swerve module needs two `SmartMotorController` instances: one for the drive wheel (velocity control) and one for the azimuth (steering angle, position control).
 
 ```cpp
-// Drive motor config — velocity PID + feedforward
+// Drive motor config: velocity PID + feedforward
 yams::motorcontrollers::SmartMotorControllerConfig driveConfig;
 driveConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
@@ -41,7 +41,7 @@ driveConfig
     .WithSubsystem(this)
     .WithTelemetry("DriveFL");
 
-// Azimuth motor config — position PID, continuous wrapping
+// Azimuth motor config: position PID, continuous wrapping
 yams::motorcontrollers::SmartMotorControllerConfig azimuthConfig;
 azimuthConfig
     .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
@@ -126,6 +126,7 @@ driveConfig
     .WithTranslationController(frc::PIDController{1.0, 0, 0})
     .WithRotationController(frc::PIDController{1.0, 0, 0})
     .WithTelemetry(
+        "swerve",
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 ```
 {% endstep %}
@@ -228,6 +229,20 @@ backLeft.SeedAzimuthEncoder();
 backRight.SeedAzimuthEncoder();
 ```
 {% endstep %}
+
+{% step %}
+#### Auto-align (`DriveToPose`) and live PID tuning
+
+`DriveToPose(frc::Pose2d)` returns a `frc2::CommandPtr` that drives the robot to a field-relative pose using the `WithTranslationController`/`WithRotationController` PID gains set on `SwerveDriveConfig`:
+
+```cpp
+frc2::CommandPtr DriveSubsystem::DriveToPoseCommand(frc::Pose2d target) {
+    return swerveDrive_.DriveToPose(target);
+}
+```
+
+`SwerveDrive<N>` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it drives toward a `TargetPose` field you can edit live in NetworkTables/Glass, so you can tune those PID gains without redeploying code. Enabling it requires `TelemetryVerbosity::HIGH` (the default) or explicitly enabling the tunable fields via a `SwerveDriveTelemetryConfig`; see [SwerveDrive (C++): Auto-Align](../c++-reference/swerve/swerve-drive.md#auto-align-drive-to-pose--pid-control).
+{% endstep %}
 {% endstepper %}
 
 ***
@@ -239,6 +254,10 @@ backRight.SeedAzimuthEncoder();
 | `SetFieldRelativeChassisSpeeds(ChassisSpeeds)` | Field-relative drive                              |
 | `SetRobotRelativeChassisSpeeds(ChassisSpeeds)` | Robot-relative drive                              |
 | `Drive(std::function<ChassisSpeeds()>)`        | Returns a run `CommandPtr` for continuous driving |
+| `DriveToPose(Pose2d)`                          | Returns a `CommandPtr` that PID-drives to a field-relative pose |
+| `DriveToPoseSetpoint(Pose2d)`                  | Computes one loop's `ChassisSpeeds` toward a pose (building block behind `DriveToPose`) |
+| `SetTranslationPID(PIDController)` / `SetRotationPID(PIDController)` | Replace the auto-align PID controllers (integrator preserved unless gains changed) |
+| `ResetTranslationPID()` / `ResetAzimuthPID()`  | Reset the auto-align PID controllers' internal state |
 | `LockPose()`                                   | X-pattern to resist pushing                       |
 | `GetPose()`                                    | Current field-relative pose from odometry         |
 | `ResetOdometry(Pose2d)`                        | Reset odometry to a known pose                    |

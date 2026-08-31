@@ -10,8 +10,8 @@
 
 Identify which motor controller you are using:
 
-* **REV SPARK MAX / SPARK FLEX** — requires the REVLib vendordep.
-* **CTRE TalonFX / TalonFXS** — requires the Phoenix 6 vendordep.
+* **REV SPARK MAX / SPARK FLEX**: requires the REVLib vendordep.
+* **CTRE TalonFX / TalonFXS**: requires the Phoenix 6 vendordep.
 
 Add the appropriate vendordep to your project before proceeding.
 {% endstep %}
@@ -21,7 +21,7 @@ Add the appropriate vendordep to your project before proceeding.
 
 `SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and idle mode.
 
-**Java — SPARK MAX with arm control:**
+**Java: SPARK MAX with arm control**
 
 ```java
 SmartMotorControllerConfig config = new SmartMotorControllerConfig()
@@ -36,7 +36,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig()
     .withTelemetry("ShoulderMotor", TelemetryVerbosity.HIGH);
 ```
 
-**C++ — TalonFX with arm control:**
+**C++: TalonFX with arm control**
 
 ```cpp
 motorcontrollers::SmartMotorControllerConfig config;

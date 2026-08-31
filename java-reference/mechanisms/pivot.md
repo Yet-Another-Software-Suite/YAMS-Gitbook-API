@@ -3,7 +3,7 @@
 **Package:** `yams.mechanisms.positional`\
 **Extends:** `SmartPositionalMechanism`
 
-Controls rotation around a vertical axis — suitable for shooter hoods, turrets, or any mechanism rotating in the XY plane. For a gravity-affected arm rotating in the XZ plane, use [Arm](arm.md) instead.
+Controls rotation around a vertical axis, suitable for shooter hoods, turrets, or any mechanism rotating in the XY plane. For a gravity-affected arm rotating in the XZ plane, use [Arm](arm.md) instead.
 
 ## Constructor
 

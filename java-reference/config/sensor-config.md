@@ -4,7 +4,7 @@
 
 Builder for a simulated sensor that bridges real hardware I/O and the YAMS simulation framework. Attach typed fields backed by live hardware suppliers, then inject override values during simulation by match-time window or an arbitrary trigger.
 
-The finished config is resolved to a `Sensor` instance via `getSensor()`, which performs real/simulated value arbitration at runtime — the hardware value is used normally, and the injected value takes over whenever its trigger is active.
+The finished config is resolved to a `Sensor` instance via `getSensor()`, which performs real/simulated value arbitration at runtime: the hardware value is used normally, and the injected value takes over whenever its trigger is active.
 
 ## Constructor
 
@@ -16,7 +16,7 @@ SensorConfig(String name)
 | --------- | -------------------------------------------- |
 | `name`    | Display name shown in the simulation window. |
 
-## Builder Methods — Field Registration
+## Builder Methods: Field Registration
 
 Register each hardware value you want to expose. Four overloads accept `DoubleSupplier`, `IntSupplier`, `BooleanSupplier`, and `LongSupplier`.
 
@@ -33,7 +33,7 @@ SensorConfig withField(String name, LongSupplier supplier, long defaultVal)
 | `supplier`   | Live hardware value source (called every loop iteration on a real robot).  |
 | `defaultVal` | Value used before any simulation override fires.                           |
 
-## Builder Methods — Simulated Value Injection
+## Builder Methods: Simulated Value Injection
 
 Override a field's value during a match-time window or when a `BooleanSupplier` trigger returns `true`. Overloads exist for `double`, `int`, `long`, and `boolean` values.
 
@@ -102,7 +102,7 @@ Multiple `withSimulatedValue` calls on the same field are all registered. The fi
 {% endhint %}
 
 {% hint style="warning" %}
-`getSensor()` is lazy — the `Sensor` instance is not built until first called. Call it once after configuration is complete and store the result.
+`getSensor()` is lazy: the `Sensor` instance is not built until first called. Call it once after configuration is complete and store the result.
 {% endhint %}
 
 ## Related Pages

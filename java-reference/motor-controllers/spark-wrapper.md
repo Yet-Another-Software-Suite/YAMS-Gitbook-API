@@ -41,8 +41,8 @@ SmartMotorController motor = new SparkWrapper(
 
 **Absolute encoder discontinuity point.** When using a `SparkAbsoluteEncoder` as the external encoder, `withExternalEncoderDiscontinuityPoint` must be called in the config:
 
-* `Rotations.of(0.5)` — sensor range is `[-0.5, 0.5)`. Use when the mechanism zero is in the middle of the encoder range.
-* `Rotations.of(1.0)` — sensor range is `[0, 1)`. Use when the full rotation is the intended range.
+* `Rotations.of(0.5)`: sensor range is `[-0.5, 0.5)`. Use when the mechanism zero is in the middle of the encoder range.
+* `Rotations.of(1.0)`: sensor range is `[0, 1)`. Use when the full rotation is the intended range.
 
 {% hint style="info" %}
 It is recommended to call `withExternalEncoderDiscontinuityPoint` when using a `SparkAbsoluteEncoder`. Without it, the encoder reports incorrect positions near the wraparound point.

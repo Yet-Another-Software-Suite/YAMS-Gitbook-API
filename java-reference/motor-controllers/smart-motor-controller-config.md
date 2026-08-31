@@ -37,7 +37,7 @@ SmartMotorControllerConfig(Subsystem subsystem)
 
 The no-argument constructor is valid; call `withSubsystem(Subsystem)` before passing the config to a `SmartMotorController`.
 
-## Builder Methods — Motor Settings
+## Builder Methods: Motor Settings
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -56,7 +56,7 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withControlMode(ControlMode mode)` | `mode` | Selects `OPEN_LOOP` or `CLOSED_LOOP`. |
 | `withResetPreviousConfig(boolean reset)` | `reset` | When `true` (default), clears any previously burned configuration before applying this one. |
 
-## Builder Methods — Gearing & Measurement
+## Builder Methods: Gearing & Measurement
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -79,12 +79,12 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withClosedLoopTolerance(Distance tolerance)` | `tolerance` | Sets position tolerance in distance units. Requires `withLinearClosedLoopController(true)`. |
 | `withFeedbackSynchronizationThreshold(Angle angle)` | `angle` | Relative encoder is re-seeded from absolute encoder when drift exceeds this angle. Incompatible with distance-based mechanisms. |
 
-## Builder Methods — Closed-Loop Control
+## Builder Methods: Closed-Loop Control
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withClosedLoopController(double kP, double kI, double kD)` | — | Sets position PID gains for SLOT_0. Units: rotations in, volts out (meters in if linear). |
-| `withClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | — | Same as above for a specific slot. |
+| `withClosedLoopController(double kP, double kI, double kD)` | N/A | Sets position PID gains for SLOT_0. Units: rotations in, volts out (meters in if linear). |
+| `withClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | N/A | Same as above for a specific slot. |
 | `withClosedLoopController(PIDController controller)` | `controller` | Attaches an existing `PIDController` to SLOT_0. |
 | `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an LQR controller. Clears all PID slots. |
 | `withClosedLoopControlPeriod(Time time)` | `time` | Period of the software closed-loop thread. Default: 20 ms. |
@@ -92,32 +92,32 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withClosedLoopControllerMaximumVoltage(Voltage volts)` | `volts` | Clamps the closed-loop voltage output to ±`volts`. |
 | `withLinearClosedLoopController(boolean linear)` | `linear` | When `true`, the controller operates in meters instead of rotations. |
 | `withFeedforward(SimpleMotorFeedforward ff)` | `ff` | Attaches a `SimpleMotorFeedforward` (kS, kV, kA) to SLOT_0. |
-| `withFeedforward(SimpleMotorFeedforward ff, ClosedLoopControllerSlot slot)` | — | Same, for a specific slot. |
+| `withFeedforward(SimpleMotorFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withFeedforward(ArmFeedforward ff)` | `ff` | Attaches an `ArmFeedforward` (kS, kG, kV, kA) to SLOT_0. Feedforward is gravity-compensated as a function of angle. |
-| `withFeedforward(ArmFeedforward ff, ClosedLoopControllerSlot slot)` | — | Same, for a specific slot. |
+| `withFeedforward(ArmFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withFeedforward(ElevatorFeedforward ff)` | `ff` | Attaches an `ElevatorFeedforward` (kS, kG, kV, kA) to SLOT_0. Enables linear closed-loop mode. |
-| `withFeedforward(ElevatorFeedforward ff, ClosedLoopControllerSlot slot)` | — | Same, for a specific slot. |
+| `withFeedforward(ElevatorFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withExponentialProfile(ExponentialProfile.Constraints constraints)` | `constraints` | Enables an exponential motion profile. |
-| `withExponentialProfile(Voltage maxVolts, DCMotor motor, MomentOfInertia moi)` | — | Derives exponential profile constraints from motor and MOI (single-jointed arm). |
-| `withExponentialProfile(Voltage maxVolts, DCMotor motor, Mass mass, Distance drumRadius)` | — | Derives exponential profile constraints for an elevator. Enables linear mode. |
-| `withExponentialProfile(Voltage maxVolts, AngularVelocity maxVel, AngularAcceleration maxAccel)` | — | Derives exponential profile constraints from velocity and acceleration bounds. |
-| `withTrapezoidalProfile(AngularVelocity maxVel, AngularAcceleration maxAccel)` | — | Enables a trapezoidal motion profile for angular position control. |
-| `withTrapezoidalProfile(LinearVelocity maxVel, LinearAcceleration maxAccel)` | — | Trapezoidal profile for linear position control. Enables linear mode. |
-| `withTrapezoidalProfile(AngularAcceleration maxAccel, Velocity<AngularAccelerationUnit> maxJerk)` | — | Trapezoidal profile for angular velocity control. |
-| `withTrapezoidalProfile(LinearAcceleration maxAccel, Velocity<LinearAccelerationUnit> maxJerk)` | — | Trapezoidal profile for linear velocity control. |
+| `withExponentialProfile(Voltage maxVolts, DCMotor motor, MomentOfInertia moi)` | N/A | Derives exponential profile constraints from motor and MOI (single-jointed arm). |
+| `withExponentialProfile(Voltage maxVolts, DCMotor motor, Mass mass, Distance drumRadius)` | N/A | Derives exponential profile constraints for an elevator. Enables linear mode. |
+| `withExponentialProfile(Voltage maxVolts, AngularVelocity maxVel, AngularAcceleration maxAccel)` | N/A | Derives exponential profile constraints from velocity and acceleration bounds. |
+| `withTrapezoidalProfile(AngularVelocity maxVel, AngularAcceleration maxAccel)` | N/A | Enables a trapezoidal motion profile for angular position control. |
+| `withTrapezoidalProfile(LinearVelocity maxVel, LinearAcceleration maxAccel)` | N/A | Trapezoidal profile for linear position control. Enables linear mode. |
+| `withTrapezoidalProfile(AngularAcceleration maxAccel, Velocity<AngularAccelerationUnit> maxJerk)` | N/A | Trapezoidal profile for angular velocity control. |
+| `withTrapezoidalProfile(LinearAcceleration maxAccel, Velocity<LinearAccelerationUnit> maxJerk)` | N/A | Trapezoidal profile for linear velocity control. |
 | `withVelocityTrapezoidalProfile(boolean enabled)` | `enabled` | Marks the trapezoidal profile as a velocity profile explicitly. |
 
 {% hint style="info" %}
 `withClosedLoopController` must be called before `withContinuousWrapping` or `withClosedLoopTolerance`. The PID controller must exist to configure those options.
 {% endhint %}
 
-## Builder Methods — Simulation Overrides
+## Builder Methods: Simulation Overrides
 
 These methods set values used only when running in simulation. If no sim-specific value is set, the real-hardware value is used in simulation as well.
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withSimClosedLoopController(double kP, double kI, double kD)` | — | PID gains used only in simulation. |
+| `withSimClosedLoopController(double kP, double kI, double kD)` | N/A | PID gains used only in simulation. |
 | `withSimClosedLoopController(LQRController controller)` | `controller` | LQR controller used only in simulation. |
 | `withSimFeedforward(ArmFeedforward ff)` | `ff` | Arm feedforward used only in simulation. |
 | `withSimFeedforward(ElevatorFeedforward ff)` | `ff` | Elevator feedforward used only in simulation. |
@@ -125,7 +125,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withSimStartingPosition(Angle angle)` | `angle` | Seeds the simulated encoder to this angle at startup (simulation only). |
 | `withSimStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance (simulation only). |
 
-## Builder Methods — External Encoder
+## Builder Methods: External Encoder
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -134,7 +134,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withExternalEncoderDiscontinuityPoint(Angle discontinuity)` | `discontinuity` | Sets the absolute encoder wraparound point. Must be `Rotations.of(0.5)` or `Rotations.of(1.0)`. Required for `SparkAbsoluteEncoder`. Optional for `CANcoder`. |
 | `withUseExternalFeedbackEncoder(boolean use)` | `use` | When `true` (default), the external encoder is used as the PID feedback source. |
 
-## Builder Methods — Simulation Model
+## Builder Methods: Simulation Model
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -143,14 +143,14 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withStartingPosition(Angle angle)` | `angle` | Seeds the encoder to this angle at startup (real hardware and simulation). |
 | `withStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance. |
 
-## Builder Methods — Subsystem & Telemetry
+## Builder Methods: Subsystem & Telemetry
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
 | `withSubsystem(Subsystem subsystem)` | `subsystem` | Associates this motor with a WPILib `Subsystem`. Must be called exactly once if not provided in the constructor. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | — | Enables NetworkTables telemetry. Publishes under `Mechanisms/<name>`. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | N/A | Enables NetworkTables telemetry. Publishes under `Mechanisms/<name>`. |
 | `withTelemetry(TelemetryVerbosity verbosity)` | `verbosity` | Enables telemetry with the default name `"motor"`. |
-| `withTelemetry(String name, SmartMotorControllerTelemetryConfig telemetryConfig)` | — | Enables telemetry with a custom field selection. |
+| `withTelemetry(String name, SmartMotorControllerTelemetryConfig telemetryConfig)` | N/A | Enables telemetry with a custom field selection. |
 | `withFollowers(Pair<Object, Boolean>... followers)` | `followers` | Adds native follower motors (varargs). Each `Pair` contains the vendor motor controller object and an inversion boolean relative to the leader. Followers must be the same vendor as the leader. |
 | `withLooselyCoupledFollowers(SmartMotorController... followers)` | `followers` | Adds `SmartMotorController` followers. Only position and velocity requests are forwarded; configurations are not transferred. |
 | `withVendorConfig(Object vendorConfig)` | `vendorConfig` | Provides a vendor-specific base configuration. YAMS options applied via this class always take precedence and overwrite it. |

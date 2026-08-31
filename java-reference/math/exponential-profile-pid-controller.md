@@ -2,7 +2,7 @@
 
 **Package:** `yams.math`
 
-`ExponentialProfilePIDController` wraps a `PIDController` with an `ExponentialProfile` to produce smooth, physically-motivated setpoints. The exponential profile models a first-order system response — unlike the trapezoidal profile, it does not have a constant-velocity segment, so it tends to feel more natural for arm and flywheel mechanisms.
+`ExponentialProfilePIDController` wraps a `PIDController` with an `ExponentialProfile` to produce smooth, physically-motivated setpoints. The exponential profile models a first-order system response; unlike the trapezoidal profile, it does not have a constant-velocity segment, so it tends to feel more natural for arm and flywheel mechanisms.
 
 ## Constructors
 
@@ -19,9 +19,9 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 | ------ | ----------- |
 | `static Constraints createElevatorConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance drumRadius, MechanismGearing gearing)` | Constraints for an elevator (linear system). |
 | `static Constraints createArmConstraints(Voltage maxVolts, DCMotor motor, MomentOfInertia moi, MechanismGearing gearing)` | Constraints for an arm using MOI directly. |
-| `static Constraints createArmConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance length, MechanismGearing gearing)` | Constraints for an arm — computes MOI from mass and length. |
+| `static Constraints createArmConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance length, MechanismGearing gearing)` | Constraints for an arm; computes MOI from mass and length. |
 | `static Constraints createFlywheelConstraints(Voltage maxVolts, DCMotor motor, MomentOfInertia moi, MechanismGearing gearing)` | Constraints for a flywheel using MOI. |
-| `static Constraints createFlywheelConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance radius, MechanismGearing gearing)` | Constraints for a flywheel — computes MOI from mass and radius. |
+| `static Constraints createFlywheelConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance radius, MechanismGearing gearing)` | Constraints for a flywheel; computes MOI from mass and radius. |
 | `static Constraints createConstraints(Voltage maxVolts, AngularVelocity maxVelocity, AngularAcceleration maxAcceleration)` | Generic constraints from physical limits. |
 
 ## Control Methods

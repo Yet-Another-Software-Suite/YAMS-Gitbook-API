@@ -102,4 +102,4 @@ frc2::CommandPtr setAngleCmd = arm.RunTo(45_deg);
 
 * [Java Arm](../../java-reference/mechanisms/arm.md)
 * [C++ ArmConfig](../config/arm-config.md)
-* [Pivot](pivot.md) — rotation in the XY plane
+* [Pivot](pivot.md): rotation in the XY plane

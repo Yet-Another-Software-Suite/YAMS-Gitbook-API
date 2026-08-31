@@ -29,13 +29,13 @@ Both parameters are **required**.
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withTiltStartingPosition(Angle angle)` | `angle` — starting tilt angle | Seeds the tilt encoder with an initial position. Optional. |
-| `withTwistStartingPosition(Angle angle)` | `angle` — starting twist angle | Seeds the twist encoder with an initial position. Optional. |
-| `withLength(Distance length)` | `length` — arm length | Sets the mechanism arm length for simulation. Optional. |
-| `withMOI(Distance length, Mass mass)` | `length` — arm length, `mass` — arm mass | Computes moment of inertia for simulation. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
-| `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Optional. |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config` — position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
+| `withTiltStartingPosition(Angle angle)` | `angle`: starting tilt angle | Seeds the tilt encoder with an initial position. Optional. |
+| `withTwistStartingPosition(Angle angle)` | `angle`: starting twist angle | Seeds the twist encoder with an initial position. Optional. |
+| `withLength(Distance length)` | `length`: arm length | Sets the mechanism arm length for simulation. Optional. |
+| `withMOI(Distance length, Mass mass)` | `length`: arm length, `mass`: arm mass | Computes moment of inertia for simulation. Optional. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
+| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional. |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
 
 ---
 

@@ -3,7 +3,7 @@
 **Package:** `yams.mechanisms.config`\
 **C++ equivalent:** [C++ SwerveDriveConfig](../../c++-reference/swerve/swerve-drive-config.md)
 
-Configures a complete swerve drivetrain. Takes a `Subsystem` and a varargs array of `SwerveModule` objects — one per module.
+Configures a complete swerve drivetrain. Takes a `Subsystem` and a varargs array of `SwerveModule` objects, one per module.
 
 ## Constructor
 
@@ -28,7 +28,7 @@ All builder methods return `SwerveDriveConfig` for chaining.
 |--------|-----------|-------------|
 | `withSubsystem(Subsystem subsystem)` | `subsystem` | Sets the owning subsystem (use with the no-arg constructor). |
 | `withModules(SwerveModule... modules)` | `modules` | Sets the swerve modules for the drive. |
-| `withGyro(Supplier<Angle> gyro)` | `gyro` — yaw angle supplier | **Required.** Provides robot heading for field-relative control and odometry. |
+| `withGyro(Supplier<Angle> gyro)` | `gyro`: yaw angle supplier | **Required.** Provides robot heading for field-relative control and odometry. |
 | `withGyroOffset(Angle offset)` | `offset` | Offset subtracted from the raw gyro reading in `getGyroAngle()`. |
 | `withGyroInverted(boolean inverted)` | `inverted` | Negates the raw gyro angle when `true`. |
 | `withGyroVelocity(Supplier<AngularVelocity> supplier)` | `supplier` | Supplies gyro angular velocity. Required for angular-velocity skew correction. |
@@ -45,8 +45,12 @@ All builder methods return `SwerveDriveConfig` for chaining.
 | `withRotationController(PIDController controller)` | `controller` | PID controller for autonomous rotation corrections (`DriveToPose`). |
 | `withSimTranslationController(PIDController controller)` | `controller` | Translation controller used only in simulation. Falls back to `withTranslationController` if unset. |
 | `withSimRotationController(PIDController controller)` | `controller` | Rotation controller used only in simulation. Falls back to `withRotationController` if unset. |
-| `withTelemetry(TelemetryVerbosity verbosity)` | `verbosity` | Sets the telemetry verbosity for drive-level fields (pose, gyro, chassis speeds, module states). |
-| `withDataLogName(String dataLogName)` | `dataLogName` | Logs the drive's telemetry to a WPILib DataLog under this name prefix, in addition to NetworkTables. See below. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`, `verbosity` | Sets the telemetry name (NetworkTables/DataLog prefix, defaults to `"swerve"`) and verbosity for drive-level fields (pose, gyro, chassis speeds, module states, auto-align PID gains) in one call. |
+| `withTelemetry(String name, SwerveDriveTelemetryConfig telemetryConfig)` | `name`, `telemetryConfig` | Sets the telemetry name and configures telemetry with an explicit [`SwerveDriveTelemetryConfig`](../../java-reference/swerve/swerve-drive.md#telemetry--datalog), taking precedence over the verbosity-based overload. |
+
+{% hint style="info" %}
+Both overloads require a name; there is no name-less `withTelemetry(...)` or standalone `withTelemetryName(...)` on `SwerveDriveConfig` (unlike, say, `SmartMotorControllerConfig`).
+{% endhint %}
 
 {% hint style="info" %}
 `withGyro` is required. Omitting it will prevent field-relative control and odometry from functioning correctly.
@@ -56,17 +60,19 @@ All builder methods return `SwerveDriveConfig` for chaining.
 
 ## DataLog Telemetry
 
-`withDataLogName(name)` logs this drive's pose, gyro angle, and chassis speeds/module states (whatever `withTelemetry`'s verbosity publishes) to a WPILib `DataLog`, in addition to NetworkTables — it does not replace NT4 publishing, and there is no swerve-level equivalent of `SmartMotorControllerTelemetryConfig.withoutNetworkTables()`.
+`SwerveDriveConfig` itself has no `withDataLogName(...)` method: DataLog output is configured on a [`SwerveDriveTelemetryConfig`](../../java-reference/swerve/swerve-drive.md#telemetry--datalog) and wired in via `withTelemetry(String name, SwerveDriveTelemetryConfig)`:
 
 ```java
 SwerveDriveConfig config = new SwerveDriveConfig(this, frontLeft, frontRight, backLeft, backRight)
     .withGyro(() -> Degrees.of(m_gyro.getYaw().getValueAsDouble()))
-    .withTelemetry(TelemetryVerbosity.HIGH)
-    .withDataLogName("swerve");  // logs pose, gyro, chassis speeds, module states
+    .withTelemetry("swerve", new SwerveDriveTelemetryConfig(TelemetryVerbosity.HIGH)
+        .withDataLogName("swerve"));  // logs pose, gyro, chassis speeds, module states
 ```
 
+`SwerveDriveTelemetryConfig(TelemetryVerbosity)` is shorthand for `new SwerveDriveTelemetryConfig().withTelemetryVerbosity(verbosity)`.
+
 {% hint style="warning" %}
-`withDataLogName` on `SwerveDriveConfig` does **not** cascade to the modules passed to the constructor, or to those modules' drive/azimuth motors. Each `SwerveModuleConfig` needs its own `withDataLogName(...)` (see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry)), and each motor's `SmartMotorControllerConfig` needs its own `withTelemetry(name, SmartMotorControllerTelemetryConfig)` for field-level control and its own DataLog name.
+`withTelemetry(name, SwerveDriveTelemetryConfig)` replaces the default field selection entirely; if you pass a config, call `withTelemetryVerbosity(...)` (or the individual `with*()` field methods) on it yourself, since a bare `new SwerveDriveTelemetryConfig()` has every field disabled. This DataLog name does **not** cascade to the modules passed to the constructor, or to those modules' drive/azimuth motors. Each `SwerveModuleConfig` needs its own telemetry setup (see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry)), and each motor's `SmartMotorControllerConfig` needs its own `withTelemetry(name, SmartMotorControllerTelemetryConfig)` for field-level control and its own DataLog name.
 {% endhint %}
 
 ---
@@ -79,8 +85,8 @@ SwerveDriveConfig config = new SwerveDriveConfig(this, frontLeft, frontRight, ba
     .withMaximumChassisSpeed(MetersPerSecond.of(4.5), RadiansPerSecond.of(Math.PI * 2))
     .withTranslationController(new PIDController(1, 0, 0))
     .withRotationController(new PIDController(1, 0, 0))
-    .withTelemetry(TelemetryVerbosity.HIGH)
-    .withDataLogName("swerve");
+    .withTelemetry("swerve", new SwerveDriveTelemetryConfig(TelemetryVerbosity.HIGH)
+        .withDataLogName("swerve"));
 ```
 
 ---

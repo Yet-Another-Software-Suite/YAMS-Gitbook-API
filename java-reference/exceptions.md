@@ -2,7 +2,7 @@
 
 Package: `yams.exceptions`
 
-YAMS throws typed `RuntimeException` subclasses for configuration and runtime errors. All exceptions extend `RuntimeException` so they are unchecked — you do not need to declare or catch them unless you want to handle configuration problems gracefully.
+YAMS throws typed `RuntimeException` subclasses for configuration and runtime errors. All exceptions extend `RuntimeException` so they are unchecked; you do not need to declare or catch them unless you want to handle configuration problems gracefully.
 
 Most exceptions are thrown during motor controller or mechanism construction if required configuration fields are missing.
 

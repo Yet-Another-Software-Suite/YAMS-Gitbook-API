@@ -64,7 +64,7 @@ Drives to target tilt and twist angles simultaneously. Runs indefinitely until i
 | `tilt` | `Angle` | Desired tilt angle |
 | `twist` | `Angle` | Desired twist angle |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ---
 
@@ -81,7 +81,7 @@ Continuously controls tilt and twist from suppliers; both suppliers are re-evalu
 | `tiltSupplier` | `Supplier<Angle>` | Supplier returning the desired tilt angle each iteration |
 | `twistSupplier` | `Supplier<Angle>` | Supplier returning the desired twist angle each iteration |
 
-**Returns:** `Command` — runs until interrupted.
+**Returns:** `Command`: runs until interrupted.
 
 ---
 

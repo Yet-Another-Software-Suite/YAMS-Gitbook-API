@@ -31,8 +31,8 @@ GearBox(String[] reductionStage)   // "IN:OUT" format per stage
 
 | Method                               | Returns   | Description                                                                              |
 | ------------------------------------ | --------- | ---------------------------------------------------------------------------------------- |
-| `getInputToOutputConversionFactor()` | `double`  | Returns `OUT/IN` — mechanism rotations per motor rotation. For a 5:1 box, returns `0.2`. |
-| `getOutputToInputConversionFactor()` | `double`  | Returns `IN/OUT` — motor rotations per mechanism rotation. For a 5:1 box, returns `5.0`. |
+| `getInputToOutputConversionFactor()` | `double`  | Returns `OUT/IN`: mechanism rotations per motor rotation. For a 5:1 box, returns `0.2`. |
+| `getOutputToInputConversionFactor()` | `double`  | Returns `IN/OUT`: motor rotations per mechanism rotation. For a 5:1 box, returns `5.0`. |
 | `times(double x)`                    | `GearBox` | Multiplies the reduction ratio by `x`. Returns the same `GearBox` for chaining.          |
 | `div(double x)`                      | `GearBox` | Divides the reduction ratio by `x`. Returns the same `GearBox` for chaining.             |
 

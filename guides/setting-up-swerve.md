@@ -45,7 +45,7 @@ SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft, frontRigh
     .withMaximumChassisSpeed(MetersPerSecond.of(4.5), DegreesPerSecond.of(360))
     .withTranslationController(new PIDController(1.0, 0, 0))
     .withRotationController(new PIDController(1.0, 0, 0))
-    .withTelemetry(TelemetryVerbosity.HIGH);
+    .withTelemetry("swerve", TelemetryVerbosity.HIGH);
 ```
 {% endstep %}
 
@@ -101,7 +101,7 @@ public class DriveSubsystem extends SubsystemBase {
             .withMaximumChassisSpeed(MetersPerSecond.of(4.5), DegreesPerSecond.of(360))
             .withTranslationController(new PIDController(1.0, 0, 0))
             .withRotationController(new PIDController(1.0, 0, 0))
-            .withTelemetry(TelemetryVerbosity.HIGH);
+            .withTelemetry("swerve", TelemetryVerbosity.HIGH);
 
         swerveDrive = new SwerveDrive(driveConfig);
     }
@@ -159,6 +159,20 @@ driveSubsystem.setDefaultCommand(
 #### Azimuth encoder seeding
 
 `seedAzimuthEncoder()` is called automatically on each `SwerveModule` during construction. No additional call is required in `robotInit()`. If you need to re-seed after the CAN bus has fully settled, you can call `seedAzimuthEncoder()` on each `SwerveModule` instance individually.
+{% endstep %}
+
+{% step %}
+#### Auto-align (`driveToPose`) and live PID tuning
+
+`driveToPose(Pose2d)` returns a `Command` that drives the robot to a field-relative pose using the `withTranslationController`/`withRotationController` PID gains set on `SwerveDriveConfig`:
+
+```java
+public Command driveToPose(Pose2d target) {
+    return swerveDrive.driveToPose(target);
+}
+```
+
+`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it drives toward a `TargetPose` field you can edit live in NetworkTables/Glass, so you can tune those PID gains without redeploying code. Enabling it requires `TelemetryVerbosity.HIGH` (the default) or explicitly enabling the tunable fields via a `SwerveDriveTelemetryConfig`; see [SwerveDrive: Auto-Align](../java-reference/swerve/swerve-drive.md#auto-align-drive-to-pose).
 {% endstep %}
 {% endstepper %}
 

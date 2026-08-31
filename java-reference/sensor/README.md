@@ -10,10 +10,10 @@ Use [SensorConfig](../config/sensor-config.md) to build a `Sensor` declaratively
 
 Each field's value is resolved in this order every loop iteration:
 
-1. **Real robot** — always returns the live hardware supplier value immediately.
-2. **Active trigger** — if any registered `addSimTrigger` condition returns `true`, the associated override value is written to Glass and returned.
-3. **Glass value** — if no trigger fired, returns whatever Glass has set for the field (including the configured default).
-4. **Supplier fallback** — if no Glass value is available, returns the hardware supplier value.
+1. **Real robot**: always returns the live hardware supplier value immediately.
+2. **Active trigger**: if any registered `addSimTrigger` condition returns `true`, the associated override value is written to Glass and returned.
+3. **Glass value**: if no trigger fired, returns whatever Glass has set for the field (including the configured default).
+4. **Supplier fallback**: if no Glass value is available, returns the hardware supplier value.
 
 ## Constructors
 
@@ -22,7 +22,7 @@ Sensor(String sensorName, List<SensorData> sensorFields)
 Sensor(SensorConfig cfg)
 ```
 
-The `SensorConfig` overload is the preferred way to create sensors — see [SensorConfig](../config/sensor-config.md).
+The `SensorConfig` overload is the preferred way to create sensors; see [SensorConfig](../config/sensor-config.md).
 
 | Parameter      | Description                                                                |
 | -------------- | -------------------------------------------------------------------------- |

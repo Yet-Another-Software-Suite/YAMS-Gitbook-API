@@ -18,7 +18,7 @@ new SwerveInputStream(SwerveDrive drive, DoubleSupplier x, DoubleSupplier y, Dou
 new SwerveInputStream(SwerveDrive drive, DoubleSupplier x, DoubleSupplier y,
                       DoubleSupplier headingX, DoubleSupplier headingY)
 
-// Static factory: translation only — add rotation later with withControllerRotationAxis()
+// Static factory: translation only, add rotation later with withControllerRotationAxis()
 // or withControllerHeadingAxis()
 SwerveInputStream.of(SwerveDrive drive, DoubleSupplier x, DoubleSupplier y)
 ```
@@ -49,19 +49,19 @@ All builder methods return `SwerveInputStream` for chaining.
 
 | Method                                                                        | Parameters                               | Description                                                                                                               |
 | ----------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `withControllerRotationAxis(DoubleSupplier rot)`                              | `rot` — range `[-1, 1]`                  | Set or replace the rotation axis supplier after construction. Enables angular-velocity mode.                              |
-| `withControllerHeadingAxis(DoubleSupplier headingX, DoubleSupplier headingY)` | `headingX`, `headingY` — range `[-1, 1]` | Set or replace the heading axis suppliers after construction. Enables heading mode when `withHeadingControl()` is active. |
-| `withDeadband(double deadband)`                                               | `deadband` — 0.0 to 1.0                  | Deadband applied to all axes before scaling. Inputs below this magnitude are treated as zero.                             |
-| `withScaleTranslation(double scale)`                                          | `scale` — range `(0, 1]`                 | Multiplies the translation output magnitude by `scale`.                                                                   |
-| `withScaleRotation(double scale)`                                             | `scale` — range `(0, 1]`                 | Multiplies the rotation axis value by `scale`.                                                                            |
+| `withControllerRotationAxis(DoubleSupplier rot)`                              | `rot`: range `[-1, 1]`                  | Set or replace the rotation axis supplier after construction. Enables angular-velocity mode.                              |
+| `withControllerHeadingAxis(DoubleSupplier headingX, DoubleSupplier headingY)` | `headingX`, `headingY`: range `[-1, 1]` | Set or replace the heading axis suppliers after construction. Enables heading mode when `withHeadingControl()` is active. |
+| `withDeadband(double deadband)`                                               | `deadband`: 0.0 to 1.0                  | Deadband applied to all axes before scaling. Inputs below this magnitude are treated as zero.                             |
+| `withScaleTranslation(double scale)`                                          | `scale`: range `(0, 1]`                 | Multiplies the translation output magnitude by `scale`.                                                                   |
+| `withScaleRotation(double scale)`                                             | `scale`: range `(0, 1]`                 | Multiplies the rotation axis value by `scale`.                                                                            |
 
 ### Input Curves
 
 | Method                                                       | Parameters | Description                                                                                 |
 | ------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
-| `withCubeTranslationControllerAxis()`                        | —          | Applies a cubic curve to translation magnitude for finer low-speed control. Always enabled. |
+| `withCubeTranslationControllerAxis()`                        | N/A | Applies a cubic curve to translation magnitude for finer low-speed control. Always enabled. |
 | `withCubeTranslationControllerAxis(BooleanSupplier enabled)` | `enabled`  | Applies a cubic curve to translation magnitude when supplier returns `true`.                |
-| `withCubeRotationControllerAxis()`                           | —          | Applies a cubic curve to the rotation axis. Always enabled.                                 |
+| `withCubeRotationControllerAxis()`                           | N/A | Applies a cubic curve to the rotation axis. Always enabled.                                 |
 | `withCubeRotationControllerAxis(BooleanSupplier enabled)`    | `enabled`  | Applies a cubic curve to the rotation axis when supplier returns `true`.                    |
 
 ### Drive Modes
@@ -76,9 +76,9 @@ All builder methods return `SwerveInputStream` for chaining.
 
 | Method                                                                    | Parameters         | Description                                                                                                    |
 | ------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `withAllianceRelativeControl()`                                           | —                  | Flips the X axis when on the Red alliance so "forward" always points toward the opponent wall. Always enabled. |
+| `withAllianceRelativeControl()`                                           | N/A | Flips the X axis when on the Red alliance so "forward" always points toward the opponent wall. Always enabled. |
 | `withAllianceRelativeControl(BooleanSupplier enabled)`                    | `enabled`          | Alliance-relative control when supplier returns `true`.                                                        |
-| `withRobotRelative()`                                                     | —                  | Outputs robot-relative `ChassisSpeeds` instead of field-relative. Always enabled.                              |
+| `withRobotRelative()`                                                     | N/A | Outputs robot-relative `ChassisSpeeds` instead of field-relative. Always enabled.                              |
 | `withRobotRelative(BooleanSupplier enabled)`                              | `enabled`          | Robot-relative output when supplier returns `true`.                                                            |
 | `withTranslationHeadingOffset(Rotation2d angle)`                          | `angle`            | Rotates the translation direction by `angle`. Always enabled.                                                  |
 | `withTranslationHeadingOffset(Rotation2d angle, BooleanSupplier enabled)` | `angle`, `enabled` | Rotates the translation direction by `angle` when supplier returns `true`.                                     |
@@ -87,7 +87,7 @@ All builder methods return `SwerveInputStream` for chaining.
 
 | Method    | Parameters | Description                                                                               |
 | --------- | ---------- | ----------------------------------------------------------------------------------------- |
-| `clone()` | —          | Returns a copy of this stream. Subsequent changes to the copy do not affect the original. |
+| `clone()` | N/A | Returns a copy of this stream. Subsequent changes to the copy do not affect the original. |
 
 ***
 

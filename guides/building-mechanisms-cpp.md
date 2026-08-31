@@ -45,7 +45,7 @@ motorConfig
         units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}})
     .WithMechanismLimits(-90_deg, 90_deg)
     .WithStatorCurrentLimit(40_A)
-    .WithMOI(0.6_m, 2.0_kg)                     // arm length, arm mass — required for simulation
+    .WithMOI(0.6_m, 2.0_kg)                     // arm length, arm mass; required for simulation
     .WithSubsystem(this)
     .WithTelemetry("ShoulderMotor");
 ```
@@ -183,7 +183,7 @@ motorConfig
     .WithTelemetry("ElevatorMotor");
 ```
 
-> **Note:** Drum radius does NOT go on `ElevatorConfig` — it's set on `SmartMotorControllerConfig` via `WithMechanismCircumference`.
+> **Note:** Drum radius does NOT go on `ElevatorConfig`; it's set on `SmartMotorControllerConfig` via `WithMechanismCircumference`.
 {% endstep %}
 
 {% step %}
@@ -276,7 +276,7 @@ yams::mechanisms::positional::Pivot pivot{&pivotConfig, &motor};
 {% step %}
 #### Command Factories & Triggers
 
-Same interface as `Arm` — `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Max()`, `Min()`.
+Same interface as `Arm`: `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Max()`, `Min()`.
 
 ```cpp
 void Periodic() override { pivot_.UpdateTelemetry(); }
@@ -290,7 +290,7 @@ void SimulationPeriodic() override { pivot_.SimIterate(); }
 ## Notes
 
 {% hint style="info" %}
-`Run(angle)` holds the setpoint indefinitely. Use it for default positions or when the mechanism should stay put until another command interrupts. `RunTo(angle, tolerance)` ends once the mechanism is within tolerance — use it in command sequences to gate the next step.
+`Run(angle)` holds the setpoint indefinitely. Use it for default positions or when the mechanism should stay put until another command interrupts. `RunTo(angle, tolerance)` ends once the mechanism is within tolerance; use it in command sequences to gate the next step.
 {% endhint %}
 
 {% hint style="warning" %}

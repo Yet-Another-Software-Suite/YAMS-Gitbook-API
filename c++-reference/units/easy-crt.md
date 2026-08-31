@@ -68,7 +68,7 @@ enum class Status {
     NotAttempted,  // No solve run since construction
     Ok,            // Solve succeeded
     NoSolution,    // No candidate within range/tolerance
-    Ambiguous,     // Two tied candidates — result suppressed
+    Ambiguous,     // Two tied candidates, result suppressed
     InvalidConfig  // Inconsistent configuration (e.g., non-coprime teeth)
 };
 ```

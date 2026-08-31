@@ -30,7 +30,7 @@ SmartMotorControllerTelemetryConfig()
 | `MID`  | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                |
 | `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), current limits, ramp rates, limit values, motor temperature               |
 
-## Builder Methods — Output Channels
+## Builder Methods: Output Channels
 
 All methods return `SmartMotorControllerTelemetryConfig&` for chaining.
 
@@ -41,7 +41,7 @@ All methods return `SmartMotorControllerTelemetryConfig&` for chaining.
 | `WithoutNetworkTables()`                               | Disables NT4 publishing. Useful during competition matches.               |
 | `WithTelemetryVerbosity(TelemetryVerbosity verbosity)` | Enables a preset bundle (`LOW`, `MID`, or `HIGH`).                        |
 
-## Builder Methods — Boolean Fields
+## Builder Methods: Boolean Fields
 
 Each method enables a single boolean status flag. Flags are automatically suppressed if the motor controller or configuration does not support them.
 
@@ -56,7 +56,7 @@ Each method enables a single boolean status flag. Flags are automatically suppre
 | `WithSimpleFeedforward()`   | Whether a simple motor feedforward is in use.                  |
 | `WithMotionProfile()`       | Whether a trapezoidal or exponential motion profile is active. |
 
-## Builder Methods — Numeric Fields
+## Builder Methods: Numeric Fields
 
 | Method                      | What it logs                                                                            |
 | --------------------------- | --------------------------------------------------------------------------------------- |
@@ -81,14 +81,14 @@ Each method enables a single boolean status flag. Flags are automatically suppre
 using Cfg    = yams::motorcontrollers::SmartMotorControllerConfig;
 using TelCfg = yams::telemetry::SmartMotorControllerTelemetryConfig;
 
-// Preset-based configuration applied via SmartMotorControllerConfig — simplest approach
+// Preset-based configuration applied via SmartMotorControllerConfig (simplest approach)
 Cfg motorConfig;
 motorConfig.WithTelemetry("ShoulderMotor", Cfg::TelemetryVerbosity::HIGH);
 
 // Fine-grained override applied after constructing the motor controller
 smc.WithTelemetry(
     TelCfg{}
-        .WithTelemetryVerbosity(Cfg::TelemetryVerbosity::MID)
+        .WithTelemetryVerbosity(Cfg::TelemetryVerbosity::MEDIUM)
         .WithMechanismPosition()
         .WithMechanismVelocity()
         .WithTemperature()
@@ -106,7 +106,7 @@ Fields that are not applicable to the current motor controller or configuration 
 {% endhint %}
 
 {% hint style="warning" %}
-The Java port additionally exposes a `withCustom(...)` escape hatch for enabling/disabling arbitrary `BooleanTelemetryField`/`DoubleTelemetryField` values (including arrays of fields at once). This is not yet ported to C++ — see [SmartMotorControllerTelemetryConfig (Java)](../../java-reference/motor-controllers/smart-motor-controller-telemetry-config.md#builder-methods-custom-escape-hatch).
+The Java port additionally exposes a `withCustom(...)` escape hatch for enabling/disabling arbitrary `BooleanTelemetryField`/`DoubleTelemetryField` values (including arrays of fields at once). This is not yet ported to C++; see [SmartMotorControllerTelemetryConfig (Java)](../../java-reference/motor-controllers/smart-motor-controller-telemetry-config.md#builder-methods-custom-escape-hatch).
 {% endhint %}
 
 ## Related Pages

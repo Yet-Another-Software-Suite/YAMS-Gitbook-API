@@ -22,7 +22,7 @@ SmartMotorControllerTelemetryConfig()
 | `MID`  | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                |
 | `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), current limits, ramp rates, limit values, motor temperature               |
 
-## Builder Methods — Output Channels
+## Builder Methods: Output Channels
 
 | Method                                                 | Description                                                                                         |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -31,7 +31,7 @@ SmartMotorControllerTelemetryConfig()
 | `withoutNetworkTables()`                               | Disables NT4 publishing. Useful during competition matches to reduce CAN/network load.              |
 | `withTelemetryVerbosity(TelemetryVerbosity verbosity)` | Enables a preset bundle of fields (`LOW`, `MID`, or `HIGH`).                                        |
 
-## Builder Methods — Boolean Fields
+## Builder Methods: Boolean Fields
 
 Each method enables a single boolean status flag. The flag is automatically suppressed if the motor controller or configuration does not support it.
 
@@ -46,7 +46,7 @@ Each method enables a single boolean status flag. The flag is automatically supp
 | `withSimpleFeedforward()`   | Whether a `SimpleMotorFeedforward` is in use.                  |
 | `withMotionProfile()`       | Whether a trapezoidal or exponential motion profile is active. |
 
-## Builder Methods — Numeric Fields
+## Builder Methods: Numeric Fields
 
 Each method enables a single numeric (double) field.
 
@@ -64,7 +64,7 @@ Each method enables a single numeric (double) field.
 | `withRotorPosition()`       | Raw rotor position (rotations).                                                                                       |
 | `withRotorVelocity()`       | Raw rotor velocity (rotations/s).                                                                                     |
 
-## Builder Methods — Custom / Escape Hatch
+## Builder Methods: Custom / Escape Hatch
 
 `withCustom(...)` is an escape hatch for enabling or disabling any `BooleanTelemetryField` or `DoubleTelemetryField` by value, without a dedicated `with*()` method. It's useful for fields that don't have a named builder method, or for bulk enabling/disabling several fields at once with an array. Both enums live on `SmartMotorControllerTelemetry` (`SmartMotorControllerTelemetry.BooleanTelemetryField`, `SmartMotorControllerTelemetry.DoubleTelemetryField`).
 

@@ -47,5 +47,5 @@ config.WithMotorGearing(gearing);
 ```
 
 {% hint style="info" %}
-`GetRotorToMechanismRatio()` returns the value WPILib expects for the `rotorToMechanismRatio` field of motor controller configs (motor rotations per mechanism rotation, i.e., IN/OUT — greater than 1 for reductions).
+`GetRotorToMechanismRatio()` returns the value WPILib expects for the `rotorToMechanismRatio` field of motor controller configs (motor rotations per mechanism rotation, i.e., IN/OUT, greater than 1 for reductions).
 {% endhint %}

@@ -18,7 +18,7 @@ PivotConfig() = default;
 
 All methods return `PivotConfig&` for chaining.
 
-> **All methods are optional.** Unlike `ArmConfig`, `PivotConfig` has no simulation-required parameters — a pivot does not use arm length in its physics model.
+> **All methods are optional.** Unlike `ArmConfig`, `PivotConfig` has no simulation-required parameters: a pivot does not use arm length in its physics model.
 
 | Method                                       | Required | Description                                                          |
 | -------------------------------------------- | -------- | -------------------------------------------------------------------- |

@@ -27,13 +27,13 @@ FlyWheelConfig clone()  // Deep copy
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withDiameter(Distance diameter)` | `diameter` — wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion and simulation. |
-| `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity` — maximum simulated velocity | Enables a simulated speedometer gauge capped at `maxVelocity`. |
+| `withDiameter(Distance diameter)` | `diameter`: wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion and simulation. |
+| `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity`: maximum simulated velocity | Enables a simulated speedometer gauge capped at `maxVelocity`. |
 | `withSpeedometerSimulation()` | _(none)_ | Enables the speedometer with the previously configured max velocity. Throws if max velocity was not set first. |
 | `disableSpeedometerSimulation()` | _(none)_ | Disables the speedometer simulation. |
-| `withSimColor(Color8Bit color)` | `color` — RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config` — position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name` — NT key prefix, `verbosity` — `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
+| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Using YAMS Sensors
 
-**Goal:** Wire real hardware sensors into the YAMS simulation framework so the same subsystem code runs identically in simulation and on a physical robot — with no `#ifdef` guards, no separate simulation paths, and optional automated test-value injection.
+**Goal:** Wire real hardware sensors into the YAMS simulation framework so the same subsystem code runs identically in simulation and on a physical robot, with no `#ifdef` guards, no separate simulation paths, and optional automated test-value injection.
 
 ***
 
@@ -14,7 +14,7 @@ Additionally, YAMS Sensors support **trigger-based value injection**: you can de
 
 ## Java
 
-### Step 1 — Identify the hardware
+### Step 1: Identify the hardware
 
 Decide which hardware readings to expose. Each reading becomes one field on the sensor.
 
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 DigitalInput noteDetector = new DigitalInput(1);  // beam-break on DIO 1
 ```
 
-### Step 2 — Describe the sensor with `SensorConfig`
+### Step 2: Describe the sensor with `SensorConfig`
 
 ```java
 import static edu.wpi.first.units.Units.Seconds;
@@ -37,7 +37,7 @@ SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
 
 Pass the field name, a supplier for the live value, and a default (used before any Glass override fires).
 
-### Step 3 — Obtain the `Sensor` instance
+### Step 3: Obtain the `Sensor` instance
 
 ```java
 import yams.motorcontrollers.simulation.Sensor;
@@ -45,9 +45,9 @@ import yams.motorcontrollers.simulation.Sensor;
 Sensor sensor = intakeSensor.getSensor();
 ```
 
-`getSensor()` is lazy — call it once, cache the result.
+`getSensor()` is lazy: call it once, cache the result.
 
-### Step 4 — Read sensor values in robot code
+### Step 4: Read sensor values in robot code
 
 ```java
 // In periodic() or wherever you need the value:
@@ -56,7 +56,7 @@ boolean hasNote = sensor.getAsBoolean("NotePresent");
 
 On a real robot this always calls `noteDetector.get()`. In simulation it reads the Glass widget.
 
-### Step 5 — Inject simulated values by match time
+### Step 5: Inject simulated values by match time
 
 Declare time windows where a specific value should be returned automatically during simulation:
 
@@ -67,7 +67,7 @@ SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
     .withSimulatedValue("NotePresent", Seconds.of(5), Seconds.of(8), true);
 ```
 
-### Step 6 — Inject simulated values by trigger condition
+### Step 6: Inject simulated values by trigger condition
 
 Use a `BooleanSupplier` trigger instead of a time window when the condition is dynamic:
 
@@ -124,7 +124,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
 ### Multiple fields on one sensor
 
-A single `SensorConfig` can hold multiple fields — useful for grouping related readings:
+A single `SensorConfig` can hold multiple fields, useful for grouping related readings:
 
 ```java
 SensorConfig armSensor = new SensorConfig("Arm")
@@ -146,14 +146,14 @@ boolean atTop = sensor.getAsBoolean("AtUpperLimit");
 
 ## C++
 
-### Step 1 — Identify the hardware
+### Step 1: Identify the hardware
 
 ```cpp
 #include <frc/DigitalInput.h>
 frc::DigitalInput noteDetector{1};  // beam-break on DIO 1
 ```
 
-### Step 2 — Describe the sensor with `SimSensorConfig`
+### Step 2: Describe the sensor with `SimSensorConfig`
 
 ```cpp
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
@@ -164,7 +164,7 @@ intakeSensor
     .WithField("NotePresent", [&noteDetector] { return !noteDetector.Get(); }, false);
 ```
 
-### Step 3 — Obtain the `Sensor` instance
+### Step 3: Obtain the `Sensor` instance
 
 ```cpp
 #include <yams/motorcontrollers/simulation/Sensor.hpp>
@@ -173,15 +173,15 @@ using yams::motorcontrollers::simulation::Sensor;
 Sensor& sensor = intakeSensor.GetSensor();
 ```
 
-`GetSensor()` is lazy — call it once, cache the returned reference.
+`GetSensor()` is lazy: call it once, cache the returned reference.
 
-### Step 4 — Read sensor values in robot code
+### Step 4: Read sensor values in robot code
 
 ```cpp
 bool hasNote = sensor.GetAsBoolean("NotePresent");
 ```
 
-### Step 5 — Inject simulated values by match time
+### Step 5: Inject simulated values by match time
 
 ```cpp
 SimSensorConfig intakeSensor{"IntakeSensor"};
@@ -190,7 +190,7 @@ intakeSensor
     .WithSimulatedValue("NotePresent", 5_s, 8_s, true);  // tripped at 5 s..8 s in sim
 ```
 
-### Step 6 — Inject simulated values by trigger condition
+### Step 6: Inject simulated values by trigger condition
 
 ```cpp
 #include <frc/DriverStation.h>
@@ -279,7 +279,7 @@ Multiple `withSimulatedValue` / `WithSimulatedValue` calls on the same field are
 {% endhint %}
 
 {% hint style="info" %}
-YAMS Sensors do not depend on any `SmartMotorController` — they work as standalone sim helpers for any sensor hardware you want to expose to Glass.
+YAMS Sensors do not depend on any `SmartMotorController`; they work as standalone sim helpers for any sensor hardware you want to expose to Glass.
 {% endhint %}
 
 {% hint style="warning" %}
@@ -298,6 +298,6 @@ The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Re
 
 * [SensorConfig (Java)](../java-reference/config/sensor-config.md)
 * [SimSensorConfig (C++)](../c++-reference/config/sim-sensor-config.md)
-* [SensorConfig (C++)](../api/cpp/config/sensor-config.md) — absolute encoder seeding (different from simulation sensors)
+* [SensorConfig (C++)](../api/cpp/config/sensor-config.md): absolute encoder seeding (different from simulation sensors)
 * [Sensor API Reference (Java)](../java-reference/sensor/)
 * [Sensor API Reference (C++)](../c++-reference/sensor/)

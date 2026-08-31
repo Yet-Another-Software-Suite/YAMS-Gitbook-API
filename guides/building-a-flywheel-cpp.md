@@ -33,7 +33,7 @@ motorConfig
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
         0.1_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{0.002},
         units::unit_t<frc::SimpleMotorFeedforward<units::turns>::ka_unit>{0.0}})    // kS, kV, kA
-    .WithMOI(0.0508_m, 0.18_kg)                // roller radius, mass — required for simulation
+    .WithMOI(0.0508_m, 0.18_kg)                // roller radius, mass; required for simulation
     .WithStatorCurrentLimit(80_A)
     .WithSubsystem(this)
     .WithTelemetry("ShooterMotor");
@@ -111,7 +111,7 @@ public:
         return flyWheel_.Run(velocity);
     }
 
-    /** Spin up and finish once within tolerance — use to gate shooting. */
+    /** Spin up and finish once within tolerance; use to gate shooting. */
     frc2::CommandPtr SpinUpAndWait(units::degrees_per_second_t velocity) {
         return flyWheel_.RunTo(velocity, kSpeedTolerance);
     }
@@ -179,7 +179,7 @@ shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 {% hint style="info" %}
 `RunTo(velocity, tolerance)` ends once the wheel reaches the target. Use it in command sequences where the next step should not begin until the wheel is at speed.
 
-`IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance — use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready.
+`IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance; use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready.
 {% endhint %}
 
 ***

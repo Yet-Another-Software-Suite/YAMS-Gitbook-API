@@ -166,7 +166,7 @@ Each built-in `SimSupplier`, along with `SparkWrapper`/`TalonFXWrapper`/`TalonFX
 
 ### CANdi as External Encoder (TalonFXWrapper / TalonFXSWrapper)
 
-A `CANdi` can be passed via `WithExternalEncoder(candi)` for both `TalonFXWrapper` and `TalonFXSWrapper`. Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the correct feedback sensor source — otherwise the CANdi will not function as an external encoder.
+A `CANdi` can be passed via `WithExternalEncoder(candi)` for both `TalonFXWrapper` and `TalonFXSWrapper`. Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the correct feedback sensor source; otherwise the CANdi will not function as an external encoder.
 
 **TalonFXWrapper + CANdi:**
 

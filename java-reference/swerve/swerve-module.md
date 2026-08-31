@@ -24,6 +24,7 @@ SwerveModule(SwerveModuleConfig config)
 | `getPosition()` | `SwerveModulePosition` | Integrated drive distance and azimuth angle. |
 | `getName()` | `String` | Module name as set in config. |
 | `getConfig()` | `SwerveModuleConfig` | The configuration this module was constructed with. |
+| `getRawAbsoluteEncoderAngle()` | `Angle` | Absolute encoder angle with no offset applied: the raw reading captured at construction. |
 
 ---
 
@@ -47,7 +48,11 @@ SwerveModule(SwerveModuleConfig config)
 
 ## Telemetry & DataLog
 
-`updateTelemetry()` publishes this module's state and absolute encoder angle to NetworkTables. To additionally record the absolute encoder angle to a WPILib DataLog, set `SwerveModuleConfig.withDataLogName(String)` — see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry). For field-level control (or a DataLog name) on the drive/azimuth motors themselves, configure each motor's own `SmartMotorControllerConfig.withTelemetry(name, SmartMotorControllerTelemetryConfig)`.
+`setupTelemetry(String mechName)` wires up this module's telemetry under `Mechanisms/<mechName>/modules/<moduleName>`; `SwerveDrive` calls it automatically for every module during its own construction, so you don't normally call it yourself. `updateTelemetry()` then publishes this module's `SwerveModuleState` and absolute encoder angle to NetworkTables at the verbosity from `SwerveModuleConfig.getTelemetryVerbosity()`, or from an explicit `SwerveModuleTelemetryConfig` passed via `SwerveModuleConfig.withTelemetry(name, SwerveModuleTelemetryConfig)`; see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry) for how to additionally record fields to a WPILib DataLog. For field-level control (or a DataLog name) on the drive/azimuth motors themselves, configure each motor's own `SmartMotorControllerConfig.withTelemetry(name, SmartMotorControllerTelemetryConfig)`.
+
+{% hint style="warning" %}
+`SwerveModuleConfig` has no `withDataLogName(String)` method: `setupTelemetry(...)` only consults the `SwerveModuleTelemetryConfig`'s own, separate DataLog name. Use `SwerveModuleConfig.withTelemetry(name, new SwerveModuleTelemetryConfig().withDataLogName(...))` instead; see [SwerveModuleConfig](swerve-module-config.md#datalog-telemetry).
+{% endhint %}
 
 ---
 
