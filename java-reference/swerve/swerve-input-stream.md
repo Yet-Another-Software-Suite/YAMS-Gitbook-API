@@ -2,7 +2,7 @@
 
 **Package:** `yams.mechanisms.swerve.utility`
 
-Converts raw joystick axis values into `ChassisSpeeds` for swerve drive control. Handles deadbands, cubic input curves, axis scaling, alliance-relative flipping, and multiple drive modes (angular-velocity, heading-snap, translation-only, aim-at-target, drive-to-pose). Implements `Supplier<ChassisSpeeds>` so it can be passed directly wherever a `ChassisSpeeds` supplier is expected.
+Converts raw joystick axis values into `ChassisSpeeds` for swerve drive control. Handles deadbands, cubic input curves, axis scaling, alliance-relative flipping, and multiple drive modes (angular-velocity, heading-snap, translation-only, aim-at-target). Implements `Supplier<ChassisSpeeds>` so it can be passed directly wherever a `ChassisSpeeds` supplier is expected.
 
 ***
 
@@ -93,10 +93,9 @@ All builder methods return `SwerveInputStream` for chaining.
 
 ## Output Methods
 
-| Method                                 | Returns         | Description                                                                                                                                                                                 |
-| -------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `get()`                                | `ChassisSpeeds` | Computes and returns the current `ChassisSpeeds` based on all configured inputs and the active drive mode. Call once per robot loop.                                                        |
-| `atTargetPose(double toleranceMeters)` | `boolean`       | Returns `true` when the robot is within `toleranceMeters` of the drive-to-pose target. Only meaningful in `DRIVE_TO_POSE` mode; logs an error and returns `true` if called in another mode. |
+| Method   | Returns         | Description                                                                                            |
+| -------- | --------------- | -------------------------------------------------------------------------------------------------------- |
+| `get()`  | `ChassisSpeeds` | Computes and returns the current `ChassisSpeeds` based on all configured inputs and the active drive mode. Call once per robot loop. |
 
 ***
 
@@ -110,9 +109,12 @@ All builder methods return `SwerveInputStream` for chaining.
 | `HEADING`          | Controls robot heading via right-stick X/Y angle. Active when `withHeadingControl()` trigger is `true` and heading axes are configured.             |
 | `AIM`              | Rotates to face a target `Pose2d`. Active when `withAim()` trigger is `true` and a target is set.                                                   |
 | `TRANSLATION_ONLY` | Suppresses rotation and holds the current heading. Active when `withTranslationOnly()` trigger is `true`, or when no rotation source is configured. |
-| `DRIVE_TO_POSE`    | Autonomously drives to a target `Pose2d`. Active when `withDriveToPose()` trigger is `true` and PID controllers are configured.                     |
 
-Mode priority (highest to lowest): `DRIVE_TO_POSE` > `TRANSLATION_ONLY` > `AIM` > `HEADING` > `ANGULAR_VELOCITY`.
+Mode priority (highest to lowest): `TRANSLATION_ONLY` > `AIM` > `HEADING` > `ANGULAR_VELOCITY`.
+
+{% hint style="info" %}
+An earlier `DRIVE_TO_POSE` mode (with a matching `atTargetPose(...)` method) has been removed from `SwerveInputStream`. Use [`SwerveDrive.driveToPose(...)`](swerve-drive.md#auto-align-drive-to-pose) for auto-align instead.
+{% endhint %}
 
 ***
 
