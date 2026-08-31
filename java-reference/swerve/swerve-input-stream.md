@@ -45,6 +45,10 @@ All builder methods return `SwerveInputStream` for chaining.
 | `withMaximumLinearVelocity(LinearVelocity velocity)`   | `velocity` | Maximum chassis translational speed. Default is 4 m/s.     |
 | `withMaximumAngularVelocity(AngularVelocity velocity)` | `velocity` | Maximum chassis rotational speed. Default is 1 rotation/s. |
 
+{% hint style="info" %}
+A stream copies `SwerveDriveConfig.withMaximumChassisSpeed(...)`'s value (if set) into its own maximum fields once, at construction time; otherwise it starts from its own defaults (4 m/s, 1 rotation/s). Calling `withMaximumLinearVelocity(...)`/`withMaximumAngularVelocity(...)` afterward overrides that value for this stream and takes effect immediately; the drive's config is not re-checked after construction.
+{% endhint %}
+
 ### Axis Configuration
 
 | Method                                                                        | Parameters                               | Description                                                                                                               |
