@@ -172,7 +172,7 @@ public Command driveToPose(Pose2d target) {
 }
 ```
 
-`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it drives toward a `TargetPose` field you can edit live in NetworkTables/Glass, so you can tune those PID gains without redeploying code. Enabling it requires `TelemetryVerbosity.HIGH` (the default) or explicitly enabling the tunable fields via a `SwerveDriveTelemetryConfig`; see [SwerveDrive: Auto-Align](../java-reference/swerve/swerve-drive.md#auto-align-drive-to-pose).
+`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it checks a tunable `autoalign/enabled` boolean and, while `true`, drives toward a target pose (`autoalign/pose/x`/`autoalign/pose/y` in meters, `autoalign/pose/rot` in degrees) you can edit live in NetworkTables/Glass, so you can tune those PID gains without redeploying code. The same command also reads a shared set of module drive/azimuth PID, feedforward, and setpoint fields (`modules/drive/*`, `modules/azimuth/*` — PID gains under `feedback/`, `kS`/`kV`/`kA` under `feedforward/`) that apply to every module on the drive at once, useful for tuning drive/azimuth motor gains without repeating the same numbers per module. These fields are already live-tunable at `TelemetryVerbosity.HIGH` (the default); see [SwerveDrive: Auto-Align](../java-reference/swerve/swerve-drive.md#auto-align-drive-to-pose).
 {% endstep %}
 {% endstepper %}
 
