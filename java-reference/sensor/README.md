@@ -6,7 +6,7 @@ A `Sensor` models a named hardware sensor whose fields are readable from robot c
 
 Use [SensorConfig](../config/sensor-config.md) to build a `Sensor` declaratively. Direct construction is available when you need finer control over the underlying `SensorData` objects.
 
-## Value Resolution Priority
+## Value resolution priority
 
 Each field's value is resolved in this order every loop iteration:
 
@@ -30,7 +30,7 @@ The `SensorConfig` overload is the preferred way to create sensors; see [SensorC
 | `sensorFields` | Fields to register. Each field must have a unique name within this sensor. |
 | `cfg`          | A completed `SensorConfig` builder.                                        |
 
-## Field Access Methods
+## Field access methods
 
 | Method                      | Returns               | Description                                                                              |
 | --------------------------- | --------------------- | ---------------------------------------------------------------------------------------- |
@@ -41,7 +41,7 @@ The `SensorConfig` overload is the preferred way to create sensors; see [SensorC
 | `getAsLong(String name)`    | `long`                | Typed convenience accessor. Throws if not a long field.                                  |
 | `getDevice()`               | `Optional<SimDevice>` | The underlying WPILib `SimDevice`. Empty on a real robot.                                |
 
-## Simulation Methods
+## Simulation methods
 
 | Method                                                                 | Description                                                                                                                                                                                       |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -60,7 +60,7 @@ SensorData(String name, BooleanSupplier supplier, boolean defaultVal)
 SensorData(String name, LongSupplier supplier, long defaultVal)
 ```
 
-### Typed Getters
+### Typed getters
 
 | Method           | Returns        | Notes                                            |
 | ---------------- | -------------- | ------------------------------------------------ |
@@ -91,7 +91,7 @@ void addSimTrigger(HALValue value, BooleanSupplier trigger)
 
 Registers a conditional override on this field directly. Triggers are evaluated in registration order; the first active one wins.
 
-### Static Converters
+### Static converters
 
 | Method                                         | Description                                 |
 | ---------------------------------------------- | ------------------------------------------- |
@@ -139,7 +139,7 @@ sensor.addSimTrigger(
 The typed `getAs*` methods throw `IllegalStateException` if the field was registered with a different type. Register a boolean field with a `BooleanSupplier`, and read it with `getAsBoolean`.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SensorConfig](../config/sensor-config.md)
 * [Sensor (C++)](../../c++-reference/sensor/)

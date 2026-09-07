@@ -145,7 +145,7 @@ private:
 {% endstep %}
 {% endstepper %}
 
-### Command Factories & Triggers
+### Command factories and triggers
 
 | Method                                      | Returns      | Description                                 |
 | ------------------------------------------- | ------------ | ------------------------------------------- |
@@ -210,7 +210,7 @@ yams::mechanisms::positional::Elevator elevator{&elevatorConfig, &motor};
 {% endstep %}
 
 {% step %}
-#### Command Factories & Triggers
+#### Command factories and triggers
 
 | Method                                     | Returns      | Description                                  |
 | ------------------------------------------ | ------------ | -------------------------------------------- |
@@ -274,7 +274,7 @@ yams::mechanisms::positional::Pivot pivot{&pivotConfig, &motor};
 {% endstep %}
 
 {% step %}
-#### Command Factories & Triggers
+#### Command factories and triggers
 
 Same interface as `Arm`: `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Max()`, `Min()`.
 
@@ -311,7 +311,7 @@ Complete C++ implementations from the `cpptest` reference project:
 
 ***
 
-## Related Pages
+## Related pages
 
 * [Arm (C++)](../c++-reference/mechanisms/arm.md)
 * [Elevator (C++)](../c++-reference/mechanisms/elevator.md)

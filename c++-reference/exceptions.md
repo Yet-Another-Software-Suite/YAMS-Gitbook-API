@@ -1,13 +1,12 @@
 # Exceptions
 
-**Namespace:** `yams::exceptions`
-**Java equivalent:** [Java Exceptions](../../java/exceptions.md)
+**Namespace:** `yams::exceptions` **Java equivalent:** [Java Exceptions](../java/exceptions.md)
 
 All YAMS C++ exceptions extend `yams::exceptions::YamsException`, which extends `std::runtime_error`.
 
----
+***
 
-## Base Exception
+## Base exception
 
 ```cpp
 class YamsException : public std::runtime_error {
@@ -16,25 +15,25 @@ public:
 };
 ```
 
----
+***
 
-## Exception Classes
+## Exception classes
 
-| Class | Thrown When |
-|-------|-------------|
-| `ArmConfigurationException` | Required `ArmConfig` fields are missing or invalid |
-| `ElevatorConfigurationException` | Required `ElevatorConfig` fields are missing or invalid |
-| `PivotConfigurationException` | Required `PivotConfig` fields are missing or invalid |
-| `SwerveDriveConfigurationException` | Required swerve drive config fields are missing or invalid |
-| `SmartMotorControllerConfigurationException` | `SmartMotorControllerConfig` is invalid |
-| `NoStagesGivenException` | `GearBox` or `Sprocket` constructed with an empty stage list |
-| `InvalidStageGivenException` | A stage string is not in `"IN:OUT"` format |
+| Class                                        | Thrown When                                                  |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| `ArmConfigurationException`                  | Required `ArmConfig` fields are missing or invalid           |
+| `ElevatorConfigurationException`             | Required `ElevatorConfig` fields are missing or invalid      |
+| `PivotConfigurationException`                | Required `PivotConfig` fields are missing or invalid         |
+| `SwerveDriveConfigurationException`          | Required swerve drive config fields are missing or invalid   |
+| `SmartMotorControllerConfigurationException` | `SmartMotorControllerConfig` is invalid                      |
+| `NoStagesGivenException`                     | `GearBox` or `Sprocket` constructed with an empty stage list |
+| `InvalidStageGivenException`                 | A stage string is not in `"IN:OUT"` format                   |
 
----
+***
 
-## Constructor Patterns
+## Constructor patterns
 
-### Configuration Exceptions
+### Configuration exceptions
 
 Most configuration exceptions follow this three-argument pattern:
 
@@ -44,11 +43,11 @@ SomeConfigurationException(const std::string& issue,
                            const std::string& fix)
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `issue` | Description of the invalid or missing configuration |
-| `result` | The runtime consequence of the misconfiguration |
-| `fix` | Suggested corrective action |
+| Parameter | Description                                         |
+| --------- | --------------------------------------------------- |
+| `issue`   | Description of the invalid or missing configuration |
+| `result`  | The runtime consequence of the misconfiguration     |
+| `fix`     | Suggested corrective action                         |
 
 ### SwerveDriveConfigurationException
 
@@ -58,7 +57,7 @@ explicit SwerveDriveConfigurationException(const std::string& message)
 
 Takes a single message string rather than the three-argument pattern.
 
----
+***
 
 ## Example
 

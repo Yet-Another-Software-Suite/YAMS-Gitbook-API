@@ -88,7 +88,7 @@ sensor.addSimTrigger(
 );
 ```
 
-### Complete Subsystem Example
+### Complete subsystem example
 
 ```java
 import static edu.wpi.first.units.Units.Seconds;
@@ -212,7 +212,7 @@ sensor.AddSimTrigger(
 );
 ```
 
-### Complete Subsystem Example
+### Complete subsystem example
 
 ```cpp
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
@@ -261,7 +261,7 @@ bool  atTop  = sensor.GetAsBoolean("AtUpperLimit");
 
 ***
 
-## Using Glass to Override Values Manually
+## Using Glass to override values manually
 
 When running simulation, any `Sensor` appears in Glass under **Other Devices → Sensor\[name]**. Each field shows as an editable widget. You can:
 
@@ -294,7 +294,7 @@ The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Re
 
 ***
 
-## Related Pages
+## Related pages
 
 * [SensorConfig (Java)](../java-reference/config/sensor-config.md)
 * [SimSensorConfig (C++)](../c++-reference/config/sim-sensor-config.md)

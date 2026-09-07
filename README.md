@@ -10,13 +10,13 @@ YAMS (Yet Another Mechanism Suite) is a WPILib vendordep library for FRC robots.
 * **Extended units:** `YUnits` constants and `EasyCRT` multi-encoder absolute position solver
 * **Simulation:** built-in sim support for all mechanism classes via WPILib's simulation framework
 
-## Quick Navigation
+## Quick navigation
 
 * [Java API](java-reference/java.md)
 * [C++ API](c++-reference/cpp.md)
 * [Guides](guides/)
 
-## Supported Hardware
+## Supported hardware
 
 | Device     | Vendor          | Interface |
 | ---------- | --------------- | --------- |

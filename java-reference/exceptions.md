@@ -6,27 +6,27 @@ YAMS throws typed `RuntimeException` subclasses for configuration and runtime er
 
 Most exceptions are thrown during motor controller or mechanism construction if required configuration fields are missing.
 
----
+***
 
-## Exception Classes
+## Exception classes
 
-| Class | Thrown When |
-|-------|-------------|
-| `ArmConfigurationException` | Required `ArmConfig` fields are missing or invalid |
-| `DifferentialMechanismConfigurationException` | Required `DifferentialMechanismConfig` fields are missing |
-| `DoubleJointedArmConfigurationException` | A joint `ArmConfig` is missing required fields |
-| `ElevatorConfigurationException` | Required `ElevatorConfig` fields are missing |
-| `FlyWheelConfigurationException` | Required `FlyWheelConfig` fields are missing |
-| `PivotConfigurationException` | Required `PivotConfig` fields are missing |
-| `SmartMotorControllerConfigurationException` | The `SmartMotorControllerConfig` is invalid or missing required options |
-| `SwerveDriveConfigurationException` | Required `SwerveDriveConfig` fields are missing |
-| `MotorNotPresentException` | The mechanism was constructed without a motor controller |
-| `InvalidStageGivenException` | A gear stage string is not in `"IN:OUT"` format |
-| `NoStagesGivenException` | A `GearBox` or `Sprocket` was constructed with an empty stage list |
+| Class                                         | Thrown When                                                             |
+| --------------------------------------------- | ----------------------------------------------------------------------- |
+| `ArmConfigurationException`                   | Required `ArmConfig` fields are missing or invalid                      |
+| `DifferentialMechanismConfigurationException` | Required `DifferentialMechanismConfig` fields are missing               |
+| `DoubleJointedArmConfigurationException`      | A joint `ArmConfig` is missing required fields                          |
+| `ElevatorConfigurationException`              | Required `ElevatorConfig` fields are missing                            |
+| `FlyWheelConfigurationException`              | Required `FlyWheelConfig` fields are missing                            |
+| `PivotConfigurationException`                 | Required `PivotConfig` fields are missing                               |
+| `SmartMotorControllerConfigurationException`  | The `SmartMotorControllerConfig` is invalid or missing required options |
+| `SwerveDriveConfigurationException`           | Required `SwerveDriveConfig` fields are missing                         |
+| `MotorNotPresentException`                    | The mechanism was constructed without a motor controller                |
+| `InvalidStageGivenException`                  | A gear stage string is not in `"IN:OUT"` format                         |
+| `NoStagesGivenException`                      | A `GearBox` or `Sprocket` was constructed with an empty stage list      |
 
----
+***
 
-## Configuration Exception Constructors
+## Configuration exception constructors
 
 Most configuration exceptions follow this constructor pattern:
 
@@ -34,15 +34,15 @@ Most configuration exceptions follow this constructor pattern:
 SomeConfigurationException(String message, String result, String remedyFunction)
 ```
 
-| Parameter | Description |
-|-----------|-------------|
-| `message` | Description of what is missing or invalid |
-| `result` | What behavior will be broken without this configuration |
-| `remedyFunction` | The builder method to call to fix the problem |
+| Parameter        | Description                                             |
+| ---------------- | ------------------------------------------------------- |
+| `message`        | Description of what is missing or invalid               |
+| `result`         | What behavior will be broken without this configuration |
+| `remedyFunction` | The builder method to call to fix the problem           |
 
----
+***
 
-## Example Error Handling
+## Example error handling
 
 ```java
 try {

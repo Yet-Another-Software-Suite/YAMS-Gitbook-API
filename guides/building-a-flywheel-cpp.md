@@ -142,7 +142,7 @@ private:
 {% endstep %}
 
 {% step %}
-#### Command Factories & Triggers
+#### Command factories and triggers
 
 | Method                                            | Returns      | Description                                           |
 | ------------------------------------------------- | ------------ | ----------------------------------------------------- |
@@ -192,7 +192,7 @@ Complete C++ implementations from the `cpptest` reference project:
 
 ***
 
-## Related Pages
+## Related pages
 
 * [FlyWheel (C++)](../c++-reference/mechanisms/flywheel.md)
 * [FlyWheelConfig (C++)](../c++-reference/config/flywheel-config.md)

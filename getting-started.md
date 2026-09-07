@@ -4,11 +4,11 @@
 YAMS requires WPILib 2026 or later. Ensure your project is up to date before installing.
 {% endhint %}
 
-## Example Code
+## Example code
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java#L82-L91" %}
 
-## Minimal Example: Java
+## Minimal example: Java
 
 The snippet below creates a single-motor arm subsystem using YAMS.
 
@@ -61,7 +61,7 @@ public class ArmSubsystem extends SubsystemBase {
 }
 ```
 
-## Minimal Example: C++
+## Minimal example: C++
 
 ```cpp
 #include <rev/SparkMax.h>
@@ -106,9 +106,9 @@ private:
 };
 ```
 
-## Next Steps
+## Next steps
 
-- [Configuring a Motor Controller](guides/configuring-a-motor.md): CAN IDs, inversion, current limits, and encoder configuration
-- [Building an Arm Subsystem](guides/building-an-arm.md): full arm setup with motion profiling and simulation
-- [Building an Elevator Subsystem](guides/building-an-elevator.md)
-- [Setting Up Swerve Drive](guides/setting-up-swerve.md)
+* [Configuring a Motor Controller](guides/configuring-a-motor.md): CAN IDs, inversion, current limits, and encoder configuration
+* [Building an Arm Subsystem](guides/building-an-arm.md): full arm setup with motion profiling and simulation
+* [Building an Elevator Subsystem](guides/building-an-elevator.md)
+* [Setting Up Swerve Drive](guides/setting-up-swerve.md)

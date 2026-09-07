@@ -247,25 +247,25 @@ frc2::CommandPtr DriveSubsystem::DriveToPoseCommand(frc::Pose2d target) {
 
 ***
 
-## Key SwerveDrive Methods
+## Key SwerveDrive methods
 
-| Method                                         | Description                                       |
-| ---------------------------------------------- | ------------------------------------------------- |
-| `SetFieldRelativeChassisSpeeds(ChassisSpeeds)` | Field-relative drive                              |
-| `SetRobotRelativeChassisSpeeds(ChassisSpeeds)` | Robot-relative drive                              |
-| `Drive(std::function<ChassisSpeeds()>)`        | Returns a run `CommandPtr` for continuous driving |
-| `DriveToPose(Pose2d)`                          | Returns a `CommandPtr` that PID-drives to a field-relative pose |
-| `DriveToPoseSetpoint(Pose2d)`                  | Computes one loop's `ChassisSpeeds` toward a pose (building block behind `DriveToPose`) |
-| `SetTranslationPID(PIDController)` / `SetRotationPID(PIDController)` | Replace the auto-align PID controllers (integrator preserved unless gains changed) |
-| `ResetTranslationPID()` / `ResetAzimuthPID()`  | Reset the auto-align PID controllers' internal state |
-| `LockPose()`                                   | X-pattern to resist pushing                       |
-| `GetPose()`                                    | Current field-relative pose from odometry         |
-| `ResetOdometry(Pose2d)`                        | Reset odometry to a known pose                    |
-| `ZeroGyro()`                                   | Zero the gyro heading                             |
-| `AddVisionMeasurement(Pose2d, second_t)`       | Fuse vision pose into odometry                    |
-| `GetSimPose()`                                 | Ground-truth simulated pose, useful for feeding a simulated vision system |
-| `UpdateTelemetry()`                            | Call in `Periodic()`                              |
-| `SimIterate()`                                 | Call in `SimulationPeriodic()`                    |
+| Method                                                               | Description                                                                             |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `SetFieldRelativeChassisSpeeds(ChassisSpeeds)`                       | Field-relative drive                                                                    |
+| `SetRobotRelativeChassisSpeeds(ChassisSpeeds)`                       | Robot-relative drive                                                                    |
+| `Drive(std::function<ChassisSpeeds()>)`                              | Returns a run `CommandPtr` for continuous driving                                       |
+| `DriveToPose(Pose2d)`                                                | Returns a `CommandPtr` that PID-drives to a field-relative pose                         |
+| `DriveToPoseSetpoint(Pose2d)`                                        | Computes one loop's `ChassisSpeeds` toward a pose (building block behind `DriveToPose`) |
+| `SetTranslationPID(PIDController)` / `SetRotationPID(PIDController)` | Replace the auto-align PID controllers (integrator preserved unless gains changed)      |
+| `ResetTranslationPID()` / `ResetAzimuthPID()`                        | Reset the auto-align PID controllers' internal state                                    |
+| `LockPose()`                                                         | X-pattern to resist pushing                                                             |
+| `GetPose()`                                                          | Current field-relative pose from odometry                                               |
+| `ResetOdometry(Pose2d)`                                              | Reset odometry to a known pose                                                          |
+| `ZeroGyro()`                                                         | Zero the gyro heading                                                                   |
+| `AddVisionMeasurement(Pose2d, second_t)`                             | Fuse vision pose into odometry                                                          |
+| `GetSimPose()`                                                       | Ground-truth simulated pose, useful for feeding a simulated vision system               |
+| `UpdateTelemetry()`                                                  | Call in `Periodic()`                                                                    |
+| `SimIterate()`                                                       | Call in `SimulationPeriodic()`                                                          |
 
 ***
 
@@ -289,7 +289,7 @@ Complete C++ implementations from the `cpptest` reference project:
 
 ***
 
-## Related Pages
+## Related pages
 
 * [SwerveDrive (C++)](../c++-reference/swerve/swerve-drive.md)
 * [SwerveModule (C++)](../c++-reference/swerve/swerve-module.md)

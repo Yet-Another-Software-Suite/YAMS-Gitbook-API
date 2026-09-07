@@ -7,7 +7,7 @@ A `Sensor` models a named hardware sensor whose fields are readable from robot c
 
 Use [SimSensorConfig](../config/sim-sensor-config.md) to build a `Sensor` declaratively. Direct construction is available when you need finer control over the underlying `SensorData` objects.
 
-## Value Resolution Priority
+## Value resolution priority
 
 Each field's value is resolved in this order every loop iteration:
 
@@ -31,7 +31,7 @@ The `SimSensorConfig` overload is the preferred way to create sensors; see [SimS
 | `fields`     | Fields to register. Each must have a unique name within this sensor.    |
 | `cfg`        | A completed `SimSensorConfig` builder.                                  |
 
-## Field Access Methods
+## Field access methods
 
 | Method                                  | Returns               | Description                                                                             |
 | --------------------------------------- | --------------------- | --------------------------------------------------------------------------------------- |
@@ -42,7 +42,7 @@ The `SimSensorConfig` overload is the preferred way to create sensors; see [SimS
 | `GetAsLong(const std::string& name)`    | `int64_t`             | Typed accessor. Throws if not a long field.                                             |
 | `GetDevice()`                           | `HAL_SimDeviceHandle` | The underlying WPILib SimDevice handle. Invalid (`HAL_kInvalidHandle`) on a real robot. |
 
-## Simulation Methods
+## Simulation methods
 
 | Method                                                                                    | Description                                                                                                                                                                                    |
 | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -61,7 +61,7 @@ SensorData(std::string name, std::function<bool()> supplier, bool defaultVal)
 SensorData(std::string name, std::function<int64_t()> supplier, int64_t defaultVal)
 ```
 
-### Typed Getters
+### Typed getters
 
 | Method           | Returns        | Notes                                   |
 | ---------------- | -------------- | --------------------------------------- |
@@ -92,7 +92,7 @@ void AddSimTrigger(HAL_Value value, std::function<bool()> trigger)
 
 Registers a conditional override directly on this field. Triggers are evaluated in registration order; the first active one wins.
 
-### Static Converters
+### Static converters
 
 | Method                                                  | Description                                         |
 | ------------------------------------------------------- | --------------------------------------------------- |
@@ -142,7 +142,7 @@ sensor.AddSimTrigger(
 The typed `GetAs*` accessors throw if the field was registered with a different type. Register a `bool` field with a `std::function<bool()>` supplier and read it with `GetAsBoolean`.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SimSensorConfig (C++)](../config/sim-sensor-config.md)
 * [SensorConfig (C++)](../../api/cpp/config/sensor-config.md): absolute encoder config (not simulation)
