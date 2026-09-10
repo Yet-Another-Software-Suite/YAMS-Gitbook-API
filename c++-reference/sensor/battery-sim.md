@@ -30,7 +30,7 @@ Registers `current` under `id` and returns the resulting loaded battery voltage 
 
 ## Discharge Simulation
 
-By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `frc::Timer::GetFPGATimestamp()`), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
+By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `frc::Timer::GetFPGATimestamp()`, derated by discharge rate; see [Capacity Derating](#capacity-derating) below), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
 
 ```cpp
 static void EnableDischarge(double batteryCapacityAmpHours, units::volt_t nominalVoltage,
@@ -82,6 +82,48 @@ yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
 
 {% hint style="info" %}
 Keys and values should span the full `[0, 1]` state-of-charge range. Querying outside the range you defined returns the nearest endpoint's voltage instead of extrapolating, so a table missing the low or high end will not sag realistically there.
+{% endhint %}
+
+## Capacity Derating
+
+Sealed lead-acid batteries deliver noticeably fewer amp-hours the faster they're discharged (the Peukert effect), unlike lithium chemistries, which stay close to their rated capacity across a wide range of discharge currents. A battery rated for 18 Ah at a light 0.9 A draw might only deliver ~11 Ah at a sustained 54 A draw, which is well within normal FRC match currents. `EnableDischarge(...)` derates the amp-hours consumed by a discharge-current &rarr; capacity-fraction table so the modeled state of charge drops faster under heavy sustained load, matching this behavior instead of assuming the full rated capacity is available at any current.
+
+```cpp
+static void ReplaceCapacityDerating(const std::map<double, double>& currentToCapacityFraction);
+```
+
+| Method                     | Description                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `ReplaceCapacityDerating`  | Replaces the discharge-current (Amps) &rarr; capacity-fraction `[0, 1]` table used to derate amp-hours consumed. |
+
+The default table is averaged from discharge testing across five FRC battery manufacturers, see [Detailed FRC Battery Comparison for 2026](https://www.chiefdelphi.com/t/detailed-frc-battery-comparison-for-2026/508077):
+
+| Discharge Current | Capacity Fraction |
+| ------------------ | ------------------ |
+| 0.9 A               | 1.000               |
+| 18 A                | 0.758               |
+| 27 A                | 0.718               |
+| 36 A                | 0.679               |
+| 45 A                | 0.639               |
+| 54 A                | 0.599               |
+
+Reach for `ReplaceCapacityDerating(...)` if you have measured discharge-rate-vs-capacity data for your specific battery rather than the averaged multi-manufacturer defaults. Call it before `EnableDischarge(...)` so discharge simulation uses the new curve from the start.
+
+```cpp
+#include <map>
+#include <yams/motorcontrollers/simulation/BatterySim.hpp>
+
+std::map<double, double> measuredDerating{
+    {0.9, 1.000}, {20.0, 0.80}, {40.0, 0.65}, {60.0, 0.55},
+};
+
+yams::motorcontrollers::simulation::BatterySim::ReplaceCapacityDerating(measuredDerating);
+yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
+    18.0, units::volt_t{12.9}, units::ohm_t{0.020});
+```
+
+{% hint style="info" %}
+Discharge currents outside the range you define clamp to the nearest endpoint's fraction instead of extrapolating, the same as `ReplaceSOCInterpolation(...)`.
 {% endhint %}
 
 ## Example
