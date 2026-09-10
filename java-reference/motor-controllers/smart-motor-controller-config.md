@@ -156,6 +156,19 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withVendorConfig(Object vendorConfig)` | `vendorConfig` | Provides a vendor-specific base configuration. YAMS options applied via this class always take precedence and overwrite it. |
 | `withVendorControlRequest(Object vendorControlRequest)` | `vendorControlRequest` | Provides a vendor-specific control request object that overrides YAMS default control requests for velocity and position. |
 
+## Feedforward Conversion
+
+| Method                                                                              | Returns   | Description                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `convertToVoltage(DCMotor motor, AngularVelocity mechanismVelocity, Force force)`   | `Voltage` | Converts a feedforward `Force` applied at the mechanism into the motor voltage needed to produce it at `mechanismVelocity`, using the configured `withGearing`/`withMechanismCircumference`. Speed-dependent (includes back-EMF), so it's the correct feedforward for voltage-mode closed-loop control. |
+| `convertToCurrent(DCMotor motor, Force force)`                                      | `Current` | Same conversion, but returns the equivalent motor current instead of voltage. Does not depend on speed, so it's the correct feedforward for torque-current-mode closed-loop control (e.g. TorqueCurrentFOC). |
+
+These back `SmartMotorController.setVelocity(velocity, Force feedforwardForce)` (see [SmartMotorController](smart-motor-controller.md#control)) — a `SwerveModule`'s drive motor uses them to turn a PathPlanner set-point generator's per-wheel `Force` into the right feedforward for whichever control mode that motor is using. Both throw `SmartMotorControllerConfigurationException` if `withGearing`/`withMechanismCircumference` were never configured.
+
+{% hint style="warning" %}
+Both methods require `withGearing(...)` and `withMechanismCircumference(...)` (or `withWheelRadius(...)`/`withWheelDiameter(...)`) to be configured — including for a `Force` of exactly zero. There's no special case that skips the config requirement for zero; a zero `Force` at a nonzero `mechanismVelocity` still needs a nonzero voltage to overcome back-EMF, so treating "zero force" as "zero output" would be physically wrong.
+{% endhint %}
+
 ## See Also
 
 - [SmartMotorController](smart-motor-controller.md)

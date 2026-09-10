@@ -33,6 +33,7 @@ SwerveModule(SwerveModuleConfig config)
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `setSwerveModuleState(SwerveModuleState state)` | `void` | Commands a drive speed and azimuth angle. |
+| `setSwerveModuleState(SwerveModuleState state, Force feedforwardForce)` | `void` | Same, plus a drive-wheel feedforward `Force` applied on top (e.g. from a PathPlanner set-point generator), converted via the drive motor's `SmartMotorControllerConfig.convertToVoltage(...)`/`convertToCurrent(...)`. |
 | `seedAzimuthEncoder()` | `void` | Reads the absolute encoder and seeds the relative encoder to match. Call on robot enable. |
 
 ---

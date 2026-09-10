@@ -22,7 +22,10 @@ SwerveDrive(SwerveDriveConfig config)
 | ----------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
 | `drive(Supplier<ChassisSpeeds> speedsSupplier)`       | `Command` | Continuously sets robot-relative chassis speeds from a supplier. Runs indefinitely. |
 | `setRobotRelativeChassisSpeeds(ChassisSpeeds speeds)` | `void`    | Directly sets robot-relative speeds. Call from `periodic()`, not a command.         |
+| `setRobotRelativeChassisSpeeds(ChassisSpeeds speeds, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force`, FL/FR/BL/BR order (matching module order). Pass an empty array for no feedforward. Designed to plug PathPlanner's `AutoBuilder.configure(...)` `driveRobotRelative` consumer straight in: `(speeds, ff) -> drive.setRobotRelativeChassisSpeeds(speeds, ff.linearForces())`. |
 | `setFieldRelativeChassisSpeeds(ChassisSpeeds speeds)` | `void`    | Sets field-relative speeds, rotating by the gyro angle before applying.             |
+| `setSwerveModuleStates(SwerveModuleState[] states)`   | `void`    | Directly commands module states, bypassing chassis-speeds-to-states kinematics.     |
+| `setSwerveModuleStates(SwerveModuleState[] states, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force` (FL/FR/BL/BR order).         |
 
 ***
 
@@ -117,7 +120,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive/java/frc/robot/subsystems/SwerveSubsystem.java#L176-L215" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java#L157-L19X" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java#L212-L248" %}
 
 ***
 

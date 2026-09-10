@@ -20,7 +20,7 @@ SmartMotorControllerTelemetryConfig()
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `LOW`  | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed-loop slot |
 | `MID`  | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                |
-| `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), current limits, ramp rates, limit values, motor temperature               |
+| `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), setpoint feedforward force, current limits, ramp rates, limit values, motor temperature |
 
 ## Builder Methods: Output Channels
 
@@ -54,6 +54,7 @@ Each method enables a single numeric (double) field.
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `withSetpointPosition()`    | Current position setpoint in mechanism units (read-only; non-tunable).                                                |
 | `withSetpointVelocity()`    | Current velocity setpoint in mechanism units.                                                                         |
+| `withSetpointForce()`       | Feedforward force last supplied to `setVelocity(velocity, Force)`, in newtons (read-only; non-tunable; `0` when unset). |
 | `withOutputVoltage()`       | Motor output voltage (V).                                                                                             |
 | `withStatorCurrent()`       | Stator (output) current (A).                                                                                          |
 | `withTemperature()`         | Motor winding temperature (°C).                                                                                       |
