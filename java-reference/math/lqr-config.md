@@ -1,6 +1,6 @@
 # LQRConfig
 
-**Package:** `yams.math`
+**Package:** `yams.core.math`
 
 `LQRConfig` is a builder for `LinearSystemLoop` objects used by `LQRController`. It encapsulates the linear system model, Kalman filter, and LQR regulator into a single configurable object.
 

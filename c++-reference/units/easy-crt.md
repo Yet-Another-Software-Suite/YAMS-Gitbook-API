@@ -1,6 +1,8 @@
 # EasyCRT
 
-**Namespace:** `yams::units` **Java equivalent:** [Java EasyCRT](../../java-reference/units/easy-crt.md)
+**Namespace:** `yams::units`\
+**Header:** `#include <yams/units/EasyCRT.hpp>`\
+**Java equivalent:** [Java EasyCRT](../../java-reference/units/easy-crt.md)
 
 `EasyCRT` computes absolute mechanism position from two absolute encoders with coprime gear ratios using the Chinese Remainder Theorem. The C++ API uses a struct-based config rather than Java's builder class.
 
@@ -10,8 +12,8 @@
 
 ```cpp
 struct EasyCRTConfig {
-    std::function<units::turn_t()> enc1;   // First absolute encoder supplier
-    std::function<units::turn_t()> enc2;   // Second absolute encoder supplier
+    std::function<wpi::units::turn_t()> enc1;   // First absolute encoder supplier
+    std::function<wpi::units::turn_t()> enc2;   // Second absolute encoder supplier
     int enc1Teeth = 19;                    // Must be coprime with enc2Teeth
     int enc2Teeth = 21;
     double commonK = 1.0;                  // Mechanism-to-encoder scale factor
@@ -53,8 +55,8 @@ inline double CrtCommonK(double commonRatio, int driveTeeth)
 | `CrtGcd`             | Greatest common divisor of two integers                                                 |
 | `CrtLcm`             | Least common multiple of two integers                                                   |
 | `CrtIsCoprime`       | Returns `true` if `CrtGcd(a, b) == 1`                                                   |
-| `CrtRatioFromChain`  | Encoder rotations per mechanism rotation from a gear chain (tooth counts in mesh order) |
-| `CrtRatioFromStages` | Ratio from alternating (driver, driven) tooth-count pairs                               |
+| `CrtRatioFromChain`  | Ratio of a simple gear chain in mesh order (`first / last`; idlers cancel out)          |
+| `CrtRatioFromStages` | Product of `driver / driven` over consecutive (driver, driven) tooth-count pairs         |
 | `CrtCommonK`         | Computes the scale factor K from a common gear ratio and driving sprocket tooth count   |
 
 ***
@@ -83,7 +85,7 @@ explicit EasyCRT(EasyCRTConfig cfg)
 
 | Method                      | Returns                        | Description                                                               |
 | --------------------------- | ------------------------------ | ------------------------------------------------------------------------- |
-| `GetAngle()`                | `std::optional<units::turn_t>` | Solves and returns mechanism position. Returns `std::nullopt` on failure. |
+| `GetAngle()`                | `std::optional<wpi::units::turn_t>` | Solves and returns mechanism position. Returns `std::nullopt` on failure. |
 | `GetStatus() const`         | `Status`                       | Status of the most recent solve attempt                                   |
 | `GetLastError() const`      | `double`                       | Combined encoder residual from the most recent solve                      |
 | `GetLastIterations() const` | `int`                          | Number of CRT candidates evaluated in the most recent solve               |
@@ -93,14 +95,14 @@ explicit EasyCRT(EasyCRTConfig cfg)
 ## Example
 
 ```cpp
-units::EasyCRTConfig cfg;
-cfg.enc1 = [this] { return units::turn_t{encoder1.GetAbsolutePosition()}; };
-cfg.enc2 = [this] { return units::turn_t{encoder2.GetAbsolutePosition()}; };
+yams::units::EasyCRTConfig cfg;
+cfg.enc1 = [this] { return wpi::units::turn_t{encoder1.GetAbsolutePosition()}; };
+cfg.enc2 = [this] { return wpi::units::turn_t{encoder2.GetAbsolutePosition()}; };
 cfg.WithTeeth(19, 21, 1.0)
    .WithRange(0.0, 10.0)
    .WithTolerance(0.005);
 
-units::EasyCRT crt{cfg};
+yams::units::EasyCRT crt{cfg};
 
 // In periodic:
 auto pos = crt.GetAngle();

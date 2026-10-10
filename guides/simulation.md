@@ -6,47 +6,74 @@
 
 {% stepper %}
 {% step %}
-#### Provide physical parameters in the mechanism config
+#### Provide physical parameters in the configs
 
-YAMS builds its simulation model from fields in `ArmConfig`, `ElevatorConfig`, or `FlyWheelConfig`. Set the fields that match your mechanism's geometry and mass:
+YAMS builds its simulation model from fields on the mechanism config and on `SmartMotorControllerConfig`. Set the fields that match your mechanism's geometry and mass:
 
-| Mechanism        | Required fields                                       |
-| ---------------- | ----------------------------------------------------- |
-| `ArmConfig`      | `.withLength(meters)`                                 |
-| `ElevatorConfig` | `.withCarriageWeight(kg)` + `.withDrumRadius(meters)` |
-| `FlyWheelConfig` | `.withWheelDiameter(meters)` + `.withWheelMass(kg)`   |
+| Mechanism  | Mechanism config                                          | `SmartMotorControllerConfig`                                    |
+| ---------- | --------------------------------------------------------- | --------------------------------------------------------------- |
+| `Arm`      | `ArmConfig.withLength(...)`, `.withHardLimits(...)`       | `.withMomentOfInertia(length, mass)`, `.withStartingPosition(Angle)`, `.withGearing(...)` |
+| `Elevator` | `ElevatorConfig.withCarriageWeight(...)`, `.withHardLimits(...)` | `.withMechanismCircumference(...)` or `.withDrumRadius(...)`, `.withStartingPosition(Distance)`, `.withGearing(...)` |
+| `FlyWheel` | none required (`FlyWheelConfig.withDiameter(...)` is optional) | `.withMomentOfInertia(...)`, `.withGearing(...)`                |
+| `Pivot`    | `PivotConfig.withHardLimits(...)`                         | `.withMomentOfInertia(...)`, `.withStartingPosition(Angle)`, `.withGearing(...)` |
 
-You do not need to manually construct a sim supplier. YAMS creates `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier` automatically when the required fields are present.
+The C++ equivalents are `ArmConfig::WithArmLength`, `ElevatorConfig::WithCarriageMass`, `SmartMotorControllerConfig::WithMOI`, and `SmartMotorControllerConfig::WithMechanismCircumference`.
+
+You do not need to manually construct a sim supplier. The mechanism creates an `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier` and hands it to the motor controller when it is constructed in simulation.
 {% endstep %}
 
 {% step %}
-#### Optionally override the sim supplier
+#### Optionally tune simulation-only settings
 
-If you need a custom physics model, call `.withSimSupplier(SimSupplier)` on the `SmartMotorControllerConfig`. This overrides YAMS's automatic supplier. For most use cases this is not needed.
+`SmartMotorControllerConfig` has simulation-only overrides, so the simulated mechanism can use different gains or a different starting position than the real one:
 
 ```java
-// Custom override, only if automatic supplier is insufficient.
-motorConfig.withSimSupplier(myCustomSimSupplier);
+motorConfig
+    .withSimClosedLoopController(4, 0, 0)                    // PID used only in simulation
+    .withSimFeedforward(new ArmFeedforward(0, 0.3, 0.5))     // feedforward used only in simulation
+    .withSimStartingPosition(Degrees.of(0))                  // where the simulated mechanism starts
+    .withSimulationPeriod(Milliseconds.of(5));               // physics step, defaults to 20 ms
 ```
+
+For most use cases these are not needed.
 {% endstep %}
 
 {% step %}
 #### Call `simIterate()` from `simulationPeriodic()`
 
-`simIterate()` advances the physics model by one 20 ms loop and writes the simulated sensor values back to the motor controller.
+`simIterate()` advances the physics model by one simulation period (20 ms unless changed with `withSimulationPeriod`) and writes the simulated sensor values back to the motor controller.
 
+{% tabs %}
+{% tab title="Commands v2" %}
 ```java
 @Override
 public void simulationPeriodic() {
     arm.simIterate();
 }
 ```
+{% endtab %}
+
+{% tab title="Commands v3" %}
+A Commands v3 `Mechanism` is not polled for you, so call the simulation update from `Robot.robotPeriodic()` before the scheduler runs:
+
+```java
+@Override
+public void robotPeriodic() {
+    arm.periodic();
+    if (RobotBase.isSimulation()) {
+        arm.simulationPeriodic();   // calls the YAMS Arm's simIterate()
+    }
+    scheduler.run();
+}
+```
+{% endtab %}
+{% endtabs %}
 {% endstep %}
 
 {% step %}
 #### Call `updateTelemetry()` from `periodic()`
 
-`updateTelemetry()` publishes current state (both real and simulated) to NetworkTables so Glass and Shuffleboard reflect simulated values.
+`updateTelemetry()` publishes current state (both real and simulated) to NetworkTables so your dashboard reflects simulated values.
 
 ```java
 @Override
@@ -57,22 +84,62 @@ public void periodic() {
 {% endstep %}
 
 {% step %}
-#### View the Mechanism2d visualization in Glass
+#### View the Mechanism2d visualization
 
-YAMS publishes a `Mechanism2d` object under the subsystem's NetworkTables key. In Glass, open **NetworkTables** and navigate to the mechanism name you set in the config (e.g., `"Shoulder"`). Select **Mechanism2d** to see the live visualization.
+YAMS publishes a `Mechanism2d` object for each mechanism. In the simulation GUI, open **NetworkTables** and navigate to the mechanism name you set in the config (e.g., `"Shoulder"`) to see the live visualization.
 {% endstep %}
 {% endstepper %}
+
+***
+
+## Shared battery simulation
+
+Every YAMS motor controller reports its simulated supply current to one shared, static `BatterySim` (`yams.core.motorcontrollers.simulation.BatterySim` in Java, `yams::motorcontrollers::simulation::BatterySim` in C++). The loaded battery voltage is computed from the sum of all of those currents, so a drivetrain pulling hard sags the voltage seen by your arm, elevator, and shooter, just like on a real robot. There is nothing to set up: it works as soon as more than one YAMS mechanism is simulated.
+
+By default the battery is an ideal 12 V source behind a fixed 20 milliohm internal resistance. To also model the battery draining over a match, enable discharge simulation once at startup:
+
+{% tabs %}
+{% tab title="Java" %}
+```java
+import yams.core.motorcontrollers.simulation.BatterySim;
+
+// 18 Ah battery, 12.9 V fully charged, 20 milliohm internal resistance
+BatterySim.enableDischarge(18.0, Volts.of(12.9), MilliOhms.of(20));
+
+double stateOfCharge = BatterySim.getStateOfCharge();  // 1.0 = full, 0.0 = empty
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+#include "yams/motorcontrollers/simulation/BatterySim.hpp"
+
+using yams::motorcontrollers::simulation::BatterySim;
+
+// 18 Ah battery, 12.9 V fully charged, 20 milliohm internal resistance
+BatterySim::EnableDischarge(18.0, 12.9_V, 0.02_Ohm);
+
+double stateOfCharge = BatterySim::GetStateOfCharge();  // 1.0 = full, 0.0 = empty
+```
+{% endtab %}
+{% endtabs %}
+
+With discharge enabled, the open circuit voltage falls and the internal resistance rises as the state of charge drops. `resetDischarge()` refills the battery and `disableDischarge()` returns to the fixed model.
+
+## SPARK closed loop runs at 1 kHz in simulation
+
+A real SPARK MAX or SPARK FLEX closes its loop onboard every millisecond. `SparkWrapper` simulates that: inside each `simIterate()` call it steps the simulated SPARK's closed loop once per millisecond across the simulation period (20 steps for the default 20 ms period), instead of once per period. Gains tuned in simulation therefore behave much closer to the real controller. No configuration is needed.
 
 ***
 
 ## Notes
 
 {% hint style="info" %}
-The three sim suppliers YAMS provides internally are `ArmSimSupplier`, `ElevatorSimSupplier`, and `DCMotorSimSupplier`. For most use cases, you do not construct these directly; YAMS instantiates them automatically when the mechanism config contains the physical parameters it needs (arm length, carriage weight, MOI, etc.).
+The three sim suppliers YAMS provides internally are `ArmSimSupplier`, `ElevatorSimSupplier`, and `DCMotorSimSupplier`. For most use cases, you do not construct these directly; the mechanism instantiates them automatically from the physical parameters in the configs (arm length, carriage weight, MOI, etc.).
 {% endhint %}
 
 {% hint style="warning" %}
-Without `.withLength()` on `ArmConfig`, or without `.withCarriageWeight()` and `.withDrumRadius()` on `ElevatorConfig`, YAMS cannot model gravity. The mechanism will behave like a frictionless flywheel in simulation: it will not fall under gravity, and your feedforward tuning will not transfer to the real robot.
+In simulation, the `Arm` constructor throws an `ArmConfigurationException` if the arm length, hard limits, or starting position are missing, and the `Elevator` constructor throws if the carriage weight, hard limits, or starting position are missing. The starting position must also lie inside the hard limits.
 {% endhint %}
 
 ***
@@ -102,13 +169,13 @@ public class ShoulderSubsystem extends SubsystemBase {
 
 ## Examples
 
-The `simple_arm` example demonstrates physics simulation with `simIterate()` and a `Mechanism2d` display:
+The `simple_robot-2027` arm demonstrates physics simulation with `simIterate()` and a `Mechanism2d` display:
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ArmSubsystem.java" %}
 
-The `simple_elevator` example shows the same pattern for linear mechanisms:
+The elevator in the same project shows the same pattern for linear mechanisms:
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_elevator/java/frc/robot/subsystems/ElevatorSubsystem.java" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ElevatorSubsystem.java" %}
 
 ***
 

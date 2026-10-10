@@ -1,6 +1,8 @@
 # Sprocket
 
-**Namespace:** `yams::gearing` **Java equivalent:** [Java Sprocket](../../java-reference/gearing/sprocket.md)
+**Namespace:** `yams::gearing`\
+**Header:** `#include <yams/gearing/Sprocket.hpp>`\
+**Java equivalent:** [Java Sprocket](../../java-reference/gearing/sprocket.md)
 
 `Sprocket` models a chain or belt drive stage. The API is identical to `GearBox`; the distinction is semantic. Use `GearBox` for meshed gears.
 
@@ -24,7 +26,7 @@ static Sprocket FromStages(std::initializer_list<std::string_view> stages)  // "
 ```
 
 {% hint style="info" %}
-`Sprocket` does not provide `FromTeeth`. Use `FromStages` with tooth-count strings (e.g., `"18:36"`) to express the ratio directly.
+`Sprocket` does not provide `FromTeeth`. Use `FromStages` with `"IN:OUT"` strings, parsed as `IN / OUT` reductions (e.g., `"36:18"` for an 18T driving sprocket and a 36T driven sprocket, a 2:1 reduction).
 {% endhint %}
 
 ***
@@ -33,10 +35,10 @@ static Sprocket FromStages(std::initializer_list<std::string_view> stages)  // "
 
 | Method                                     | Returns     | Description                                                    |
 | ------------------------------------------ | ----------- | -------------------------------------------------------------- |
-| `GetInputToOutputConversionFactor() const` | `double`    | Mechanism rotations per motor rotation (OUT/IN)                |
-| `GetOutputToInputConversionFactor() const` | `double`    | Motor rotations per mechanism rotation (IN/OUT)                |
-| `Times(double x)`                          | `Sprocket&` | Multiplies the reduction by `x`. Returns `*this` for chaining. |
-| `Div(double x)`                            | `Sprocket&` | Divides the reduction by `x`. Returns `*this` for chaining.    |
+| `GetInputToOutputConversionFactor() const` | `double`    | Mechanism rotations per motor rotation (less than 1 for a reduction) |
+| `GetOutputToInputConversionFactor() const` | `double`    | Motor rotations per mechanism rotation (the reduction ratio itself) |
+| `Times(double x)`                          | `Sprocket&` | Multiplies the input-to-output conversion factor by `x` (divides the reduction by `x`). Returns `*this` for chaining. |
+| `Div(double x)`                            | `Sprocket&` | Divides the input-to-output conversion factor by `x` (multiplies the reduction by `x`). Returns `*this` for chaining. |
 
 ***
 
@@ -53,8 +55,8 @@ static Sprocket FromStages(std::initializer_list<std::string_view> stages)  // "
 
 ```cpp
 // 18T driving sprocket, 36T driven sprocket = 2:1
-auto s = gearing::Sprocket::FromStages({"18:36"});
+auto s = yams::gearing::Sprocket::FromStages({"36:18"});
 
-// Multi-stage belt drive
-auto s2 = gearing::Sprocket::FromStages({"18:36", "12:24"});
+// Multi-stage belt drive: 2:1 then 2:1 = 4:1
+auto s2 = yams::gearing::Sprocket::FromStages({"36:18", "24:12"});
 ```

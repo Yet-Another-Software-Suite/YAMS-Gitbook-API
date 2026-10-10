@@ -1,9 +1,9 @@
 # SwerveModuleConfig
 
-**Package:** `yams.mechanisms.config`\
+**Package:** `yams.core.mechanisms.config`\
 **C++ equivalent:** [C++ SwerveModuleConfig](../../c++-reference/swerve/swerve-module-config.md)
 
-Configures one swerve module. Takes drive and azimuth motor controllers in the constructor.
+Configures one swerve module. Takes drive and azimuth motor controllers in the constructor. It does not need a `Subsystem` or `Mechanism`, so the same class is used with Commands v2 and Commands v3.
 
 ## Constructor
 
@@ -28,6 +28,8 @@ All builder methods return `SwerveModuleConfig` for chaining.
 |--------|-----------|-------------|
 | `withSmartMotorController(SmartMotorController driveMotor, SmartMotorController azimuthMotor)` | `driveMotor`, `azimuthMotor` | Sets both motor controllers (use with the no-arg constructor). |
 | `withCosineCompensation(boolean compensate)` | `compensate` | Scales drive speed by `cos(angle_error)` to reduce skew while steering. |
+| `withCouplingRatio(GearBox couplingRatio)` | `couplingRatio` | Steer-to-drive coupling, compensated as in the CTRE swerve API: drive motor (input) to azimuth (output), e.g. `GearBox.fromReductionStages(kCoupleRatio)` with `kCoupleRatio` from CTRE Tuner X. The motion steering causes is added to the drive setpoint and removed from the measured wheel speed and distance. |
+| `withCouplingRatio(double driveMotorRotationsPerAzimuthRotation)` | `driveMotorRotationsPerAzimuthRotation` | Same, as a single reduction. `0` disables coupling compensation. |
 | `withAbsoluteEncoder(Object absoluteEncoder)` | `absoluteEncoder` | Same-vendor absolute encoder object for the azimuth `SmartMotorController`. |
 | `withAbsoluteEncoder(Supplier<Angle> locationProvider)` | `locationProvider` | Cross-vendor absolute encoder angle supplier. |
 | `withAbsoluteEncoder(DoubleSupplier rotationSupplier)` | `rotationSupplier` | Cross-vendor absolute encoder angle supplier, in rotations. |
@@ -40,13 +42,26 @@ All builder methods return `SwerveModuleConfig` for chaining.
 | `withWheelRadius(Distance radius)` | `radius`: wheel radius | Drive wheel radius used for velocity and position conversion. |
 | `withWheelDiameter(Distance diameter)` | `diameter` | Drive wheel diameter used for velocity and position conversion. |
 | `withVelocityDeadband(LinearVelocity speed)` | `speed` | Below this speed, the module holds its current azimuth instead of tracking. |
-| `withOptimization(boolean swerveModuleStateOptimization)` | `swerveModuleStateOptimization` | Enables/disables `SwerveModuleState.optimize()` (flip by 180° to minimize rotation). |
-| `withTelemetry(String telemetryName, TelemetryVerbosity telemetryVerbosity)` | `telemetryName`, `telemetryVerbosity` | NetworkTables key prefix and verbosity for this module's own fields (absolute encoder angle, `SwerveModuleState`). |
+| `withOptimization(boolean swerveModuleStateOptimization)` | `swerveModuleStateOptimization` | Enables/disables state optimization (turn the wheel around and reverse the drive when that is the shorter way to the requested angle). `SwerveDriveConfig.withModuleStateOptimization(boolean)` overrides it for every module. |
+| `withTelemetry(String telemetryName, TelemetryVerbosity telemetryVerbosity)` | `telemetryName`, `telemetryVerbosity` | NetworkTables key prefix and verbosity for this module's own fields (absolute encoder angle, `SwerveModuleVelocity`). |
 | `withTelemetry(String telemetryName, SwerveModuleTelemetryConfig telemetryConfig)` | `telemetryName`, `telemetryConfig` | NetworkTables key prefix plus an explicit [`SwerveModuleTelemetryConfig`](../../java-reference/swerve/swerve-module.md), taking precedence over `withTelemetry(String, TelemetryVerbosity)`. |
 
 {% hint style="info" %}
 `withAbsoluteEncoderOffset` must be calibrated per module. An incorrect offset causes the module to drive at an angle on startup until `seedAzimuthEncoder()` corrects it.
 {% endhint %}
+
+---
+
+## State Helpers
+
+`SwerveModule` uses these to turn a requested `SwerveModuleVelocity` into what it sends to the motors. You rarely call them yourself.
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getOptimizedState(SwerveModuleVelocity state)` | `SwerveModuleVelocity` | Applies the velocity deadband, optimization and cosine compensation, measuring the wheel with the azimuth motor. |
+| `getOptimizedState(SwerveModuleVelocity state, SwerveModuleVelocityWithAzimuth measured)` | `SwerveModuleVelocity` | Same, against a given measured state. |
+| `getLockedState(Rotation2d angle, SwerveModuleVelocityWithAzimuth measured)` | `SwerveModuleVelocity` | Zero-speed state that turns the wheel to `angle` without driving it, as for locking the drive in place. Unlike `getOptimizedState`, the velocity deadband does not hold the wheel where it is. With optimization enabled the wheel turns to whichever of `angle` and its opposite is nearer. Used by `SwerveModule.lock(Rotation2d)` and `SwerveDrive.lockPose()`. |
+| `getCosineCompensationScalar(Rotation2d desiredAngle)` | `double` | Cosine compensation factor from 0 to 1 against the current azimuth angle, or 1 if cosine compensation is disabled. |
 
 ---
 

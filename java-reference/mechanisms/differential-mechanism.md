@@ -1,11 +1,19 @@
 # DifferentialMechanism
 
-**Package:** `yams.mechanisms.positional`\
-**Extends:** `SmartPositionalMechanism`
+**Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
+**Extends:** `yams.core.mechanisms.positional.DifferentialMechanism` (which extends `SmartPositionalMechanism`)
 
-`DifferentialMechanism` mixes two motor outputs to produce independent tilt and twist motion. Motor A drives (tilt + twist) / 2; motor B drives (tilt − twist) / 2. This is common in wrist mechanisms that need to tilt and rotate simultaneously.
+`DifferentialMechanism` mixes two motor outputs to produce independent tilt and twist motion. For a position target, the left motor goes to `tilt + twist * twistRatio` and the right motor to `tilt - twist * twistRatio`, where `twistRatio` is the twist gearing from the `DifferentialMechanismConfig`. This is common in wrist mechanisms that need to tilt and rotate simultaneously.
 
-Unlike other mechanisms, `DifferentialMechanism` takes a `DifferentialMechanismConfig` that already encapsulates both motor controllers.
+Unlike other mechanisms, `DifferentialMechanism` takes a `DifferentialMechanismConfig` that already holds both motor controllers.
+
+Robot code imports `DifferentialMechanism` from `yams.commands2.mechanisms` (or `yams.commands3.mechanisms`). The base class `yams.core.mechanisms.positional.DifferentialMechanism` holds the state, simulation and telemetry. Its constructor is protected, so it is not constructed directly.
+
+```java
+import yams.commands2.config.SmartMotorControllerConfig;
+import yams.commands2.mechanisms.DifferentialMechanism;
+import yams.core.mechanisms.config.DifferentialMechanismConfig;
+```
 
 **See also:** [DifferentialMechanismConfig](../config/differential-mechanism-config.md)
 
@@ -19,33 +27,25 @@ DifferentialMechanism(DifferentialMechanismConfig diffConfig)
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `diffConfig` | `DifferentialMechanismConfig` | Configuration containing both motor controllers, gear ratios, and joint limits for tilt and twist axes |
+| `diffConfig` | `DifferentialMechanismConfig` | Configuration containing both motor controllers, gearing, and starting positions for the tilt and twist axes |
+
+Throws `DifferentialMechanismConfigurationException` if the starting tilt or twist angle or the length is not set, if the two motor controller configs were built with different `Subsystem`s (Commands v2) or `Mechanism`s (Commands v3), or, in simulation, if the moment of inertia is missing.
 
 ---
 
 ## State Queries
 
-### `getTiltPosition()`
+These come from `yams.core.mechanisms.positional.DifferentialMechanism` and work outside of commands.
 
-```java
-public Angle getTiltPosition()
-```
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getTiltPosition()` | `Angle` | Current tilt angle (from the configured tilt supplier if set, otherwise computed from both motors) |
+| `getTwistPosition()` | `Angle` | Current twist angle (from the configured twist supplier if set, otherwise computed from both motors) |
+| `getLeftMotorController()` | `SmartMotorController` | Left motor controller |
+| `getRightMotorController()` | `SmartMotorController` | Right motor controller |
+| `getDifferentialMechanismConfig()` | `DifferentialMechanismConfig` | The config used to build this mechanism |
 
-Returns the current tilt angle of the mechanism.
-
-**Returns:** `Angle`
-
----
-
-### `getTwistPosition()`
-
-```java
-public Angle getTwistPosition()
-```
-
-Returns the current twist angle of the mechanism.
-
-**Returns:** `Angle`
+`isAtMax()` and `isAtMin()` are not supported and always throw.
 
 ---
 
@@ -55,31 +55,45 @@ Returns the current twist angle of the mechanism.
 
 ```java
 public Command setPosition(Angle tilt, Angle twist)
+public Command setPosition(Supplier<Angle> tilt, Supplier<Angle> twist)
 ```
 
-Drives to target tilt and twist angles simultaneously. Runs indefinitely until interrupted.
+Drives to target tilt and twist angles simultaneously. Supplier overloads are re-evaluated each loop. Runs indefinitely until interrupted.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `tilt` | `Angle` | Desired tilt angle |
-| `twist` | `Angle` | Desired twist angle |
+| `tilt` | `Angle` / `Supplier<Angle>` | Desired tilt angle |
+| `twist` | `Angle` / `Supplier<Angle>` | Desired twist angle |
 
 **Returns:** `Command`: runs until interrupted.
 
 ---
 
-### `run(Supplier<Angle> tiltSupplier, Supplier<Angle> twistSupplier)`
+### `run(Angle tilt, Angle twist)`
 
 ```java
-public Command run(Supplier<Angle> tiltSupplier, Supplier<Angle> twistSupplier)
+public Command run(Angle tilt, Angle twist)
+public Command run(Supplier<Angle> tilt, Supplier<Angle> twist)
 ```
 
-Continuously controls tilt and twist from suppliers; both suppliers are re-evaluated each loop iteration.
+Same as `setPosition` with the same arguments.
+
+**Returns:** `Command`: runs until interrupted.
+
+---
+
+### `set(double twist, double tilt)`
+
+```java
+public Command set(double twist, double tilt)
+```
+
+Open-loop duty cycle. Note the argument order: twist first, then tilt. The left motor gets `tilt - twist` and the right motor `tilt + twist`. The closed-loop controllers are stopped while it runs and restarted when it ends.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `tiltSupplier` | `Supplier<Angle>` | Supplier returning the desired tilt angle each iteration |
-| `twistSupplier` | `Supplier<Angle>` | Supplier returning the desired twist angle each iteration |
+| `twist` | `double` | Twist duty cycle |
+| `tilt` | `double` | Tilt duty cycle |
 
 **Returns:** `Command`: runs until interrupted.
 
@@ -87,60 +101,37 @@ Continuously controls tilt and twist from suppliers; both suppliers are re-evalu
 
 ## Triggers
 
-### `isNear(Angle tilt, Angle twist, Angle tolerance)`
+`DifferentialMechanism` has no Trigger factories. Wrap the state queries in a `Trigger` yourself:
 
 ```java
-public Trigger isNear(Angle tilt, Angle twist, Angle tolerance)
+new Trigger(() -> diffy.getTiltPosition().isNear(Degrees.of(45), Degrees.of(2)))
+    .onTrue(intake.set(0.5));
 ```
-
-True when both the tilt and twist axes are within `tolerance` of their respective targets.
-
-| Name | Type | Description |
-|------|------|-------------|
-| `tilt` | `Angle` | Reference tilt angle |
-| `twist` | `Angle` | Reference twist angle |
-| `tolerance` | `Angle` | Maximum acceptable angular error for each axis |
-
-**Returns:** `Trigger`
 
 ---
 
-### `max()`
+## Commands v2 and Commands v3
 
-```java
-public Trigger max()
-```
-
-True when either axis is at its upper hard limit.
-
-**Returns:** `Trigger`
-
----
-
-### `min()`
-
-```java
-public Trigger min()
-```
-
-True when either axis is at its lower hard limit.
-
-**Returns:** `Trigger`
+Both packages have the same method names and parameters. Commands v2 returns `org.wpilib.command2.Command` and requires the shared `Subsystem` (`getSubsystem()`); Commands v3 returns `org.wpilib.command3.Command` and requires the shared `Mechanism` (`getMechanism()`). In Commands v3, use `org.wpilib.command3.Trigger` in the example above.
 
 ---
 
 ## Visualization & Simulation
 
-The following methods share the same interface as other YAMS mechanisms.
-
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `simIterate()` | `void` | Advances mechanism physics simulation one loop iteration; call in `simulationPeriodic()` |
-| `updateTelemetry()` | `void` | Publishes current tilt and twist positions to NetworkTables |
-| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization |
+| `simIterate()` | `void` | Advances mechanism physics simulation one loop and updates the visualization; call in `simulationPeriodic()` |
+| `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
+| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
+| `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
+| `getName()` | `String` | The mechanism telemetry name |
 
 ---
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/differential_mechanism/java/frc/robot/subsystems/DiffyMechSubsystem.java#L114-L121" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/DiffyMechSubsystem.java" %}
+
+Commands v3:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/DiffyMechanism.java" %}

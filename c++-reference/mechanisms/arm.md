@@ -1,7 +1,7 @@
 # Arm
 
 Namespace: `yams::mechanisms::positional`\
-Header: `<yams/mechanisms/positional/Arm.h>`\
+Header: `<yams/mechanisms/positional/Arm.hpp>`\
 Inherits: `SmartPositionalMechanism`
 
 **Java equivalent:** [Java Arm](../../java-reference/mechanisms/arm.md)
@@ -24,7 +24,7 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 | Method     | Signature                          | Description                              |
 | ---------- | ---------------------------------- | ---------------------------------------- |
-| `GetAngle` | `units::degree_t GetAngle() const` | Current mechanism angle from the encoder |
+| `GetAngle` | `wpi::units::degree_t GetAngle() const` | Current mechanism angle from the encoder |
 
 ***
 
@@ -32,14 +32,14 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 | Method                  | Signature                                                                                             | Description                                                             |
 | ----------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `Run` (target)          | `frc2::CommandPtr Run(units::degree_t angle)`                                                         | Drives to `angle`, runs indefinitely                                    |
-| `Run` (supplier)        | `frc2::CommandPtr Run(std::function<units::degree_t()> angle)`                                        | Drives to a supplier-provided angle, re-evaluated each iteration        |
-| `RunTo` (target)        | `frc2::CommandPtr RunTo(units::degree_t angle, units::degree_t tolerance = 1.0_deg)`                  | Drives to `angle`, ends when within `tolerance`. Default tolerance: 1°. |
-| `RunTo` (supplier)      | `frc2::CommandPtr RunTo(std::function<units::degree_t()> angle, units::degree_t tolerance = 1.0_deg)` | `RunTo` with a supplier target                                          |
-| `Set` (duty cycle)      | `frc2::CommandPtr Set(double dutycycle)`                                                              | Open-loop duty cycle                                                    |
-| `Set` (supplier)        | `frc2::CommandPtr Set(std::function<double()> dutycycle)`                                             | Open-loop duty cycle with supplier                                      |
-| `SetVoltage`            | `frc2::CommandPtr SetVoltage(units::volt_t volts)`                                                    | Open-loop voltage                                                       |
-| `SetVoltage` (supplier) | `frc2::CommandPtr SetVoltage(std::function<units::volt_t()> volts)`                                   | Open-loop voltage with supplier                                         |
+| `Run` (target)          | `wpi::cmd::CommandPtr Run(wpi::units::degree_t angle)`                                                         | Drives to `angle`, runs indefinitely                                    |
+| `Run` (supplier)        | `wpi::cmd::CommandPtr Run(std::function<wpi::units::degree_t()> angle)`                                        | Drives to a supplier-provided angle, re-evaluated each iteration        |
+| `RunTo` (target)        | `wpi::cmd::CommandPtr RunTo(wpi::units::degree_t angle, wpi::units::degree_t tolerance = 1.0_deg)`                  | Drives to `angle`, ends when within `tolerance`. Default tolerance: 1°. |
+| `RunTo` (supplier)      | `wpi::cmd::CommandPtr RunTo(std::function<wpi::units::degree_t()> angle, wpi::units::degree_t tolerance = 1.0_deg)` | `RunTo` with a supplier target                                          |
+| `Set` (duty cycle)      | `wpi::cmd::CommandPtr Set(double dutycycle)`                                                              | Open-loop duty cycle                                                    |
+| `Set` (supplier)        | `wpi::cmd::CommandPtr Set(std::function<double()> dutycycle)`                                             | Open-loop duty cycle with supplier                                      |
+| `SetVoltage`            | `wpi::cmd::CommandPtr SetVoltage(wpi::units::volt_t volts)`                                                    | Open-loop voltage                                                       |
+| `SetVoltage` (supplier) | `wpi::cmd::CommandPtr SetVoltage(std::function<wpi::units::volt_t()> volts)`                                   | Open-loop voltage with supplier                                         |
 
 ***
 
@@ -47,12 +47,16 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 | Method    | Signature                                                                       | Description                                           |
 | --------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `IsNear`  | `frc2::Trigger IsNear(units::degree_t angle, units::degree_t within = 1.0_deg)` | True when current angle is within `within` of `angle` |
-| `Gte`     | `frc2::Trigger Gte(units::degree_t angle)`                                      | True when current angle ≥ `angle`                     |
-| `Lte`     | `frc2::Trigger Lte(units::degree_t angle)`                                      | True when current angle ≤ `angle`                     |
-| `Between` | `frc2::Trigger Between(units::degree_t start, units::degree_t end)`             | True when angle is in `[start, end]`                  |
-| `Max`     | `frc2::Trigger Max() override`                                                  | True when arm is at its upper hard limit              |
-| `Min`     | `frc2::Trigger Min() override`                                                  | True when arm is at its lower hard limit              |
+| `IsNear`  | `wpi::cmd::Trigger IsNear(wpi::units::degree_t angle, wpi::units::degree_t within = 1.0_deg)` | True when current angle is within `within` of `angle` |
+| `Gte`     | `wpi::cmd::Trigger Gte(wpi::units::degree_t angle)`                                      | True when current angle ≥ `angle`                     |
+| `Lte`     | `wpi::cmd::Trigger Lte(wpi::units::degree_t angle)`                                      | True when current angle ≤ `angle`                     |
+| `Between` | `wpi::cmd::Trigger Between(wpi::units::degree_t start, wpi::units::degree_t end)`             | True when angle is in `[start, end]`                  |
+| `Max`     | `wpi::cmd::Trigger Max() override`                                                  | True when arm is at its upper hard limit              |
+| `Min`     | `wpi::cmd::Trigger Min() override`                                                  | True when arm is at its lower hard limit              |
+
+{% hint style="info" %}
+C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed its trigger factory to `near(...)` in 2027; the C++ name did not change.
+{% endhint %}
 
 ***
 
@@ -60,16 +64,34 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 | Method                         | Signature                                                 | Description                                              |
 | ------------------------------ | --------------------------------------------------------- | -------------------------------------------------------- |
-| `SetAngle`                     | `void SetAngle(units::degree_t angle)`                    | Directly commands the setpoint without a command wrapper |
-| `GetRelativeMechanismPosition` | `frc::Translation3d GetRelativeMechanismPosition() const` | 3D end-effector position relative to the mechanism root  |
+| `SetAngle`                     | `void SetAngle(wpi::units::degree_t angle)`                    | Directly commands the setpoint without a command wrapper |
+| `GetRelativeMechanismPosition` | `wpi::math::Translation3d GetRelativeMechanismPosition() const` | 3D end-effector position relative to the mechanism root  |
 | `GetConfig`                    | `const config::ArmConfig& GetConfig() const`              | Returns the configuration this arm was constructed with  |
 | `GetMotor`                     | `motorcontrollers::SmartMotorController* GetMotor()`      | Returns the underlying motor controller pointer          |
-| `GetMechanismLigament`         | `frc::MechanismLigament2d* GetMechanismLigament()`        | The Mechanism2d visualization ligament                   |
-| `GetMechanismRoot`             | `frc::MechanismRoot2d* GetMechanismRoot()`                | The Mechanism2d visualization root                       |
+| `GetMechanismLigament`         | `wpi::MechanismLigament2d* GetMechanismLigament()`        | The Mechanism2d visualization ligament                   |
+| `GetMechanismRoot`             | `wpi::MechanismRoot2d* GetMechanismRoot()`                | The Mechanism2d visualization root                       |
 | `SimIterate`                   | `void SimIterate() override`                              | Advances arm physics simulation one loop iteration       |
 | `UpdateTelemetry`              | `void UpdateTelemetry() override`                         | Publishes current state to NetworkTables                 |
 | `VisualizationUpdate`          | `void VisualizationUpdate() override`                     | Syncs Mechanism2d with current encoder reading           |
 | `GetName`                      | `std::string GetName() const override`                    | Returns the mechanism name                               |
+
+***
+
+## Inherited from SmartMechanism
+
+Every mechanism also exposes the helpers declared in `yams::mechanisms::SmartMechanism` (`<yams/mechanisms/SmartMechanism.hpp>`):
+
+| Method                           | Signature                                                                 | Description                                                         |
+| -------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `SetMechanismPositionSetpoint`   | `void SetMechanismPositionSetpoint(wpi::units::turn_t angle)`             | Starts closed-loop control and sets a mechanism angle setpoint      |
+| `SetMeasurementPositionSetpoint` | `void SetMeasurementPositionSetpoint(wpi::units::meter_t distance)`       | Starts closed-loop control and sets a linear position setpoint      |
+| `SetMechanismVelocitySetpoint`   | `void SetMechanismVelocitySetpoint(wpi::units::turns_per_second_t velocity)` | Starts closed-loop control and sets a mechanism velocity setpoint |
+| `SetMeasurementVelocitySetpoint` | `void SetMeasurementVelocitySetpoint(wpi::units::meters_per_second_t velocity)` | Starts closed-loop control and sets a linear velocity setpoint |
+| `SetVoltageSetpoint`             | `void SetVoltageSetpoint(wpi::units::volt_t voltage)`                     | Stops the closed-loop controller and applies a voltage immediately  |
+| `SetDutyCycleSetpoint`           | `void SetDutyCycleSetpoint(double dutycycle)`                             | Stops the closed-loop controller and applies a duty cycle           |
+| `GetMotorController`             | `motorcontrollers::SmartMotorController* GetMotorController()`            | Returns the underlying motor controller                             |
+| `GetMechanismSetpoint`           | `std::optional<wpi::units::turn_t> GetMechanismSetpoint()`                | Current mechanism setpoint, if one has been set                     |
+| `GetMechanismWindow`             | `wpi::Mechanism2d* GetMechanismWindow()`                                  | The Mechanism2d window, or `nullptr` if not initialized             |
 
 ***
 
@@ -82,19 +104,29 @@ armConfig.WithMinAngle(-90_deg)
          .WithArmLength(0.6_m)
          .WithTelemetryName("Arm");
 
+// 2027: MOI and starting position live on the SmartMotorControllerConfig.
 motorcontrollers::SmartMotorControllerConfig motorConfig;
-motorConfig.WithMotorInverted(false)
-           .WithMotorGearing(gearing::MechanismGearing{14.0 / 72.0})
-           .WithFeedback(0.5, 0.0, 0.0);
+motorConfig.WithSubsystem(this)
+           .WithMotorInverted(false)
+           .WithMotorGearing(gearing::MechanismGearing{
+               gearing::GearBox::FromReductionStages({3.0, 4.0})})
+           .WithFeedback(0.5, 0.0, 0.0)
+           .WithStartingPosition(0_deg)
+           .WithMOI(0.6_m, 2.0_kg)
+           .WithClosedLoopMode();
 
-// motor is a SmartMotorController* created elsewhere
+// motor is a SmartMotorController* (for example a TalonFXWrapper) built from motorConfig
 positional::Arm arm{&armConfig, motor};
 
 // In the subsystem command factory:
-frc2::CommandPtr setAngleCmd = arm.RunTo(45_deg);
+wpi::cmd::CommandPtr setAngleCmd = arm.RunTo(45_deg);
 ```
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ArmSubsystem.cpp#L61-L74" %}
+{% hint style="warning" %}
+In simulation the `Arm` constructor throws `exceptions::ArmConfigurationException` if the arm length, minimum angle, maximum angle, starting position (`SmartMotorControllerConfig::WithStartingPosition`, or an external encoder zero offset) or MOI (`SmartMotorControllerConfig::WithMOI`) is missing.
+{% endhint %}
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/cpptest/src/main/cpp/subsystems/ArmSubsystem.cpp#L64-L78" %}
 
 ***
 

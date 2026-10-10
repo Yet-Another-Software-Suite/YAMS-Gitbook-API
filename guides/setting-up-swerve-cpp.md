@@ -6,18 +6,35 @@
 
 ## Prerequisites
 
+Install the Commands v2 YAMS vendordep (`https://cdn.yassrobotics.com/yams_commands2.json`). `YAMS.hpp` does not pull in the vendor wrappers, so include the wrapper for your motor controller explicitly.
+
 ```cpp
 #include <yams/YAMS.hpp>
 
 // Or individually:
 #include <yams/mechanisms/swerve/SwerveDrive.hpp>
+#include <yams/mechanisms/swerve/SwerveDriveConfig.hpp>
 #include <yams/mechanisms/swerve/SwerveModule.hpp>
 #include <yams/mechanisms/swerve/utility/SwerveInputStream.hpp>
-#include <yams/mechanisms/config/SwerveDriveConfig.hpp>
 #include <yams/mechanisms/config/SwerveModuleConfig.hpp>
+#include <yams/gearing/MechanismGearing.hpp>
 #include <yams/motorcontrollers/SmartMotorControllerConfig.hpp>
+
+// Vendor wrapper (always included individually):
 #include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>
+
+// WPILib 2027 headers used below:
+#include <wpi/commands2/CommandPtr.hpp>
+#include <wpi/commands2/SubsystemBase.hpp>
+#include <wpi/commands2/button/CommandXboxController.hpp>
+#include <wpi/math/controller/PIDController.hpp>
+#include <wpi/math/controller/SimpleMotorFeedforward.hpp>
+#include <wpi/math/geometry/Pose2d.hpp>
+#include <wpi/math/geometry/Translation2d.hpp>
+#include <wpi/math/system/DCMotor.hpp>
 ```
+
+WPILib 2027 renamed `ChassisSpeeds` to `wpi::math::ChassisVelocities` and `SwerveModuleState` to `wpi::math::SwerveModuleVelocity`. The YAMS method names (`SetFieldRelativeChassisSpeeds`, ...) are unchanged.
 
 ***
 
@@ -31,25 +48,25 @@ Each swerve module needs two `SmartMotorController` instances: one for the drive
 // Drive motor config: velocity PID + feedforward
 yams::motorcontrollers::SmartMotorControllerConfig driveConfig;
 driveConfig
+    .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(6.75))
     .WithFeedback(0.1, 0.0, 0.0)
-    .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
-        0.12_V, units::unit_t<frc::SimpleMotorFeedforward<units::turns>::kv_unit>{2.2},
-        units::unit_t<frc::SimpleMotorFeedforward<units::turns>::ka_unit>{0.3}})   // kS, kV, kA
+    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{
+        0.12_V, wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::kv_unit>{2.2},
+        wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::ka_unit>{0.3}})   // kS, kV, kA
     .WithStatorCurrentLimit(60_A)
-    .WithSubsystem(this)
     .WithTelemetry("DriveFL");
 
 // Azimuth motor config: position PID, continuous wrapping
 yams::motorcontrollers::SmartMotorControllerConfig azimuthConfig;
 azimuthConfig
+    .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(12.8))
     .WithFeedback(7.0, 0.0, 0.3)
-    .WithExternalEncoderDiscontinuityPoint(0.5_tr)
+    .WithContinuousWrapping(-0.5_tr, 0.5_tr)
     .WithStatorCurrentLimit(40_A)
-    .WithSubsystem(this)
     .WithTelemetry("AzimuthFL");
 ```
 
@@ -59,15 +76,20 @@ Repeat for each module (FR, BL, BR), adjusting the telemetry name and CAN IDs.
 {% step %}
 #### Construct motor controllers
 
+The wrapper takes pointers to the vendor hardware object and to the config. Both must outlive the wrapper, so keep them as subsystem members.
+
 ```cpp
+ctre::phoenix6::hardware::TalonFX driveTalonFL{10, ctre::phoenix6::CANBus{}};
+ctre::phoenix6::hardware::TalonFX azimuthTalonFL{11, ctre::phoenix6::CANBus{}};
+
 yams::motorcontrollers::remote::TalonFXWrapper driveMotorFL{
-    new ctre::phoenix6::hardware::TalonFX(10),
-    frc::DCMotor::KrakenX60(1),
+    &driveTalonFL,
+    wpi::math::DCMotor::KrakenX60(1),
     &driveConfig
 };
 yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
-    new ctre::phoenix6::hardware::TalonFX(11),
-    frc::DCMotor::KrakenX60(1),
+    &azimuthTalonFL,
+    wpi::math::DCMotor::KrakenX60(1),
     &azimuthConfig
 };
 ```
@@ -76,15 +98,18 @@ yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
 {% step %}
 #### Create a `SwerveModuleConfig` for each module
 
-Pass drive and azimuth motor controllers, then set wheel radius, module location (relative to robot center), and absolute encoder offset.
+Pass drive and azimuth motor controllers, then set the wheel radius, the module location (relative to robot center), the absolute encoder supplier, and its offset.
 
 ```cpp
 yams::mechanisms::config::SwerveModuleConfig frontLeftModuleConfig{
     &driveMotorFL, &azimuthMotorFL
 };
 frontLeftModuleConfig
-    .WithWheelRadius(0.0508_m)                       // 2-inch wheel radius
-    .WithLocation(frc::Translation2d{0.381_m, 0.381_m})  // front-left position
+    .WithWheelRadius(0.0508_m)                                  // 2-inch wheel radius
+    .WithLocation(wpi::math::Translation2d{0.381_m, 0.381_m})  // front-left position
+    .WithAbsoluteEncoder([this]() -> wpi::units::degree_t {
+        return wpi::units::degree_t{wpi::units::turn_t{encoderFL_.GetAbsolutePosition().GetValue()}};
+    })
     .WithAbsoluteEncoderOffset(130.0_deg)
     .WithTelemetry("FrontLeft",
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
@@ -114,17 +139,19 @@ yams::mechanisms::swerve::SwerveModule backRight{&backRightModuleConfig};
 {% step %}
 #### Create a `SwerveDriveConfig`
 
-Collect the four modules, set kinematic limits, and provide a gyro supplier.
+Collect the four modules, set kinematic limits, and provide a gyro supplier. In C++ the gyro supplier returns the yaw as a `wpi::units::degree_t`.
 
 ```cpp
 yams::mechanisms::swerve::SwerveDriveConfig driveConfig;
 driveConfig
     .WithSubsystem(this)
     .WithModules({&frontLeft, &frontRight, &backLeft, &backRight})
-    .WithGyro([this]() { return imu_.GetYaw().GetValueAsDouble() * 1_deg; })
-    .WithMaximumChassisSpeed(4.5_mps, units::degrees_per_second_t{360.0})
-    .WithTranslationController(frc::PIDController{1.0, 0, 0})
-    .WithRotationController(frc::PIDController{1.0, 0, 0})
+    .WithGyro([this]() -> wpi::units::degree_t {
+        return wpi::units::degree_t{wpi::units::turn_t{imu_.GetYaw().GetValue()}};
+    })
+    .WithMaximumChassisSpeed(4.5_mps, wpi::units::degrees_per_second_t{360.0})
+    .WithTranslationController(wpi::math::PIDController{1.0, 0, 0})
+    .WithRotationController(wpi::math::PIDController{1.0, 0, 0})
     .WithTelemetry(
         "swerve",
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
@@ -144,33 +171,39 @@ yams::mechanisms::swerve::SwerveDrive<4> swerveDrive{&driveConfig};
 {% step %}
 #### Integrate into a subsystem
 
+The subsystem owns the `SwerveInputStream` so it lives as long as the drive command that reads it.
+
 ```cpp
-class DriveSubsystem : public frc2::SubsystemBase {
+class DriveSubsystem : public wpi::cmd::SubsystemBase {
 public:
-    DriveSubsystem() { /* configure as shown above */ }
+    using InputStream = yams::mechanisms::swerve::utility::SwerveInputStream<4>;
+
+    DriveSubsystem() { /* configure as shown above, then swerveDrive_.emplace(&driveConfig_) */ }
+
+    yams::mechanisms::swerve::SwerveDrive<4>& GetSwerveDrive() { return swerveDrive_.value(); }
 
     /** Field-relative drive command driven by a SwerveInputStream. */
-    frc2::CommandPtr DriveFieldRelativeCommand(
-        yams::mechanisms::swerve::utility::SwerveInputStream<4>& inputStream)
-    {
-        return Run([&] {
-            swerveDrive_.SetFieldRelativeChassisSpeeds(inputStream.Get());
+    wpi::cmd::CommandPtr DriveFieldRelativeCommand(InputStream inputStream) {
+        inputStream_.emplace(std::move(inputStream));
+        return Run([this] {
+            swerveDrive_->SetFieldRelativeChassisSpeeds(inputStream_->Get());
         }).WithName("Field Oriented Drive");
     }
 
-    void AddVisionMeasurement(frc::Pose2d pose, units::second_t timestamp) {
-        swerveDrive_.AddVisionMeasurement(pose, timestamp);
+    void AddVisionMeasurement(wpi::math::Pose2d pose, wpi::units::second_t timestamp) {
+        swerveDrive_->AddVisionMeasurement(pose, timestamp);
     }
 
-    frc::Pose2d GetPose() const { return swerveDrive_.GetPose(); }
-    void ZeroGyro() { swerveDrive_.ZeroGyro(); }
+    wpi::math::Pose2d GetPose() { return swerveDrive_->GetPose(); }
+    void ZeroGyro() { swerveDrive_->ZeroGyro(); }
 
-    void Periodic() override { swerveDrive_.UpdateTelemetry(); }
-    void SimulationPeriodic() override { swerveDrive_.SimIterate(); }
+    void Periodic() override { swerveDrive_->UpdateTelemetry(); }
+    void SimulationPeriodic() override { swerveDrive_->SimIterate(); }
 
 private:
-    // ... motor configs, module configs, modules, drive config ...
-    yams::mechanisms::swerve::SwerveDrive<4> swerveDrive_{&driveConfig_};
+    // ... hardware, motor configs, wrappers, module configs, modules, drive config ...
+    std::optional<yams::mechanisms::swerve::SwerveDrive<4>> swerveDrive_;
+    std::optional<InputStream> inputStream_;
 };
 ```
 {% endstep %}
@@ -178,49 +211,55 @@ private:
 {% step %}
 #### Set up driver input with `SwerveInputStream`
 
-`SwerveInputStream<4>` translates raw joystick axes into `frc::ChassisSpeeds`. Pass the `SwerveDrive` reference as the first argument, then set a rotation axis with `WithControllerRotationAxis`.
+`SwerveInputStream<4>` translates raw joystick axes into field-relative `wpi::math::ChassisVelocities`. Pass the `SwerveDrive` reference as the first argument, then set a rotation axis with `WithControllerRotationAxis`.
 
 ```cpp
 // In RobotContainer or a drive command factory:
-yams::mechanisms::swerve::utility::SwerveInputStream<4> driverInput =
-    yams::mechanisms::swerve::utility::SwerveInputStream<4>::Of(
-        driveSubsystem_->GetSwerveDrive(),
-        [&] { return -driverController_.GetLeftY(); },   // forward/back
-        [&] { return -driverController_.GetLeftX(); }    // strafe
+using InputStream = yams::mechanisms::swerve::utility::SwerveInputStream<4>;
+
+InputStream driverInput =
+    InputStream::Of(
+        driveSubsystem_.GetSwerveDrive(),
+        [this] { return -driverController_.GetLeftY(); },   // forward/back
+        [this] { return -driverController_.GetLeftX(); }    // strafe
     )
-    .WithControllerRotationAxis([&] { return -driverController_.GetRightX(); })
+    .WithControllerRotationAxis([this] { return -driverController_.GetRightX(); })
     .WithDeadband(0.1)
     .WithMaximumLinearVelocity(4.5_mps)
-    .WithMaximumAngularVelocity(units::radians_per_second_t{2 * std::numbers::pi})
+    .WithMaximumAngularVelocity(wpi::units::radians_per_second_t{2 * std::numbers::pi})
     .WithAllianceRelativeControl()
-    .WithCubeTranslationControllerAxis();
+    .WithCubeTranslationControllerAxis()
+    .WithTelemetry("Driver",
+        yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 
-driveSubsystem_->SetDefaultCommand(
-    driveSubsystem_->DriveFieldRelativeCommand(driverInput)
+driveSubsystem_.SetDefaultCommand(
+    driveSubsystem_.DriveFieldRelativeCommand(driverInput)
 );
 ```
+
+`WithTelemetry(name, verbosity)` publishes the stream under `SwerveInputStream/<name>` every time it is read. At `HIGH` the stream is also live tunable from the dashboard. Call it last, after the rest of the configuration.
 {% endstep %}
 
 {% step %}
 #### Heading-snap mode (optional)
 
-Clone the input stream to add heading control without affecting the base stream:
+Clone the input stream to add heading control without affecting the base stream. A `Clone()` has no telemetry, so give it its own name if you want it published.
 
 ```cpp
-yams::mechanisms::swerve::utility::SwerveInputStream<4> headingInput =
+InputStream headingInput =
     driverInput.Clone()
     .WithControllerHeadingAxis(
-        [&] { return driverController_.GetRightX(); },
-        [&] { return driverController_.GetRightY(); }
+        [this] { return driverController_.GetRightX(); },
+        [this] { return driverController_.GetRightY(); }
     )
-    .WithHeadingControl([&] { return driverController_.GetRightStickButton(); });
+    .WithHeadingControl([this] { return driverController_.RightStick().Get(); });
 ```
 {% endstep %}
 
 {% step %}
 #### Azimuth encoder seeding
 
-Azimuth encoders are seeded automatically during `SwerveModule` construction. If you need to re-seed after the CAN bus has fully settled (e.g., in `Robot::RobotInit`), call `SeedAzimuthEncoder()` on each module:
+Azimuth encoders are seeded automatically during `SwerveModule` construction. If you need to re-seed after the CAN bus has fully settled, call `SeedAzimuthEncoder()` on each module:
 
 ```cpp
 frontLeft.SeedAzimuthEncoder();
@@ -233,15 +272,15 @@ backRight.SeedAzimuthEncoder();
 {% step %}
 #### Auto-align (`DriveToPose`) and live PID tuning
 
-`DriveToPose(frc::Pose2d)` returns a `frc2::CommandPtr` that drives the robot to a field-relative pose using the `WithTranslationController`/`WithRotationController` PID gains set on `SwerveDriveConfig`:
+`DriveToPose(wpi::math::Pose2d)` returns a `wpi::cmd::CommandPtr` that drives the robot to a field-relative pose using the `WithTranslationController`/`WithRotationController` PID gains set on `SwerveDriveConfig`:
 
 ```cpp
-frc2::CommandPtr DriveSubsystem::DriveToPoseCommand(frc::Pose2d target) {
-    return swerveDrive_.DriveToPose(target);
+wpi::cmd::CommandPtr DriveSubsystem::DriveToPoseCommand(wpi::math::Pose2d target) {
+    return swerveDrive_->DriveToPose(target);
 }
 ```
 
-`SwerveDrive<N>` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it checks a tunable `autoalign/enabled` boolean and, while `true`, drives toward a target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y` in meters, `autoalign/setpoint/rot` in degrees) you can edit live in NetworkTables/Glass, so you can tune those PID gains without redeploying code. The same command also reads a shared set of module drive/azimuth PID, feedforward, and setpoint fields (`modules/drive/*`, `modules/azimuth/*` — PID gains under `feedback/`, `kS`/`kV`/`kA` under `feedforward/`) that apply to every module on the drive at once. These are all already live-tunable at `TelemetryVerbosity::HIGH` (the default); see [SwerveDrive (C++): Auto-Align](../c++-reference/swerve/swerve-drive.md#auto-align-drive-to-pose--pid-control).
+`SwerveDrive<N>` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose`. Running it checks a tunable `autoalign/enabled` boolean and, while `true`, drives toward a target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y` in meters, `autoalign/setpoint/rot` in degrees) you can edit live in NetworkTables, so you can tune those PID gains without redeploying code. The same command also reads a shared set of module drive/azimuth PID, feedforward, and setpoint fields (`modules/drive/*`, `modules/azimuth/*`, with PID gains under `feedback/` and `kS`/`kV`/`kA` under `feedforward/`) that apply to every module on the drive at once. These are all already live-tunable at `TelemetryVerbosity::HIGH` (the default); see [SwerveDrive (C++): Auto-Align](../c++-reference/swerve/swerve-drive.md#auto-align-drive-to-pose--pid-control).
 {% endstep %}
 {% endstepper %}
 
@@ -249,23 +288,24 @@ frc2::CommandPtr DriveSubsystem::DriveToPoseCommand(frc::Pose2d target) {
 
 ## Key SwerveDrive methods
 
-| Method                                                               | Description                                                                             |
-| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `SetFieldRelativeChassisSpeeds(ChassisSpeeds)`                       | Field-relative drive                                                                    |
-| `SetRobotRelativeChassisSpeeds(ChassisSpeeds)`                       | Robot-relative drive                                                                    |
-| `Drive(std::function<ChassisSpeeds()>)`                              | Returns a run `CommandPtr` for continuous driving                                       |
-| `DriveToPose(Pose2d)`                                                | Returns a `CommandPtr` that PID-drives to a field-relative pose                         |
-| `DriveToPoseSetpoint(Pose2d)`                                        | Computes one loop's `ChassisSpeeds` toward a pose (building block behind `DriveToPose`) |
-| `SetTranslationPID(PIDController)` / `SetRotationPID(PIDController)` | Replace the auto-align PID controllers (integrator preserved unless gains changed)      |
-| `ResetTranslationPID()` / `ResetAzimuthPID()`                        | Reset the auto-align PID controllers' internal state                                    |
-| `LockPose()`                                                         | X-pattern to resist pushing                                                             |
-| `GetPose()`                                                          | Current field-relative pose from odometry                                               |
-| `ResetOdometry(Pose2d)`                                              | Reset odometry to a known pose                                                          |
-| `ZeroGyro()`                                                         | Zero the gyro heading                                                                   |
-| `AddVisionMeasurement(Pose2d, second_t)`                             | Fuse vision pose into odometry                                                          |
-| `GetSimPose()`                                                       | Ground-truth simulated pose, useful for feeding a simulated vision system               |
-| `UpdateTelemetry()`                                                  | Call in `Periodic()`                                                                    |
-| `SimIterate()`                                                       | Call in `SimulationPeriodic()`                                                          |
+| Method                                                               | Description                                                                                 |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `SetFieldRelativeChassisSpeeds(ChassisVelocities)`                   | Field-relative drive                                                                        |
+| `SetRobotRelativeChassisSpeeds(ChassisVelocities)`                   | Robot-relative drive                                                                        |
+| `Drive(std::function<ChassisVelocities()>)`                          | Returns a run `CommandPtr` for continuous robot-relative driving                            |
+| `DriveToPose(Pose2d)`                                                | Returns a `CommandPtr` that PID-drives to a field-relative pose                             |
+| `DriveToPoseSetpoint(Pose2d)`                                        | Computes one loop's `ChassisVelocities` toward a pose (building block behind `DriveToPose`) |
+| `SetTranslationPID(PIDController)` / `SetRotationPID(PIDController)` | Replace the auto-align PID controllers (integrator preserved unless gains changed)          |
+| `ResetTranslationPID()` / `ResetRotationPID()`                       | Reset the auto-align PID controllers' internal state                                        |
+| `LockPose()`                                                         | X-pattern to resist pushing                                                                 |
+| `GetPose()`                                                          | Current field-relative pose from odometry                                                   |
+| `GetGyroAngle()`                                                     | Current gyro heading as a `degree_t`                                                        |
+| `ResetOdometry(Pose2d)`                                              | Reset odometry to a known pose                                                              |
+| `ZeroGyro()`                                                         | Zero the gyro heading                                                                       |
+| `AddVisionMeasurement(Pose2d, second_t)`                             | Fuse vision pose into odometry                                                              |
+| `GetSimPose()`                                                       | Ground-truth simulated pose, useful for feeding a simulated vision system                   |
+| `UpdateTelemetry()`                                                  | Call in `Periodic()`                                                                        |
+| `SimIterate()`                                                       | Call in `SimulationPeriodic()`                                                              |
 
 ***
 
@@ -277,6 +317,10 @@ frc2::CommandPtr DriveSubsystem::DriveToPoseCommand(frc::Pose2d target) {
 
 {% hint style="info" %}
 `SwerveInputStream::Of()` takes translation axes only. Add rotation later with `WithControllerRotationAxis()` or switch to heading control with `WithControllerHeadingAxis()` + `WithHeadingControl()`.
+{% endhint %}
+
+{% hint style="info" %}
+The Java-only gyro changes (`GyroAxis`, `withGyroHeadingAxis`, `getGyroRotation3d()`) do not apply to C++. The C++ gyro supplier is still a yaw angle and `SwerveDrive::GetGyroAngle()` is still available.
 {% endhint %}
 
 ***

@@ -1,8 +1,13 @@
 # SwerveDrive
 
-**Package:** `yams.mechanisms.swerve`
+**Package (robot code):** `yams.commands2.swerve` (Commands v2) or `yams.commands3.swerve` (Commands v3)\
+**Extends:** `yams.core.mechanisms.swerve.SwerveDrive`
 
 Manages a complete swerve drivetrain: kinematics, module states, odometry via `SwerveDrivePoseEstimator`, and optional vision measurement fusion.
+
+The state, odometry and simulation logic lives in `yams.core.mechanisms.swerve.SwerveDrive`, which robot code does not construct directly. Import the `SwerveDrive` from the package matching your command framework; it adds the `Subsystem` (v2) or `Mechanism` (v3) binding and the `Command` factories.
+
+Java swerve APIs use the WPILib 2027 kinematics types: `ChassisVelocities` (formerly `ChassisSpeeds`) and `SwerveModuleVelocity` (formerly `SwerveModuleState`), both in `org.wpilib.math.kinematics`.
 
 ## Constructor
 
@@ -12,7 +17,36 @@ SwerveDrive(SwerveDriveConfig config)
 
 | Parameter | Type                | Description                                                            |
 | --------- | ------------------- | ---------------------------------------------------------------------- |
-| `config`  | `SwerveDriveConfig` | Full drivetrain configuration including modules, kinematics, and gyro. |
+| `config`  | `SwerveDriveConfig` | Full drivetrain configuration including modules, kinematics, and gyro. Use `yams.commands2.config.SwerveDriveConfig` with the v2 drive and `yams.commands3.config.SwerveDriveConfig` with the v3 drive. |
+
+On a real robot (not in simulation) the constructor throws `IllegalStateException` if no gyro was set with `SwerveDriveConfig.withGyro(...)`.
+
+***
+
+## Commands
+
+The command factories differ between the two frameworks.
+
+{% tabs %}
+{% tab title="Commands v2" %}
+| Method                                                      | Returns     | Description                                                                                                 |
+| ----------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------- |
+| `drive(Supplier<ChassisVelocities> robotRelativeChassisSpeeds)` | `Command` | Continuously sets robot-relative chassis velocities from a supplier. Requires the drive's `Subsystem`. Runs until interrupted. |
+| `driveToPose(Pose2d pose)`                                  | `Command`   | Resets the translation/rotation PID controllers, then continuously drives toward the field-relative `pose` until interrupted. |
+| `getSubsystem()`                                            | `Subsystem` | The `Subsystem` set on the `SwerveDriveConfig`.                                                              |
+{% endtab %}
+
+{% tab title="Commands v3" %}
+| Method                                                                           | Returns     | Description                                                                                                  |
+| -------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| `drive(Supplier<ChassisVelocities> robotRelativeChassisSpeeds)`                  | `Command`   | Continuously sets robot-relative chassis velocities from a supplier. Requires the drive's `Mechanism`. Runs until canceled. |
+| `driveToPose(Pose2d pose)`                                                       | `Command`   | Resets the PID controllers, then drives toward the field-relative `pose` until canceled. Stops the drive when canceled. |
+| `driveToPose(Pose2d pose, Distance translationTolerance, Angle rotationTolerance)` | `Command` | Same, but ends once the robot is within both tolerances, then stops the drive.                                |
+| `isNear(Pose2d pose, Distance translationTolerance, Angle rotationTolerance)`    | `boolean`   | Whether the robot is within both tolerances of `pose`.                                                        |
+| `stop()`                                                                         | `void`      | Commands zero chassis velocities.                                                                             |
+| `getMechanism()`                                                                 | `Mechanism` | The `Mechanism` set on the `SwerveDriveConfig`.                                                               |
+{% endtab %}
+{% endtabs %}
 
 ***
 
@@ -20,12 +54,26 @@ SwerveDrive(SwerveDriveConfig config)
 
 | Method                                                | Returns   | Description                                                                         |
 | ----------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| `drive(Supplier<ChassisSpeeds> speedsSupplier)`       | `Command` | Continuously sets robot-relative chassis speeds from a supplier. Runs indefinitely. |
-| `setRobotRelativeChassisSpeeds(ChassisSpeeds speeds)` | `void`    | Directly sets robot-relative speeds. Call from `periodic()`, not a command.         |
-| `setRobotRelativeChassisSpeeds(ChassisSpeeds speeds, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force`, FL/FR/BL/BR order (matching module order). Pass an empty array for no feedforward. Designed to plug PathPlanner's `AutoBuilder.configure(...)` `driveRobotRelative` consumer straight in: `(speeds, ff) -> drive.setRobotRelativeChassisSpeeds(speeds, ff.linearForces())`. |
-| `setFieldRelativeChassisSpeeds(ChassisSpeeds speeds)` | `void`    | Sets field-relative speeds, rotating by the gyro angle before applying.             |
-| `setSwerveModuleStates(SwerveModuleState[] states)`   | `void`    | Directly commands module states, bypassing chassis-speeds-to-states kinematics.     |
-| `setSwerveModuleStates(SwerveModuleState[] states, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force` (FL/FR/BL/BR order).         |
+| `setRobotRelativeChassisSpeeds(ChassisVelocities speeds)` | `void` | Directly sets robot-relative velocities. Call from `periodic()` or a command.        |
+| `setRobotRelativeChassisSpeeds(ChassisVelocities speeds, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force`, FL/FR/BL/BR order (matching module order). Pass an empty array for no feedforward; any other length that does not match the module count throws `IllegalArgumentException`. Designed to plug PathPlanner's `AutoBuilder.configure(...)` `driveRobotRelative` consumer straight in: `(speeds, ff) -> drive.setRobotRelativeChassisSpeeds(speeds, ff.linearForces())`. |
+| `setFieldRelativeChassisSpeeds(ChassisVelocities speeds)` | `void` | Sets field-relative velocities, rotating by the gyro heading before applying.        |
+| `setSwerveModuleStates(SwerveModuleVelocity[] states)`   | `void`    | Directly commands module states, bypassing chassis-velocities-to-states kinematics.  |
+| `setSwerveModuleStates(SwerveModuleVelocity[] states, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force` (FL/FR/BL/BR order).  |
+| `getStateFromRobotRelativeChassisSpeeds(ChassisVelocities speeds)` | `SwerveModuleVelocity[]` | Converts robot-relative velocities to module states, desaturated by `withMaximumModuleSpeed(...)` (and `withMaximumChassisSpeed(...)` if set). |
+| `lockPose()`                                          | `void`    | Turns every module toward the robot center without driving it (the X pattern), making the robot hard to push. Uses `SwerveModule.lock(Rotation2d)`, which skips the velocity deadband, so the wheels actually turn. Call it every loop while locking, e.g. from a command. |
+
+***
+
+## Gyro
+
+| Method                 | Returns      | Description |
+| ---------------------- | ------------ | ----------- |
+| `getGyroRotation3d()`  | `Rotation3d` | The robot's attitude from the gyro (see [`SwerveDriveConfig.getGyroRotation3d()`](swerve-drive-config.md#gyro)). Its yaw (`getZ()`, or `toRotation2d()`) is the robot heading, wrapped to +/-180 degrees; its roll and pitch are the robot's tilt. In simulation, the simulated heading with no tilt. |
+| `zeroGyro()`           | `void`       | Resets the heading to zero and the odometry to the same position facing 0 (toward the red alliance). |
+
+{% hint style="warning" %}
+`getGyroAngle()` was removed from `SwerveDrive` and `SwerveDriveConfig`. Use `getGyroRotation3d()` instead, e.g. `drive.getGyroRotation3d().toRotation2d()` for the heading as a `Rotation2d`.
+{% endhint %}
 
 ***
 
@@ -33,15 +81,17 @@ SwerveDrive(SwerveDriveConfig config)
 
 | Method                                     | Returns         | Description                                                                                                 |
 | ------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------ |
-| `driveToPose(Pose2d pose)`                  | `Command`       | Resets the translation/rotation PID controllers, then continuously drives toward the field-relative `pose`.  |
-| `driveToPoseSetpoint(Pose2d targetPose)`    | `ChassisSpeeds` | Computes one loop's robot-relative `ChassisSpeeds` toward `targetPose` using the configured PID controllers. Lower-level building block behind `driveToPose(...)`; reset the PID controllers yourself before looping on this. |
-| `setTranslationPID(PIDController controller)` | `void`        | Replaces the translation controller used by `driveToPose(...)`. Only resets the controller (clearing its integrator) if P, I, or D actually changed, so live-tuning doesn't wipe accumulated state every loop. |
+| `driveToPoseSetpoint(Pose2d targetPose)`    | `ChassisVelocities` | Computes one loop's robot-relative `ChassisVelocities` toward `targetPose` using the configured PID controllers. Lower-level building block behind `driveToPose(...)`; reset the PID controllers yourself before looping on this. Throws `SwerveDriveConfigurationException` if either controller is not configured. |
+| `driveToPoseSetpoint(Pose2d targetPose, Pose2d currentPose, Rotation2d heading)` | `ChassisVelocities` | Same, from a given pose and heading (e.g. replayed from a log). |
+| `getDistanceFromPose(Pose2d pose)`          | `Distance`      | Distance from `pose` to the robot.                                                                          |
+| `getAngleDifferenceFromPose(Pose2d pose)`   | `Angle`         | Heading difference between the robot and `pose`.                                                            |
+| `setTranslationPID(PIDController controller)` | `void`        | Replaces the translation controller used by `driveToPose(...)`. Only resets the controller (clearing its integrator) if P, I, or D actually changed, so live tuning doesn't wipe accumulated state every loop. |
 | `setRotationPID(PIDController controller)`  | `void`          | Replaces the rotation controller used by `driveToPose(...)`, with the same change-detection guard as `setTranslationPID`. |
 | `resetTranslationPID()`                     | `void`          | Resets the translation controller's internal state (e.g. integrator).                                        |
 | `resetRotationPID()`                        | `void`          | Resets the rotation controller's internal state.                                                              |
 
 {% hint style="info" %}
-`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning/driveToPose` (see [Telemetry & DataLog](#telemetry--datalog) below). Running it resets both PID controllers, then every loop checks a tunable `AutoAlignEnabled` boolean and, while `true`, calls `driveToPoseSetpoint(...)` against a tunable target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y`/`autoalign/setpoint/rot`) published to NetworkTables, useful for tuning `withTranslationController`/`withRotationController` gains — or driving to an arbitrary pose — without redeploying code. The `TranslationP/I/D`/`RotationP/I/D` tuning entries are pre-seeded from the PID controllers passed to `withTranslationController`/`withRotationController` (not `0`), the same way `SmartMotorControllerTelemetry` seeds its `kP`/`kI`/`kD` entries from the motor's configured PID.
+When both a translation and a rotation controller are configured, `SwerveDrive` publishes a live-tuning command at `Mechanisms/<name>/tuning` (a Commands v2 `Command` in v2, or a Commands v3 `Command` wrapped in a `CommandTunable` in v3; see [Telemetry & DataLog](#telemetry--datalog) below). Running it resets both PID controllers, then every loop checks a tunable `AutoAlignEnabled` boolean and, while `true`, drives toward a tunable target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y`/`autoalign/setpoint/rot`). This is useful for tuning `withTranslationController`/`withRotationController` gains, or driving to an arbitrary pose, without redeploying code. The `TranslationP/I/D`/`RotationP/I/D` tuning entries are pre-seeded from the PID controllers passed to `withTranslationController`/`withRotationController` (not `0`), the same way `SmartMotorControllerTelemetry` seeds its `kP`/`kI`/`kD` entries from the motor's configured PID.
 {% endhint %}
 
 ***
@@ -51,19 +101,27 @@ SwerveDrive(SwerveDriveConfig config)
 | Method                                                | Returns                  | Description                                                                    |
 | ----------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------ |
 | `getPose()`                                           | `Pose2d`                 | Returns the current estimated robot pose.                                      |
-| `resetOdometry(Pose2d pose)`                          | `void`                   | Resets the pose estimator to `pose`. Also reseeds all module azimuth encoders. |
+| `resetOdometry(Pose2d pose)`                          | `void`                   | Resets the pose estimator to `pose` and sets the gyro heading to the pose's heading, so field-relative driving agrees with the reset pose. |
 | `addVisionMeasurement(Pose2d pose, double timestamp)` | `void`                   | Fuses a vision-derived pose into the estimator at `timestamp` (FPGA seconds).  |
-| `getChassisSpeeds()`                                  | `ChassisSpeeds`          | Returns the current robot-relative chassis speeds derived from module states.  |
-| `getModuleStates()`                                   | `SwerveModuleState[]`    | Returns the current state (speed and angle) of each module.                    |
+| `addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3, N1> stdDevs)` | `void` | Same, with per-measurement standard deviations.                     |
+| `setVisionMeasurementStdDevs(Matrix<N3, N1> stdDevs)` | `void`                   | Sets the estimator's default trust in vision measurements (x, y in meters, theta in radians). |
+| `getRobotRelativeSpeed()`                             | `ChassisVelocities`      | Measured robot-relative velocities, from the module states.                     |
+| `getFieldRelativeSpeed()`                             | `ChassisVelocities`      | Measured field-relative velocities.                                             |
+| `getModuleStates()`                                   | `SwerveModuleVelocity[]` | Returns the current state (speed and angle) of each module.                    |
 | `getModulePositions()`                                | `SwerveModulePosition[]` | Returns the integrated position of each module.                                |
-| `getDesiredChassisSpeeds()`                           | `ChassisSpeeds`          | Returns the last-commanded robot-relative setpoint (not a measurement).        |
-| `getDesiredModuleStates()`                            | `SwerveModuleState[]`    | Returns the last-commanded module states (not a measurement).                  |
-| `getRobotRelativeChassisSpeedsFromState(SwerveModuleState[])` | `ChassisSpeeds`   | Converts an arbitrary set of module states back into robot-relative chassis speeds. |
+| `getDesiredChassisSpeeds()`                           | `ChassisVelocities`      | Returns the last-commanded robot-relative setpoint (not a measurement).        |
+| `getDesiredModuleStates()`                            | `SwerveModuleVelocity[]` | Returns the last-commanded module states (not a measurement).                  |
+| `getRobotRelativeChassisSpeedsFromState(SwerveModuleVelocity[])` | `ChassisVelocities` | Converts an arbitrary set of module states back into robot-relative chassis velocities. |
+| `getKinematics()`                                     | `SwerveDriveKinematics`  | Builds a `SwerveDriveKinematics` from the module locations.                    |
 | `getSimPose()`                                        | `Pose2d`                 | Returns the simulated ground-truth pose. See below.                            |
-| `getField2d()`                                        | `Field2d`                | Returns the `Field2d` widget the drive already publishes to SmartDashboard.    |
+| `getField2d()`                                        | `Field2d`                | Returns the `Field2d` the drive already publishes (at `Mechanisms/<name>/field`). Add your own `FieldObject2d`s to it instead of creating another `Field2d`. |
+| `getModule(String moduleName)`                        | `Optional<SwerveModule>` | The module with the given name, if any.                                        |
+| `getModules()`                                        | `SwerveModule[]`         | All modules of the drive.                                                      |
+| `getConfig()`                                         | `SwerveDriveConfig<?>`   | The drive's configuration.                                                     |
+| `getName()`                                           | `String`                 | The telemetry name of the drive.                                               |
 
 {% hint style="warning" %}
-`getDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion: it is whatever was last passed to `setRobotRelativeChassisSpeeds(...)` (directly, or via `setFieldRelativeChassisSpeeds(...)`/`drive(...)`), cached and republished every `updateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `ChassisSpeeds`. For the drive's actual measured speed, use `getRobotRelativeSpeed()` / `getFieldRelativeSpeed()` instead.
+`getDesiredChassisSpeeds()` returns a **setpoint**, not the robot's actual measured motion: it is whatever was last passed to `setRobotRelativeChassisSpeeds(...)` (directly, or via `setFieldRelativeChassisSpeeds(...)`/`drive(...)`), cached and republished every `updateTelemetry()` call. If nothing has commanded the drive yet, it returns a zeroed `ChassisVelocities`. For the drive's actual measured speed, use `getRobotRelativeSpeed()` / `getFieldRelativeSpeed()` instead.
 {% endhint %}
 
 {% hint style="info" %}
@@ -71,7 +129,7 @@ There is no direct accessor for the underlying `SwerveDrivePoseEstimator`. `Swer
 {% endhint %}
 
 {% hint style="info" %}
-`getSimPose()` returns a separate, ground-truth `Pose2d` that assumes every module reached its last-commanded `SwerveModuleState` perfectly; it is **not** the same as `getPose()` (the noisy, gyro/odometry-fused estimate). It's updated in simulation by `simIterate()`, by integrating a `Twist2d` built from the desired module states, and is also snapped to the given pose by `resetOdometry(Pose2d)` so it stays in sync with the fused estimate. On a real robot it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera.
+`getSimPose()` returns a separate, ground-truth `Pose2d` that assumes every module reached its last-commanded `SwerveModuleVelocity` perfectly; it is **not** the same as `getPose()` (the noisy, gyro/odometry-fused estimate). It's updated in simulation by `simIterate()`, by integrating a `Twist2d` built from the desired module states, and is also snapped to the given pose by `resetOdometry(Pose2d)` so it stays in sync with the fused estimate. On a real robot it stays at the configured starting pose. This makes it a convenient "known truth" pose to feed into a simulated vision system (e.g. to generate synthetic AprilTag detections) so you can test vision code end-to-end without a physical camera.
 {% endhint %}
 
 ***
@@ -80,47 +138,108 @@ There is no direct accessor for the underlying `SwerveDrivePoseEstimator`. `Swer
 
 | Method              | Returns | Description                                                                                     |
 | ------------------- | ------- | ----------------------------------------------------------------------------------------------- |
-| `updateTelemetry()` | `void`  | Publishes pose, module states, and speeds to NetworkTables. Call from `periodic()`.             |
+| `updateTelemetry()` | `void`  | Updates the pose estimator and publishes pose, module states, and speeds to NetworkTables. Call from `periodic()`. |
 | `simIterate()`      | `void`  | Advances the swerve physics simulation by one loop iteration. Call from `simulationPeriodic()`. |
 
 ***
 
 ## Telemetry & DataLog
 
-`updateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig.withTelemetry(String name, TelemetryVerbosity)`. It also calls `SwerveModule.updateTelemetry()` for each module in the drive.
+`updateTelemetry()` publishes pose, gyro, chassis speeds, and module states to NetworkTables under `Mechanisms/<name>` at the verbosity configured via `SwerveDriveConfig.withTelemetry(String name, TelemetryVerbosity)` (default `HIGH`). Tunable values are published under `Tuning/<name>`. It also calls `SwerveModule.updateTelemetry()` for each module in the drive.
 
-For full control over exactly which fields are published (including the auto-align PID gains `TranslationP/I/D`, `RotationP/I/D`, the tunable target pose fields `AutoAlignPoseX`/`AutoAlignPoseY`/`AutoAlignPoseRotation` (`autoalign/setpoint/x`, `autoalign/setpoint/y`, `autoalign/setpoint/rot`), the `AutoAlignEnabled` boolean, and the shared module tuning fields `ModulesDriveP/I/D`/`ModulesDriveKs/Kv/Ka`/`ModulesDriveVelocity`/`ModulesDriveTuningEnabled`/`ModulesDriveInPlace` (`modules/drive/feedback/p,i,d`, `modules/drive/feedforward/s,v,a`, `modules/drive/velocity`, `modules/drive/enabled`, `modules/drive/inplace`) and `ModulesAzimuthP/I/D`/`ModulesAzimuthKs/Kv/Ka`/`ModulesAzimuthAngle`/`ModulesAzimuthTuningEnabled` (`modules/azimuth/feedback/p,i,d`, `modules/azimuth/feedforward/s,v,a`, `modules/azimuth/angle`, `modules/azimuth/enabled`), all used by the live-tuning dashboard command), pass a [`SwerveDriveTelemetryConfig`](../../java-reference/swerve/swerve-drive.md) to `SwerveDriveConfig.withTelemetry(String name, SwerveDriveTelemetryConfig)`. The module tuning fields apply to every module on the drive at once, not to a single module, and the feedback/feedforward gains are pre-seeded from the first module's configured PID controller and `SimpleMotorFeedforward`, not `0`. To additionally record fields to a WPILib DataLog (for offline review in AdvantageScope), call `.withDataLogName(String)` on that `SwerveDriveTelemetryConfig`; see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
+For full control over exactly which fields are published (including the auto-align PID gains `TranslationP/I/D`, `RotationP/I/D`, the tunable target pose fields `AutoAlignPoseX`/`AutoAlignPoseY`/`AutoAlignPoseRotation` (`autoalign/setpoint/x`, `autoalign/setpoint/y`, `autoalign/setpoint/rot`), the `AutoAlignEnabled` boolean, and the shared module tuning fields `ModulesDriveP/I/D`/`ModulesDriveKs/Kv/Ka`/`ModulesDriveVelocity`/`ModulesDriveTuningEnabled`/`ModulesDriveInPlace` (`modules/drive/feedback/p,i,d`, `modules/drive/feedforward/s,v,a`, `modules/drive/velocity`, `modules/drive/enabled`, `modules/drive/inplace`) and `ModulesAzimuthP/I/D`/`ModulesAzimuthKs/Kv/Ka`/`ModulesAzimuthAngle`/`ModulesAzimuthTuningEnabled` (`modules/azimuth/feedback/p,i,d`, `modules/azimuth/feedforward/s,v,a`, `modules/azimuth/angle`, `modules/azimuth/enabled`), all used by the live-tuning dashboard command), pass a `SwerveDriveTelemetryConfig` (`yams.core.telemetry`) to `SwerveDriveConfig.withTelemetry(String name, SwerveDriveTelemetryConfig)`. The module tuning fields apply to every module on the drive at once, not to a single module, and the feedback/feedforward gains are pre-seeded from the first module's configured PID controller and `SimpleMotorFeedforward`, not `0`. To additionally record fields to a WPILib DataLog (for offline review in AdvantageScope), call `.withDataLogName(String)` on that `SwerveDriveTelemetryConfig`; see [SwerveDriveConfig](swerve-drive-config.md#datalog-telemetry).
 
 {% hint style="warning" %}
-`AutoAlignEnabled`, `ModulesDriveTuningEnabled`, and `ModulesAzimuthTuningEnabled` are mutually exclusive. `applyTuningValues(...)` only acts on one at a time (priority: auto-align, then drive tuning, then azimuth tuning) and forces the others' NetworkTables value back to `false` if more than one is `true`. Both module tuning modes build a `SwerveModuleState[]` (one entry per module) and command it in one call via `SwerveDrive.setSwerveModuleStates(...)` rather than the drive/azimuth `SmartMotorController`s directly: while `ModulesDriveInPlace` is `false` (the default), drive tuning commands each module to an angle of `0°` while driving the tuned velocity; while `ModulesDriveInPlace` is `true`, it instead orients each module tangent to its position around the robot center (that module's location angle plus `90°`), so a positive `ModulesDriveVelocity` spins the whole robot counter-clockwise, matching WPILib's positive rotation direction. Azimuth tuning always commands `0` velocity alongside the tuned angle. When drive tuning is off (and auto-align isn't active), every module's drive motor is continuously commanded to `0` velocity.
+`AutoAlignEnabled`, `ModulesDriveTuningEnabled`, and `ModulesAzimuthTuningEnabled` are mutually exclusive. `applyTuningValues()` only acts on one at a time (priority: auto-align, then drive tuning, then azimuth tuning) and forces the others' NetworkTables value back to `false` if more than one is `true`. Both module tuning modes build a `SwerveModuleVelocity[]` (one entry per module) and command it in one call via `SwerveDrive.setSwerveModuleStates(...)` rather than the drive/azimuth `SmartMotorController`s directly: while `ModulesDriveInPlace` is `false` (the default), drive tuning commands each module to an angle of `0°` while driving the tuned velocity; while `ModulesDriveInPlace` is `true`, it instead orients each module tangent to its position around the robot center (that module's location angle plus `90°`), so a positive `ModulesDriveVelocity` spins the whole robot counter-clockwise, matching WPILib's positive rotation direction. Azimuth tuning always commands `0` velocity alongside the tuned angle. When drive tuning is off (and auto-align isn't active), every module's drive motor is continuously commanded to `0` velocity.
 {% endhint %}
 
 ***
 
 ## Example Usage
 
+{% tabs %}
+{% tab title="Commands v2" %}
 ```java
+import org.wpilib.command2.Command;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import java.util.function.Supplier;
+import yams.commands2.config.SwerveDriveConfig;
+import yams.commands2.swerve.SwerveDrive;
+
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrive m_drive;
 
     public SwerveSubsystem() {
-        m_drive = new SwerveDrive(/* SwerveDriveConfig */);
+        m_drive = new SwerveDrive(new SwerveDriveConfig(this, fl, fr, bl, br)
+            .withGyro(m_gyro::getRotation3d));
     }
 
-    public Command driveCommand(Supplier<ChassisSpeeds> speeds) {
-        return m_drive.drive(speeds);
+    public Command driveCommand(Supplier<ChassisVelocities> robotRelativeSpeeds) {
+        return m_drive.drive(robotRelativeSpeeds);
+    }
+
+    public Command lock() {
+        return run(m_drive::lockPose);
     }
 
     @Override
     public void periodic() {
         m_drive.updateTelemetry();
     }
+
+    @Override
+    public void simulationPeriodic() {
+        m_drive.simIterate();
+    }
 }
 ```
+{% endtab %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive/java/frc/robot/subsystems/SwerveSubsystem.java#L176-L215" %}
+{% tab title="Commands v3" %}
+```java
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import java.util.function.Supplier;
+import yams.commands3.config.SwerveDriveConfig;
+import yams.commands3.swerve.SwerveDrive;
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/swerve_drive_pathplanner/java/frc/robot/subsystems/SwerveSubsystem.java#L212-L248" %}
+public class SwerveMechanism implements Mechanism {
+    private final SwerveDrive m_drive;
+
+    public SwerveMechanism() {
+        m_drive = new SwerveDrive(new SwerveDriveConfig(this, fl, fr, bl, br)
+            .withGyro(m_gyro::getRotation3d));
+    }
+
+    public Command driveCommand(Supplier<ChassisVelocities> robotRelativeSpeeds) {
+        return m_drive.drive(robotRelativeSpeeds);
+    }
+
+    public Command lock() {
+        return run(coroutine -> {
+            while (true) {
+                m_drive.lockPose();
+                coroutine.yield();
+            }
+        }).named("Swerve Lock");
+    }
+
+    // Called from the robot's periodic loop.
+    public void periodic() {
+        m_drive.updateTelemetry();
+    }
+
+    public void simulationPeriodic() {
+        m_drive.simIterate();
+    }
+}
+```
+{% endtab %}
+{% endtabs %}
+
+Full examples: [Commands v2 `SwerveSubsystem`](https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/SwerveSubsystem.java) and [Commands v3 `SwerveMechanism`](https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/SwerveMechanism.java).
 
 ***
 

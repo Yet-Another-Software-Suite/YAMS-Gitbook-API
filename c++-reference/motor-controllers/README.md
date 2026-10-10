@@ -1,3 +1,3 @@
 # Motor Controllers
 
-C++ motor controller abstraction for REV and CTRE hardware.
+C++ motor controller abstraction for REV (SPARK MAX, SPARK Flex), CTRE (TalonFX, TalonFXS) and Thrifty Bot (Thrifty Nova) hardware.

@@ -1,8 +1,8 @@
 # FlyWheelConfig
 
-**Package:** `yams.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`
 
-`FlyWheelConfig` configures a velocity-controlled spinning mechanism.
+`FlyWheelConfig` configures a velocity-controlled spinning mechanism: shooters, and also intakes, rollers, feeders and indexers (even when driven open loop).
 
 All builder methods return the `FlyWheelConfig` instance for chaining.
 
@@ -27,19 +27,30 @@ FlyWheelConfig clone()  // Deep copy
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withDiameter(Distance diameter)` | `diameter`: wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion and simulation. |
+| `withDiameter(Distance diameter)` | `diameter`: wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion (`getLinearVelocity`, `getAngularVelocity`) and the visualization. |
 | `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity`: maximum simulated velocity | Enables a simulated speedometer gauge capped at `maxVelocity`. |
 | `withSpeedometerSimulation()` | _(none)_ | Enables the speedometer with the previously configured max velocity. Throws if max velocity was not set first. |
 | `disableSpeedometerSimulation()` | _(none)_ | Disables the speedometer simulation. |
 | `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
 | `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
 
 ---
 
 ## Getters
 
-All getters return `Optional<>` for configured values. `getSimColor()` and `getMechanismPositionConfig()` always return a value.
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getTelemetryName()` | `Optional<String>` | The configured NT prefix, or empty if telemetry is not set. |
+| `getTelemetryVerbosity()` | `Optional<TelemetryVerbosity>` | The configured verbosity, or empty. |
+| `getDiameter()` | `Optional<Distance>` | The wheel diameter, or empty if not configured. |
+| `getCircumference()` | `Distance` | The wheel circumference. Requires `withDiameter`. |
+| `getLinearVelocity(AngularVelocity velocity)` | `LinearVelocity` | Converts a wheel angular velocity to surface speed. Requires `withDiameter`. |
+| `getAngularVelocity(LinearVelocity velocity)` | `AngularVelocity` | Converts a surface speed to wheel angular velocity. Requires `withDiameter`. |
+| `isUsingSpeedometerSimulation()` | `boolean` | Whether the speedometer simulation is enabled. |
+| `getSpeedometerMaxVelocity()` | `Optional<AngularVelocity>` | The speedometer maximum velocity, or empty. |
+| `getSimColor()` | `Color8Bit` | The visualization color. Defaults to orange. |
+| `getMechanismPositionConfig()` | `MechanismPositionConfig` | The position/plane configuration. |
 
 ---
 
@@ -52,4 +63,4 @@ FlyWheelConfig config = new FlyWheelConfig()
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java#L150-L156" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ShooterSubsystem.java#L49-L53" %}

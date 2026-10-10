@@ -1,8 +1,8 @@
 # YUnits
 
-Package: `yams.units`
+Package: `yams.core.units`
 
-`YUnits` is a static utility class containing extended unit constants for use with WPILib's `edu.wpi.first.units` system. All values are defined as `Unit` instances compatible with WPILib's `Measure<>` framework.
+`YUnits` is a static utility class containing extended unit constants for use with WPILib's `org.wpilib.units` system. All values are defined as `Unit` instances compatible with WPILib's `Measure` types.
 
 `YUnits` cannot be instantiated.
 
@@ -68,10 +68,10 @@ Package: `yams.units`
 ## Usage
 
 ```java
-import static yams.units.YUnits.*;
+import static yams.core.units.YUnits.*;
 
-Measure<Distance> armLength = Cubits.of(1.5);   // 1.5 cubits ≈ 0.686 m
-Measure<Velocity<Distance>> speed = MilesPerHour.of(15);
+Distance armLength = Cubits.of(1.5);   // 1.5 cubits ≈ 0.686 m
+LinearVelocity speed = MilesPerHour.of(15);
 ```
 
 {% hint style="info" %}

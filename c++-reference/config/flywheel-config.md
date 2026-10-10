@@ -1,6 +1,8 @@
 # FlyWheelConfig
 
-**Namespace:** `yams::mechanisms::config` **Java equivalent:** [Java FlyWheelConfig](../../java-reference/config/flywheel-config.md)
+**Namespace:** `yams::mechanisms::config`\
+**Header:** `<yams/mechanisms/config/FlyWheelConfig.hpp>`\
+**Java equivalent:** [Java FlyWheelConfig](../../java-reference/config/flywheel-config.md)
 
 `FlyWheelConfig` holds physical and simulation parameters for a `FlyWheel` mechanism.
 
@@ -25,8 +27,8 @@ All methods return `FlyWheelConfig&` for chaining.
 | Method                                        | Description                                                         |
 | --------------------------------------------- | ------------------------------------------------------------------- |
 | `WithTelemetryName(const std::string& name)`  | Name used for SmartDashboard and log entries                        |
-| `WithRollerDiameter(units::meter_t diameter)` | Roller/flywheel outer diameter, used for surface speed calculations |
-| `WithSimColor(const frc::Color8Bit& color)`   | Color of the simulated flywheel (default: orange)                   |
+| `WithRollerDiameter(wpi::units::meter_t diameter)` | Roller/flywheel outer diameter, used for surface speed calculations |
+| `WithSimColor(const wpi::util::Color8Bit& color)`   | Color of the simulated flywheel (default: orange)                   |
 
 ***
 
@@ -34,8 +36,8 @@ All methods return `FlyWheelConfig&` for chaining.
 
 ```cpp
 std::string GetTelemetryName() const;
-std::optional<units::meter_t> GetRollerDiameter() const;
-frc::Color8Bit GetSimColor() const;
+std::optional<wpi::units::meter_t> GetRollerDiameter() const;
+wpi::util::Color8Bit GetSimColor() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.

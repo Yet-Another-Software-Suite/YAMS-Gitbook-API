@@ -1,6 +1,6 @@
 # ExponentialProfilePIDController
 
-**Package:** `yams.math`
+**Package:** `yams.core.math`
 
 `ExponentialProfilePIDController` wraps a `PIDController` with an `ExponentialProfile` to produce smooth, physically-motivated setpoints. The exponential profile models a first-order system response; unlike the trapezoidal profile, it does not have a constant-velocity segment, so it tends to feel more natural for arm and flywheel mechanisms.
 
@@ -28,7 +28,7 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 
 | Method | Returns | Description |
 | ------ | ------- | ----------- |
-| `calculate(double measurementPosition, double setpointPosition)` | `double` | Advances the profile by one timestep and returns PID output. Uses FPGA clock for dt. |
+| `calculate(double measurementPosition, double setpointPosition)` | `double` | Advances the profile by one timestep and returns PID output. The timestep is measured with a WPILib `Timer` between calls. |
 | `calculate(double measurementPosition, double setpointVelocity, double setpointPosition)` | `double` | Same, but also provides an explicit velocity setpoint for feedforward. |
 | `reset(State measurement)` | `void` | Resets the profile and PID to the given state. Call on enable. |
 | `reset(double position, double velocity)` | `void` | Resets with position and velocity scalars. |
@@ -46,6 +46,8 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 | `getNextVelocitySetpoint()` | `AngularVelocity` | Next velocity setpoint. |
 | `getNextState()` | `Optional<State>` | The next profile state, or empty if not yet calculated. |
 | `getConstraints()` | `Optional<Constraints>` | The configured constraints, or empty. |
+| `getKv()` | `AngularVelocity` | Velocity gain derived from the constraints (`-A/B`). Throws `IllegalStateException` if no constraints are set. |
+| `getKa()` | `AngularAcceleration` | Acceleration gain derived from the constraints (`1/B`). Throws `IllegalStateException` if no constraints are set. |
 
 ## PID Tuning Methods
 
@@ -77,6 +79,6 @@ controller.setTolerance(0.05); // radians
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java#L157-L171" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ExponentiallyProfiledArmSubsystem.java#L75-L83" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_elevator/java/frc/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java#L134-L146" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ExponentiallyProfiledElevatorSubsystem.java#L89-L94" %}

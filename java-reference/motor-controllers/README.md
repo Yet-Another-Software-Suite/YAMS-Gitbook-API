@@ -1,3 +1,3 @@
 # Motor Controllers
 
-Motor controller abstraction layer for REV and CTRE hardware.
+Motor controller abstraction layer for REV, CTRE and Thrifty Bot hardware.

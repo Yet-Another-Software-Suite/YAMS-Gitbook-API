@@ -6,7 +6,7 @@
 
 ## What YAMS Sensors solve
 
-WPILib's simulation layer lets you override hardware values in the **Glass** GUI. YAMS Sensors expose any arbitrary hardware reading (limit switch, encoder, analog input, color sensor, …) to Glass through a `SimDevice`, using the same typed supplier API on robot and in sim.
+WPILib's simulation layer lets you override hardware values in the **Glass** GUI. YAMS Sensors expose any arbitrary hardware reading (limit switch, encoder, analog input, color sensor, and so on) to Glass through a `SimDevice`, using the same typed supplier API on robot and in sim.
 
 Additionally, YAMS Sensors support **trigger-based value injection**: you can declare "from match time 10 s to 12 s, make this limit switch read `true`" directly in your subsystem constructor. This makes automated simulation regression testing possible without touching Glass at all.
 
@@ -19,7 +19,7 @@ Additionally, YAMS Sensors support **trigger-based value injection**: you can de
 Decide which hardware readings to expose. Each reading becomes one field on the sensor.
 
 ```java
-import edu.wpi.first.wpilibj.DigitalInput;
+import org.wpilib.hardware.discrete.DigitalInput;
 
 DigitalInput noteDetector = new DigitalInput(1);  // beam-break on DIO 1
 ```
@@ -27,8 +27,8 @@ DigitalInput noteDetector = new DigitalInput(1);  // beam-break on DIO 1
 ### Step 2: Describe the sensor with `SensorConfig`
 
 ```java
-import static edu.wpi.first.units.Units.Seconds;
-import yams.mechanisms.config.SensorConfig;
+import static org.wpilib.units.Units.Seconds;
+import yams.core.mechanisms.config.SensorConfig;
 
 SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
     // Register a boolean field backed by the real DIO channel
@@ -40,7 +40,7 @@ Pass the field name, a supplier for the live value, and a default (used before a
 ### Step 3: Obtain the `Sensor` instance
 
 ```java
-import yams.motorcontrollers.simulation.Sensor;
+import yams.core.motorcontrollers.simulation.Sensor;
 
 Sensor sensor = intakeSensor.getSensor();
 ```
@@ -72,30 +72,35 @@ SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
 Use a `BooleanSupplier` trigger instead of a time window when the condition is dynamic:
 
 ```java
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.hardware.hal.HALValue;
 
 intakeSensor.withSimulatedValue(
     "NotePresent",
-    DriverStation::isAutonomous,  // active whenever auto is running
+    RobotState::isAutonomous,  // active whenever auto is running
     true
 );
 
 // Or inject programmatically after the Sensor is built:
 sensor.addSimTrigger(
     "NotePresent",
-    yams.motorcontrollers.simulation.SensorData.convert(true),
-    DriverStation::isAutonomous
+    HALValue.makeBoolean(true),
+    RobotState::isAutonomous
 );
 ```
 
 ### Complete subsystem example
 
 ```java
-import static edu.wpi.first.units.Units.Seconds;
-import yams.mechanisms.config.SensorConfig;
-import yams.motorcontrollers.simulation.Sensor;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+package first.robot.subsystems;
+
+import static org.wpilib.units.Units.Seconds;
+
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.button.Trigger;
+import org.wpilib.hardware.discrete.DigitalInput;
+import yams.core.mechanisms.config.SensorConfig;
+import yams.core.motorcontrollers.simulation.Sensor;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -114,13 +119,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return intakeSensor.getAsBoolean("NotePresent");
     }
 
-    @Override
-    public void periodic() {
-        // Expose to SmartDashboard/telemetry as usual
-        SmartDashboard.putBoolean("Intake/NotePresent", hasNote());
+    /** Trigger for binding commands to the sensor. */
+    public Trigger noteDetected() {
+        return new Trigger(this::hasNote);
     }
 }
 ```
+
+In a Commands v3 project the sensor code is the same: the class implements `org.wpilib.command3.Mechanism` instead of extending `SubsystemBase`, and `Trigger` comes from `org.wpilib.command3`.
 
 ### Multiple fields on one sensor
 
@@ -149,8 +155,8 @@ boolean atTop = sensor.getAsBoolean("AtUpperLimit");
 ### Step 1: Identify the hardware
 
 ```cpp
-#include <frc/DigitalInput.h>
-frc::DigitalInput noteDetector{1};  // beam-break on DIO 1
+#include <wpi/hardware/discrete/DigitalInput.hpp>
+wpi::DigitalInput noteDetector{1};  // beam-break on DIO 1
 ```
 
 ### Step 2: Describe the sensor with `SimSensorConfig`
@@ -193,14 +199,14 @@ intakeSensor
 ### Step 6: Inject simulated values by trigger condition
 
 ```cpp
-#include <frc/DriverStation.h>
+#include <wpi/driverstation/RobotState.hpp>
 #include <yams/motorcontrollers/simulation/SensorData.hpp>
 using yams::motorcontrollers::simulation::SensorData;
 
 // Declare in the config builder:
 intakeSensor.WithSimulatedValue(
     "NotePresent",
-    [] { return frc::DriverStation::IsAutonomous(); },
+    [] { return wpi::RobotState::IsAutonomous(); },
     true
 );
 
@@ -208,7 +214,7 @@ intakeSensor.WithSimulatedValue(
 sensor.AddSimTrigger(
     "NotePresent",
     SensorData::Convert(true),
-    [] { return frc::DriverStation::IsAutonomous(); }
+    [] { return wpi::RobotState::IsAutonomous(); }
 );
 ```
 
@@ -217,11 +223,11 @@ sensor.AddSimTrigger(
 ```cpp
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
 #include <yams/motorcontrollers/simulation/Sensor.hpp>
-#include <frc/DigitalInput.h>
-#include <frc2/command/SubsystemBase.h>
-#include <frc/smartdashboard/SmartDashboard.h>
+#include <wpi/commands2/SubsystemBase.hpp>
+#include <wpi/commands2/button/Trigger.hpp>
+#include <wpi/hardware/discrete/DigitalInput.hpp>
 
-class IntakeSubsystem : public frc2::SubsystemBase {
+class IntakeSubsystem : public wpi::cmd::SubsystemBase {
  public:
     IntakeSubsystem() {
         intakeSensor_
@@ -229,16 +235,17 @@ class IntakeSubsystem : public frc2::SubsystemBase {
             .WithSimulatedValue("NotePresent", 5_s, 8_s, true);
     }
 
-    bool HasNote() const {
+    bool HasNote() {
         return intakeSensor_.GetSensor().GetAsBoolean("NotePresent");
     }
 
-    void Periodic() override {
-        frc::SmartDashboard::PutBoolean("Intake/NotePresent", HasNote());
+    /** Trigger for binding commands to the sensor. */
+    wpi::cmd::Trigger NoteDetected() {
+        return wpi::cmd::Trigger{[this] { return HasNote(); }};
     }
 
  private:
-    frc::DigitalInput noteDetector_{1};
+    wpi::DigitalInput noteDetector_{1};
     yams::mechanisms::config::SimSensorConfig intakeSensor_{"IntakeSensor"};
 };
 ```
@@ -290,7 +297,9 @@ The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Re
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/exponential_arm/java/frc/robot/subsystems/ExponentiallyProfiledArmSubsystem.java" %}
+The `simple_robot-2027` arm declares a beam break sensor with a time window and a trigger condition:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ArmSubsystem.java#L87-L92" %}
 
 ***
 
@@ -298,6 +307,6 @@ The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Re
 
 * [SensorConfig (Java)](../java-reference/config/sensor-config.md)
 * [SimSensorConfig (C++)](../c++-reference/config/sim-sensor-config.md)
-* [SensorConfig (C++)](../api/cpp/config/sensor-config.md): absolute encoder seeding (different from simulation sensors)
+* [SensorConfig (C++)](../c++-reference/config/sensorconfig.md): how the Java `SensorConfig` maps to C++
 * [Sensor API Reference (Java)](../java-reference/sensor/)
 * [Sensor API Reference (C++)](../c++-reference/sensor/)

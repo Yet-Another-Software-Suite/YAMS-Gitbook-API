@@ -40,7 +40,7 @@ Override a field's value during a match-time window. Overloads exist for `double
 
 ```cpp
 SimSensorConfig& WithSimulatedValue(const std::string& fieldName,
-                                    units::second_t start, units::second_t end,
+                                    wpi::units::second_t start, wpi::units::second_t end,
                                     double value)
 // ... int, int64_t, bool overloads follow the same signature
 ```
@@ -77,10 +77,10 @@ SimSensorConfig& WithSimulatedValue(const std::string& fieldName,
 
 ```cpp
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
-#include <frc/DigitalInput.h>
+#include <wpi/hardware/discrete/DigitalInput.hpp>
 
 // Hardware limit switch on DIO 0
-frc::DigitalInput limitSwitch{0};
+wpi::DigitalInput limitSwitch{0};
 
 yams::mechanisms::config::SimSensorConfig forwardLimit{"ForwardLimitSwitch"};
 forwardLimit
@@ -95,7 +95,7 @@ encoderConfig
     .WithField("velocityRPM",       [&]() { return myEncoder.GetVelocity(); }, 0.0)
     // Override position to 2.5 rotations whenever a test condition is active
     .WithSimulatedValue("positionRotations",
-                        [&]() { return frc::RobotBase::IsSimulation(); },
+                        [&]() { return wpi::RobotBase::IsSimulation(); },
                         2.5);
 
 // Get the ready-to-use Sensor reference (lazy construction on first call)
@@ -112,6 +112,6 @@ Multiple `WithSimulatedValue` calls on the same field are all registered. The fi
 
 ## Related Pages
 
-* [SensorConfig (C++)](../../api/cpp/config/sensor-config.md): absolute encoder configuration (hardware seeding, not simulation)
+* [SensorConfig (C++)](sensorconfig.md): why there is no separate C++ `SensorConfig`
 * [SensorConfig (Java)](../../java-reference/config/sensor-config.md)
 * [SmartMotorControllerConfig (C++)](../motor-controllers/smart-motor-controller-config.md)

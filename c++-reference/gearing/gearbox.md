@@ -1,6 +1,8 @@
 # GearBox
 
-**Namespace:** `yams::gearing` **Java equivalent:** [Java GearBox](../../java-reference/gearing/gearbox.md)
+**Namespace:** `yams::gearing`\
+**Header:** `#include <yams/gearing/GearBox.hpp>`\
+**Java equivalent:** [Java GearBox](../../java-reference/gearing/gearbox.md)
 
 `GearBox` models a multi-stage gear reduction. Semantically represents meshed gears. Use `Sprocket` for chain or belt drives.
 
@@ -15,7 +17,7 @@ explicit GearBox(const std::vector<double>& reductionStages)
 explicit GearBox(const std::vector<std::string>& stages)  // "IN:OUT" format
 ```
 
-Each element of `reductionStages` is the ratio for one stage (input teeth / output teeth). Strings must be in `"IN:OUT"` format.
+Each element of `reductionStages` is the reduction for one stage (for example `3.0` for a 3:1 stage); the stages are multiplied together. Strings must be in `"IN:OUT"` format and are parsed as `IN / OUT`, so `"12:1"` is a 12:1 reduction.
 
 ***
 
@@ -27,7 +29,7 @@ static GearBox FromStages(std::initializer_list<std::string_view> stages)  // "I
 static GearBox FromTeeth(std::initializer_list<int> teeth)  // alternating driver, driven
 ```
 
-`FromTeeth` takes tooth counts in alternating driver/driven order. Two values produce a single-stage reduction; four values produce two stages, etc.
+`FromTeeth` takes the tooth counts of a gear train in order, starting with the driver. Each consecutive pair contributes `next / previous`, so `{12, 62}` is a 62:12 (about 5.17:1) reduction. Because consecutive pairs are chained, intermediate gears cancel out (`{12, 48, 16, 64}` evaluates to 64:12, not 16:1). For compound gearboxes with gears sharing a shaft, use `FromReductionStages` or `FromStages` with one entry per stage.
 
 ***
 
@@ -35,10 +37,10 @@ static GearBox FromTeeth(std::initializer_list<int> teeth)  // alternating drive
 
 | Method                                     | Returns    | Description                                                    |
 | ------------------------------------------ | ---------- | -------------------------------------------------------------- |
-| `GetInputToOutputConversionFactor() const` | `double`   | Mechanism rotations per motor rotation (OUT/IN)                |
-| `GetOutputToInputConversionFactor() const` | `double`   | Motor rotations per mechanism rotation (IN/OUT)                |
-| `Times(double x)`                          | `GearBox&` | Multiplies the reduction by `x`. Returns `*this` for chaining. |
-| `Div(double x)`                            | `GearBox&` | Divides the reduction by `x`. Returns `*this` for chaining.    |
+| `GetInputToOutputConversionFactor() const` | `double`   | Mechanism rotations per motor rotation (less than 1 for a reduction) |
+| `GetOutputToInputConversionFactor() const` | `double`   | Motor rotations per mechanism rotation (the reduction ratio itself) |
+| `Times(double x)`                          | `GearBox&` | Multiplies the input-to-output conversion factor by `x` (divides the reduction by `x`). Returns `*this` for chaining. |
+| `Div(double x)`                            | `GearBox&` | Divides the input-to-output conversion factor by `x` (multiplies the reduction by `x`). Returns `*this` for chaining. |
 
 ***
 
@@ -48,21 +50,25 @@ static GearBox FromTeeth(std::initializer_list<int> teeth)  // alternating drive
 | ---------------------------------------- | ------------------------------------------ |
 | `exceptions::NoStagesGivenException`     | Stage list is empty                        |
 | `exceptions::InvalidStageGivenException` | A string stage is not in `"IN:OUT"` format |
+| `std::invalid_argument`                   | `FromTeeth` gets fewer than two tooth counts, or a count that is not positive |
 
 ***
 
 ## Example
 
 ```cpp
-// All three equivalent: 12T driver, 62T driven = 5.17:1
-auto g1 = gearing::GearBox::FromTeeth({12, 62});
-auto g2 = gearing::GearBox::FromStages({"12:62"});
-auto g3 = gearing::GearBox::FromReductionStages({5.1667});
+using namespace yams::gearing;
 
-// Two-stage: (12→48) × (16→64) = 4 × 4 = 16:1
-auto g4 = gearing::GearBox::FromTeeth({12, 48, 16, 64});
+// All three equivalent: 12T driver, 62T driven, about 5.17:1
+auto g1 = GearBox::FromTeeth({12, 62});
+auto g2 = GearBox::FromStages({"62:12"});
+auto g3 = GearBox::FromReductionStages({62.0 / 12.0});
+
+// Two-stage compound gearbox: 3:1 then 4:1 = 12:1
+auto g4 = GearBox::FromReductionStages({3.0, 4.0});
+auto g5 = GearBox::FromStages({"3:1", "4:1"});
 ```
 
 {% hint style="info" %}
-`GetInputToOutputConversionFactor()` returns OUT/IN (less than 1 for reductions). `GetOutputToInputConversionFactor()` returns IN/OUT (greater than 1 for reductions). Pass `GearBox` to `MechanismGearing` for use with `SmartMotorControllerConfig`.
+`GetInputToOutputConversionFactor()` returns mechanism rotations per motor rotation (less than 1 for reductions). `GetOutputToInputConversionFactor()` returns the reduction ratio (greater than 1 for reductions). Pass `GearBox` to `MechanismGearing` for use with `SmartMotorControllerConfig`.
 {% endhint %}

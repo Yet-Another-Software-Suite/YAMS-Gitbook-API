@@ -1,10 +1,15 @@
 # SwerveInputStream
 
 **Namespace:** `yams::mechanisms::swerve::utility`\
+**Header:** `#include <yams/mechanisms/swerve/utility/SwerveInputStream.hpp>`\
 **Template:** `template <size_t NumModules = 4>`\
 **Java equivalent:** [Java SwerveInputStream](../../java-reference/swerve/swerve-input-stream.md)
 
-`SwerveInputStream<N>` converts raw joystick inputs into `frc::ChassisSpeeds` suitable for `SwerveDrive::Drive()`. Handles deadbands, cubic input curves, axis scaling, alliance flipping, and multiple drive modes (angular-velocity, heading-angle, aim-at-target, translation-only).
+`SwerveInputStream<N>` converts raw joystick inputs into **field-relative** `wpi::math::ChassisVelocities` for a `SwerveDrive<N>`. Handles deadbands, cubic input curves, axis scaling, alliance flipping, and multiple drive modes (angular-velocity, heading-angle, aim-at-target, translation-only). It can also publish its own telemetry and be live tuned from the dashboard (see [Telemetry & Live Tuning](#telemetry--live-tuning)).
+
+{% hint style="info" %}
+The stream keeps a pointer to the `SwerveDrive<N>` it was built from, so the drive must outlive it. Store the stream as a member of your subsystem rather than a local in a command factory.
+{% endhint %}
 
 ***
 
@@ -49,11 +54,11 @@ All builder methods return `SwerveInputStream&` for chaining.
 
 | Method                       | Signature                                                          | Description                                                           |
 | ---------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `WithMaximumLinearVelocity`  | `WithMaximumLinearVelocity(units::meters_per_second_t velocity)`   | Maximum chassis translational speed. Default is 4 m/s.                |
-| `WithMaximumAngularVelocity` | `WithMaximumAngularVelocity(units::radians_per_second_t velocity)` | Maximum chassis rotational speed. Default is 2π rad/s (1 rotation/s). |
+| `WithMaximumLinearVelocity`  | `WithMaximumLinearVelocity(wpi::units::meters_per_second_t velocity)`   | Maximum chassis translational speed. Default is 4 m/s.                |
+| `WithMaximumAngularVelocity` | `WithMaximumAngularVelocity(wpi::units::radians_per_second_t velocity)` | Maximum chassis rotational speed. Default is 2 pi rad/s (1 rotation/s). |
 
 {% hint style="info" %}
-A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if set) into its own maximum fields once, at construction time; otherwise it starts from its own defaults (4 m/s, 2π rad/s). Calling `WithMaximumLinearVelocity(...)`/`WithMaximumAngularVelocity(...)` afterward overrides that value for this stream and takes effect immediately; the drive's config is not re-checked after construction.
+A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if set) into its own maximum fields once, at construction time; otherwise it starts from its own defaults (4 m/s, 2 pi rad/s). Calling `WithMaximumLinearVelocity(...)`/`WithMaximumAngularVelocity(...)` afterward overrides that value for this stream and takes effect immediately; the drive's config is not re-checked after construction.
 {% endhint %}
 
 ### Axis Configuration
@@ -61,8 +66,9 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 | Method                       | Signature                                                                                       | Description                                                                                                               |
 | ---------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | `WithControllerRotationAxis` | `WithControllerRotationAxis(std::function<double()> rot)`                                       | Set or replace the rotation axis supplier. Range `[-1, 1]`. Enables `ANGULAR_VELOCITY` mode.                              |
-| `WithControllerHeadingAxis`  | `WithControllerHeadingAxis(std::function<double()> headingX, std::function<double()> headingY)` | Set or replace the heading axis suppliers. Range `[-1, 1]`. Enables `HEADING` mode when `WithHeadingControl()` is active. |
-| `WithDeadband`               | `WithDeadband(double deadband)`                                                                 | Deadband applied to all axes (0.0–1.0). Pass 0 to disable.                                                                |
+| `WithControllerHeadingAxis`  | `WithControllerHeadingAxis(std::function<double()> headingX, std::function<double()> headingY)` | Set or replace the heading axis suppliers. Range `[-1, 1]`. The target heading is `atan2(headingX, headingY)`. Enables `HEADING` mode when `WithHeadingControl()` is active. |
+| `WithHeading`                | `WithHeading(std::function<wpi::units::radian_t()> heading)`                                    | Supplies a target heading directly instead of from controller axes (replaces any heading axes). Used in `HEADING` mode.    |
+| `WithDeadband`               | `WithDeadband(double deadband)`                                                                 | Deadband applied to all axes (0.0 to 1.0). Pass 0 to disable.                                                             |
 | `WithScaleTranslation`       | `WithScaleTranslation(double scale)`                                                            | Multiplies translation output magnitude by `scale`. Range `(0, 1]`.                                                       |
 | `WithScaleRotation`          | `WithScaleRotation(double scale)`                                                               | Multiplies rotation axis value by `scale`. Range `(0, 1]`.                                                                |
 
@@ -77,23 +83,27 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 
 | Method                | Signature                                                                        | Description                                                                                             |
 | --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `WithHeadingControl`  | `WithHeadingControl(std::function<bool()> trigger)`                              | Enables heading-angle control mode when trigger returns `true`. Requires `WithControllerHeadingAxis()`. |
-| `WithAim`             | `WithAim(std::function<frc::Pose2d()> aimTarget, std::function<bool()> trigger)` | Rotates the robot to face `aimTarget` while translating. Enables `AIM` mode when trigger is `true`.     |
+| `WithHeadingControl`  | `WithHeadingControl(std::function<bool()> trigger)`                              | Enables heading-angle control mode when trigger returns `true`. Requires `WithControllerHeadingAxis()` or `WithHeading()`. |
+| `WithAim`             | `WithAim(std::function<wpi::math::Pose2d()> aimTarget, std::function<bool()> trigger)` | Rotates the robot to face `aimTarget` while translating. Enables `AIM` mode when trigger is `true`.     |
 | `WithTranslationOnly` | `WithTranslationOnly(std::function<bool()> trigger)`                             | Suppresses rotation and locks the current heading while trigger returns `true`.                         |
+
+{% hint style="warning" %}
+`HEADING`, `AIM` and `TRANSLATION_ONLY` modes use the drive's rotation PID controller. If `SwerveDriveConfig::WithRotationController(...)` was not called, `Get()` throws a `SwerveDriveConfigurationException` when one of those modes becomes active.
+{% endhint %}
 
 ### Field Orientation
 
 | Method                         | Signature                                                                                     | Description                                                                    |
 | ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `WithAllianceRelativeControl`  | `WithAllianceRelativeControl()` or `WithAllianceRelativeControl(std::function<bool()>)`       | Flips the X axis for Red alliance so "forward" always faces the opponent wall. |
-| `WithRobotRelative`            | `WithRobotRelative()` or `WithRobotRelative(std::function<bool()>)`                           | Outputs robot-relative `ChassisSpeeds` instead of field-relative.              |
-| `WithTranslationHeadingOffset` | `WithTranslationHeadingOffset(frc::Rotation2d angle)` or with `std::function<bool()>` trigger | Rotates the output translation vector by a fixed `angle`.                      |
+| `WithAllianceRelativeControl`  | `WithAllianceRelativeControl()` or `WithAllianceRelativeControl(std::function<bool()>)`       | Rotates the translation input by 180 degrees on the Red alliance so "forward" always points away from your driver station. Ignored while robot-relative control is active. |
+| `WithRobotRelative`            | `WithRobotRelative()` or `WithRobotRelative(std::function<bool()>)`                           | Treats the translation input as robot-relative and converts it to field-relative using the gyro heading. The output of `Get()` is still field-relative. |
+| `WithTranslationHeadingOffset` | `WithTranslationHeadingOffset(wpi::math::Rotation2d angle)` or `WithTranslationHeadingOffset(wpi::math::Rotation2d angle, std::function<bool()> enabled)` | Rotates the output translation vector by a fixed `angle`.                      |
 
 ### Utility
 
 | Method  | Signature                         | Description                                                                                     |
 | ------- | --------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `Clone` | `SwerveInputStream Clone() const` | Returns a copy of this stream. Subsequent `With*` calls on the copy do not affect the original. |
+| `Clone` | `SwerveInputStream Clone() const` | Returns a copy of this stream without telemetry. Subsequent `With*` calls on the copy do not affect the original. |
 
 ***
 
@@ -101,8 +111,12 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 
 | Method       | Signature                         | Description                                                                                                    |
 | ------------ | --------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `Get`        | `frc::ChassisSpeeds Get()`        | Computes and returns the current field-relative (or robot-relative) `ChassisSpeeds`. Call once per robot loop. |
-| `operator()` | `frc::ChassisSpeeds operator()()` | Same as `Get()`, allows using the stream as a `std::function<frc::ChassisSpeeds()>` directly.                 |
+| `Get`        | `wpi::math::ChassisVelocities Get()`        | Computes and returns the current **field-relative** `ChassisVelocities`, and updates the stream's telemetry if enabled. Call once per robot loop. |
+| `operator()` | `wpi::math::ChassisVelocities operator()()` | Same as `Get()`, allows using the stream as a `std::function<wpi::math::ChassisVelocities()>` directly.                 |
+
+{% hint style="warning" %}
+`Get()` returns field-relative speeds. Send them to `SwerveDrive::SetFieldRelativeChassisSpeeds(...)`. `SwerveDrive::Drive(...)` expects robot-relative speeds, so do not pass the stream to it directly.
+{% endhint %}
 
 ***
 
@@ -113,39 +127,93 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 | Mode               | Description                                                                                                                                         |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ANGULAR_VELOCITY` | Default. Rotates using the angular-velocity axis (`WithControllerRotationAxis`).                                                                    |
-| `HEADING`          | Controls robot heading via right-stick X/Y angle. Active when `WithHeadingControl()` trigger is `true` and heading axes are configured.             |
-| `AIM`              | Rotates to face a target `frc::Pose2d`. Active when `WithAim()` trigger is `true` and a target is set.                                              |
+| `HEADING`          | Controls robot heading via right-stick X/Y angle (or `WithHeading`). Active when `WithHeadingControl()` trigger is `true` and a heading source is configured. |
+| `AIM`              | Rotates to face a target `wpi::math::Pose2d`. Active when `WithAim()` trigger is `true` and a target is set.                                              |
 | `TRANSLATION_ONLY` | Suppresses rotation and holds the current heading. Active when `WithTranslationOnly()` trigger is `true`, or when no rotation source is configured. |
 
-Mode priority (highest to lowest): `TRANSLATION_ONLY` > `AIM` > `HEADING` > `ANGULAR_VELOCITY`.
+Mode priority (highest to lowest): `TRANSLATION_ONLY` > `AIM` > `HEADING` > `ANGULAR_VELOCITY`. `GetCurrentModeName()` returns the active mode as a string.
+
+***
+
+## Telemetry & Live Tuning
+
+Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It then publishes every time the stream is read with `Get()`, so there is nothing to call each loop.
+
+| Method               | Signature                                                                                        | Description |
+| -------------------- | ------------------------------------------------------------------------------------------------ | ----------- |
+| `WithTelemetry`      | `SwerveInputStream& WithTelemetry(std::string name, TelemetryVerbosity verbosity)`                | Publishes this stream under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had; `TelemetryVerbosity::NONE` turns it off. |
+| `GetTelemetry`       | `std::optional<std::reference_wrapper<SwerveInputStreamTelemetry<NumModules>>> GetTelemetry()` | The stream's telemetry, or empty if telemetry is not enabled. Creates it on first call. |
+| `GetCurrentModeName` | `std::string GetCurrentModeName() const`                                                          | Active drive mode (`ANGULAR_VELOCITY`, `HEADING`, `AIM`, `TRANSLATION_ONLY`). |
+
+`TelemetryVerbosity` is `SwerveDriveConfig::TelemetryVerbosity` (`NONE`, `LOW`, `MEDIUM`, `HIGH`; `MEDIUM` is Java's `MID`):
+
+| Verbosity | Publishes |
+| --------- | --------- |
+| `LOW`     | The current drive mode (`SwerveInputStream/<name>/mode`). |
+| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. |
+| `HIGH`    | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>/`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`. |
+
+The tunable values are `deadband` `[0, 1)`, `translationScale` `(0, 1]`, `rotationScale` `(0, 1]`, `maxLinearVelocity` (m/s, > 0), `maxAngularVelocity` (rad/s, > 0), and the booleans `translationCube`, `rotationCube`, `allianceRelative` and `robotRelative`. The output velocities are not published (reading them would run the heading controller a second time each loop); log the speeds you send to the drive instead.
+
+At `HIGH`, dashboard edits are applied to the stream every loop while the `Live Tuning` command runs. Start and stop it from the dashboard, or bind it to a button through `SwerveInputStreamTelemetry::GetLiveTuningCommand()`. Values stay in sync both ways: a change made in code (for example a slow-mode binding calling `WithScaleTranslation`) is published to the dashboard and is not overridden, and a dashboard value outside its allowed range is replaced with the stream's current value. The command has no requirements, so it does not interrupt the command driving with the stream.
+
+**`SwerveInputStreamTelemetry<N>`** (`#include <yams/mechanisms/swerve/utility/SwerveInputStreamTelemetry.hpp>`, already included by `SwerveInputStream.hpp`):
+
+| Method                 | Signature                                                                        | Description |
+| ---------------------- | -------------------------------------------------------------------------------- | ----------- |
+| `GetLiveTuningCommand` | `std::optional<std::reference_wrapper<wpi::cmd::Command>> GetLiveTuningCommand()` | The `Live Tuning` command at `HIGH`, otherwise empty. |
+| `ApplyTuningValues`    | `void ApplyTuningValues()`                                                       | Applies dashboard edits and publishes code changes. Called every loop by the `Live Tuning` command; does nothing below `HIGH`. |
+| `UpdateTelemetry`      | `void UpdateTelemetry()`                                                         | Publishes the mode and, at `MEDIUM` and above, the configuration. Called by `Get()`. |
+
+The live-tuning values map to plain getters and setters on the stream, which you can also call yourself: `GetAxisDeadband`/`SetAxisDeadband`, `GetTranslationAxisScale`/`SetTranslationAxisScale`, `GetOmegaAxisScale`/`SetOmegaAxisScale`, `GetMaximumChassisLinearVelocity`/`SetMaximumChassisLinearVelocity`, `GetMaximumChassisAngularVelocity`/`SetMaximumChassisAngularVelocity`, `IsTranslationCubeEnabled`/`SetTranslationCubeEnabled`, `IsOmegaCubeEnabled`/`SetOmegaCubeEnabled`, `IsAllianceRelativeEnabled`/`SetAllianceRelativeEnabled`, and `IsRobotRelativeEnabled`/`SetRobotRelativeEnabled`.
+
+{% hint style="info" %}
+The stream is a value type, so telemetry ownership differs from Java:
+
+* `WithTelemetry` only stores the name and verbosity. The telemetry is created when the stream is first read with `Get()` (or `GetTelemetry()` is called), so the temporary copies made while building a stream do not publish. Call `WithTelemetry` last so the dashboard starts with the configured values.
+* The stream owns its telemetry and stops publishing (and removes the `Live Tuning` command) when it is destroyed.
+* A copy of a stream keeps the telemetry settings and publishes under the same name once it is read. `Clone()` returns a copy without telemetry.
+* Moving a stream moves the settings; the moved-from stream stops publishing.
+* To stop publishing, call `WithTelemetry(name, TelemetryVerbosity::NONE)`. Use `LOW` in competition code.
+{% endhint %}
+
+{% hint style="info" %}
+The C++ API is WPILib Commands v2 only: the `Live Tuning` command is a `wpi::cmd::Command`. WPILib has no C++ Commands v3.
+{% endhint %}
 
 ***
 
 ## Example
 
 ```cpp
-swerve::utility::SwerveInputStream<4> driveInput{
-    *m_drive,
-    [this] { return -m_controller.GetLeftY(); },
-    [this] { return -m_controller.GetLeftX(); },
-    [this] { return -m_controller.GetRightX(); }  // rotation axis
-};
-driveInput.WithMaximumLinearVelocity(4.5_mps)
-          .WithMaximumAngularVelocity(units::radians_per_second_t{2 * std::numbers::pi})
-          .WithDeadband(0.1)
-          .WithScaleTranslation(0.8)
-          .WithCubeTranslationControllerAxis()
-          .WithAllianceRelativeControl();
+#include <yams/mechanisms/swerve/utility/SwerveInputStream.hpp>
 
-// Heading-snap variant using Clone():
-auto headingInput = driveInput.Clone()
-    .WithControllerHeadingAxis(
-        [this] { return m_controller.GetRightX(); },
-        [this] { return m_controller.GetRightY(); })
-    .WithHeadingControl([this] { return m_controller.GetRightStickButton(); });
+using namespace yams::mechanisms::swerve;
+using namespace yams::mechanisms::swerve::utility;
 
-// Pass to Drive():
-frc2::CommandPtr driveCmd = m_drive->Drive([this] { return driveInput.Get(); });
+// Members of your swerve subsystem (declared after m_drive and m_controller).
+SwerveInputStream<4> m_driveStream =
+    SwerveInputStream<4>::Of(m_drive,
+                             [this] { return -m_controller.GetLeftY(); },
+                             [this] { return -m_controller.GetLeftX(); })
+        .WithControllerRotationAxis([this] { return -m_controller.GetRightX(); })
+        .WithDeadband(0.1)
+        .WithScaleTranslation(0.8)
+        .WithCubeTranslationControllerAxis()
+        .WithAllianceRelativeControl()
+        .WithTelemetry("Driver", SwerveDriveConfig::TelemetryVerbosity::HIGH);
+
+// Heading-snap variant using Clone() (no telemetry of its own):
+SwerveInputStream<4> m_headingStream =
+    m_driveStream.Clone()
+        .WithControllerHeadingAxis([this] { return m_controller.GetRightX(); },
+                                   [this] { return m_controller.GetRightY(); })
+        .WithHeadingControl([this] { return m_controller.GetRightStickButton(); });
+
+// The stream output is field relative.
+wpi::cmd::CommandPtr DriveCommand() {
+  return Run([this] { m_drive.SetFieldRelativeChassisSpeeds(m_driveStream.Get()); });
+}
 ```
 
 ***
@@ -154,3 +222,4 @@ frc2::CommandPtr driveCmd = m_drive->Drive([this] { return driveInput.Get(); });
 
 * [Java SwerveInputStream](../../java-reference/swerve/swerve-input-stream.md)
 * [C++ SwerveDrive\<N>](swerve-drive.md)
+* [SwerveDriveConfig](swerve-drive-config.md)

@@ -1,6 +1,6 @@
 # Simulation
 
-**Package:** `yams.motorcontrollers.simulation`
+**Package:** `yams.core.motorcontrollers.simulation`
 
 A `Sensor` models a named hardware sensor whose fields are readable from robot code and, in simulation, visible in the WPILib **Glass** GUI. Every field delegates to a real hardware supplier on a physical robot. In simulation, Glass can override any field's value, and trigger-based overrides can inject specific readings at scripted moments during automated testing.
 
@@ -21,6 +21,8 @@ Each field's value is resolved in this order every loop iteration:
 Sensor(String sensorName, List<SensorData> sensorFields)
 Sensor(SensorConfig cfg)
 ```
+
+Both constructors throw `IllegalStateException` if two fields share the same name.
 
 The `SensorConfig` overload is the preferred way to create sensors; see [SensorConfig](../config/sensor-config.md).
 
@@ -49,7 +51,7 @@ The `SensorConfig` overload is the preferred way to create sensors; see [SensorC
 
 ## SensorData
 
-`SensorData` (`yams.motorcontrollers.simulation.SensorData`) represents a single typed field inside a `Sensor`. You interact with `SensorData` directly when constructing sensors without `SensorConfig`, or when calling `addSimTrigger` on an individual field.
+`SensorData` (`yams.core.motorcontrollers.simulation.SensorData`) represents a single typed field inside a `Sensor`. You interact with `SensorData` directly when constructing sensors without `SensorConfig`, or when calling `addSimTrigger` on an individual field.
 
 ### Constructors
 
@@ -58,6 +60,7 @@ SensorData(String name, DoubleSupplier supplier, double defaultVal)
 SensorData(String name, IntSupplier supplier, int defaultVal)
 SensorData(String name, BooleanSupplier supplier, boolean defaultVal)
 SensorData(String name, LongSupplier supplier, long defaultVal)
+SensorData(String name, Supplier<HALValue> supplier, HALValue defaultValue, HALValueType type)
 ```
 
 ### Typed getters
@@ -71,7 +74,7 @@ SensorData(String name, LongSupplier supplier, long defaultVal)
 | `getValue()`     | `HALValue`     | Raw value applying full priority logic.          |
 | `getDefault()`   | `HALValue`     | The default value set at construction.           |
 | `getName()`      | `String`       | Field name.                                      |
-| `getType()`      | `HALValueType` | `kDouble`, `kInt`, `kBoolean`, `kLong`.          |
+| `getType()`      | `HALValueType` | `SensorData.HALValueType`: `kBoolean`, `kDouble`, `kEnum`, `kInt`, `kLong`. |
 
 ### Setters (simulation only)
 
@@ -100,16 +103,19 @@ Registers a conditional override on this field directly. Triggers are evaluated 
 | `SensorData.convert(boolean value)`            |                                             |
 | `SensorData.convert(long value)`               |                                             |
 | `SensorData.convert(DoubleSupplier supplier)`  | Wraps a supplier in a `Supplier<HALValue>`. |
+| `SensorData.convert(IntSupplier supplier)`     |                                             |
 | `SensorData.convert(BooleanSupplier supplier)` |                                             |
+| `SensorData.convert(LongSupplier supplier)`    |                                             |
 
 ## Example
 
 ```java
-import yams.mechanisms.config.SensorConfig;
-import yams.motorcontrollers.simulation.Sensor;
-import yams.motorcontrollers.simulation.SensorData;
-import static edu.wpi.first.units.Units.Seconds;
-import edu.wpi.first.wpilibj.DigitalInput;
+import yams.core.mechanisms.config.SensorConfig;
+import yams.core.motorcontrollers.simulation.Sensor;
+import yams.core.motorcontrollers.simulation.SensorData;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Seconds;
+import org.wpilib.hardware.discrete.DigitalInput;
 
 // --- Preferred: build via SensorConfig ---
 DigitalInput beamBreak = new DigitalInput(3);
@@ -127,7 +133,7 @@ boolean isTriggered = sensor.getAsBoolean("BeamBreak");
 sensor.addSimTrigger(
     "BeamBreak",
     SensorData.convert(true),
-    () -> edu.wpi.first.wpilibj.DriverStation.isAutonomous()
+    () -> arm.isNear(Degrees.of(40), Degrees.of(2))
 );
 ```
 

@@ -1,9 +1,18 @@
 # Arm
 
-**Package:** `yams.mechanisms.positional`\
-**Extends:** `SmartPositionalMechanism`
+**Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
+**Extends:** `yams.core.mechanisms.positional.Arm` (which extends `SmartPositionalMechanism`)\
+**Implements:** `CommandMechanism`
 
 Controls a single-jointed arm rotating in the XZ plane (gravity-affected rotation). For a turret or shooter hood rotating in the XY plane, use [Pivot](pivot.md) instead. For a double-jointed arm, see [DoubleJointedArm](double-jointed-arm.md).
+
+Robot code imports `Arm` from `yams.commands2.mechanisms` (or `yams.commands3.mechanisms`). The base class `yams.core.mechanisms.positional.Arm` holds the state, simulation and telemetry. Its constructor is protected, so it is not constructed directly.
+
+```java
+import yams.commands2.config.SmartMotorControllerConfig;
+import yams.commands2.mechanisms.Arm;
+import yams.core.mechanisms.config.ArmConfig;
+```
 
 ## Constructor
 
@@ -16,195 +25,167 @@ Arm(ArmConfig config, SmartMotorController smc)
 | `config` | `ArmConfig`            | Arm geometry, limits, and control parameters      |
 | `smc`    | `SmartMotorController` | Configured motor controller driving the arm joint |
 
-Requires `ArmConfig` with at least `withHardLimits` set. See [ArmConfig](../config/arm-config.md) and [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md).
+The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) passed to the `SmartMotorControllerConfig` constructor, so build the motor controller with `yams.commands2.config.SmartMotorControllerConfig` or `yams.commands3.config.SmartMotorControllerConfig` to match the `Arm` you import.
+
+In simulation the constructor throws `ArmConfigurationException` if `ArmConfig.withLength` or `ArmConfig.withHardLimits` is missing, if neither `SmartMotorControllerConfig.withStartingPosition` nor an external encoder zero offset is set, or if the starting position is outside the hard limits. See [ArmConfig](../config/arm-config.md) and [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md).
 
 ## State Queries
 
-| Method       | Returns | Description                              |
-| ------------ | ------- | ---------------------------------------- |
-| `getAngle()` | `Angle` | Current mechanism angle from the encoder |
+These come from `yams.core.mechanisms.positional.Arm` and work outside of commands.
+
+| Method                              | Returns                | Description                                                                     |
+| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------- |
+| `getAngle()`                        | `Angle`                | Current mechanism angle from the encoder                                        |
+| `isNear(Angle angle, Angle within)` | `boolean`              | `true` when the current angle is within `within` of `angle`                     |
+| `isGte(Angle angle)`                | `boolean`              | `true` when the current angle is greater than or equal to `angle`               |
+| `isLte(Angle angle)`                | `boolean`              | `true` when the current angle is less than or equal to `angle`                  |
+| `isBetween(Angle start, Angle end)` | `boolean`              | `true` when the current angle is in `[start, end]`                              |
+| `isAtMax()`                         | `boolean`              | `true` at or above the upper soft limit if set, otherwise the upper hard limit |
+| `isAtMin()`                         | `boolean`              | `true` at or below the lower soft limit if set, otherwise the lower hard limit |
+| `getArmConfig()`                    | `ArmConfig`            | The `ArmConfig` used to build this arm                                          |
+| `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                 |
+| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                               |
+
+`isAtMax()` and `isAtMin()` throw `ArmConfigurationException` when neither a soft limit nor a hard limit is configured.
 
 ## Command Factories
 
-Commands returned are compatible with the WPILib command scheduler. Commands that run indefinitely must be interrupted or composed with a terminating condition.
+Commands that run indefinitely must be interrupted or composed with a terminating condition.
 
-| Method                                 | Returns   | Description                                                            |
-| -------------------------------------- | --------- | ---------------------------------------------------------------------- |
-| `setAngle(Angle target)`               | `Command` | Holds `target` angle using closed-loop control; runs indefinitely      |
-| `runTo(Angle target, Angle tolerance)` | `Command` | Drives to `target` and ends when within `tolerance`                    |
-| `set(double dutycycle)`                | `Command` | Open-loop: applies the given duty cycle; runs indefinitely             |
-| `set(Supplier<Double> dutycycle)`      | `Command` | Open-loop duty cycle from a supplier; re-evaluates each loop iteration |
-| `setVoltage(Voltage volts)`            | `Command` | Open-loop: applies a fixed voltage; runs indefinitely                  |
-| `setVoltage(Supplier<Voltage> volts)`  | `Command` | Open-loop voltage from a supplier; re-evaluates each loop iteration    |
+| Method                                          | Returns   | Description                                                               |
+| ----------------------------------------------- | --------- | ------------------------------------------------------------------------- |
+| `setAngle(Angle angle)`                         | `Command` | Holds `angle` using closed-loop control; runs indefinitely                |
+| `setAngle(Supplier<Angle> angle)`               | `Command` | Holds the supplied angle, re-evaluated each loop; runs indefinitely       |
+| `run(Angle angle)`                              | `Command` | Same as `setAngle(Angle)`                                                 |
+| `run(Supplier<Angle> angle)`                    | `Command` | Same as `setAngle(Supplier<Angle>)`                                       |
+| `runTo(Angle angle, Angle tolerance)`           | `Command` | Sets the target and ends once within `tolerance` (debounced 0.1 s)        |
+| `runTo(Supplier<Angle> angle, Angle tolerance)` | `Command` | Reads the supplier once at start, then behaves like `runTo(Angle, Angle)` |
+| `set(double dutycycle)`                         | `Command` | Open-loop duty cycle; runs indefinitely                                   |
+| `set(Supplier<Double> dutycycle)`               | `Command` | Open-loop duty cycle from a supplier; re-evaluated each loop              |
+| `setVoltage(Voltage volts)`                     | `Command` | Open-loop fixed voltage; runs indefinitely                                |
+| `setVoltage(Supplier<Voltage> volts)`           | `Command` | Open-loop voltage from a supplier; re-evaluated each loop                 |
+
+`set` and `setVoltage` come from the `CommandMechanism` interface. They stop the closed-loop controller while running and restart it when the command ends.
 
 ### `setAngle`
 
 ```java
-public Command setAngle(Angle target)
+public Command setAngle(Angle angle)
+public Command setAngle(Supplier<Angle> angle)
 ```
 
-| Name     | Type    | Description               |
-| -------- | ------- | ------------------------- |
-| `target` | `Angle` | Desired arm angle to hold |
+| Name    | Type                        | Description               |
+| ------- | --------------------------- | ------------------------- |
+| `angle` | `Angle` / `Supplier<Angle>` | Desired arm angle to hold |
 
 Returns `Command`.
 
 ### `runTo`
 
 ```java
-public Command runTo(Angle target, Angle tolerance)
+public Command runTo(Angle angle, Angle tolerance)
+public Command runTo(Supplier<Angle> angle, Angle tolerance)
 ```
 
-| Name        | Type    | Description                                        |
-| ----------- | ------- | -------------------------------------------------- |
-| `target`    | `Angle` | Desired arm angle                                  |
-| `tolerance` | `Angle` | Acceptable angular error for the command to finish |
+| Name        | Type                        | Description                                        |
+| ----------- | --------------------------- | -------------------------------------------------- |
+| `angle`     | `Angle` / `Supplier<Angle>` | Desired arm angle                                  |
+| `tolerance` | `Angle`                     | Acceptable angular error for the command to finish |
 
 Returns `Command`.
 
-### `set(double)`
+### `set`
 
 ```java
 public Command set(double dutycycle)
-```
-
-| Name        | Type     | Description                   |
-| ----------- | -------- | ----------------------------- |
-| `dutycycle` | `double` | Motor duty cycle in `[-1, 1]` |
-
-Returns `Command`.
-
-### `set(Supplier<Double>)`
-
-```java
 public Command set(Supplier<Double> dutycycle)
 ```
 
-| Name        | Type               | Description                                  |
-| ----------- | ------------------ | -------------------------------------------- |
-| `dutycycle` | `Supplier<Double>` | Supplier returning duty cycle each iteration |
+| Name        | Type                          | Description                   |
+| ----------- | ----------------------------- | ----------------------------- |
+| `dutycycle` | `double` / `Supplier<Double>` | Motor duty cycle in `[-1, 1]` |
 
 Returns `Command`.
 
-### `setVoltage(Voltage)`
+### `setVoltage`
 
 ```java
 public Command setVoltage(Voltage volts)
-```
-
-| Name    | Type      | Description          |
-| ------- | --------- | -------------------- |
-| `volts` | `Voltage` | Fixed voltage output |
-
-Returns `Command`.
-
-### `setVoltage(Supplier<Voltage>)`
-
-```java
 public Command setVoltage(Supplier<Voltage> volts)
 ```
 
-| Name    | Type                | Description                               |
-| ------- | ------------------- | ----------------------------------------- |
-| `volts` | `Supplier<Voltage>` | Supplier returning voltage each iteration |
+| Name    | Type                            | Description    |
+| ------- | ------------------------------- | -------------- |
+| `volts` | `Voltage` / `Supplier<Voltage>` | Voltage output |
 
 Returns `Command`.
 
 ## Triggers
 
-Triggers integrate with the WPILib `Trigger` / `CommandScheduler` binding API.
+| Method                            | Returns   | Description                                                       |
+| --------------------------------- | --------- | ----------------------------------------------------------------- |
+| `near(Angle angle, Angle within)` | `Trigger` | Active when the current angle is within `within` of `angle`       |
+| `gte(Angle angle)`                | `Trigger` | Active when the current angle is greater than or equal to `angle` |
+| `lte(Angle angle)`                | `Trigger` | Active when the current angle is less than or equal to `angle`    |
+| `between(Angle start, Angle end)` | `Trigger` | Active when the current angle is in `[start, end]`                |
+| `max()`                           | `Trigger` | Active while `isAtMax()` is `true`                                |
+| `min()`                           | `Trigger` | Active while `isAtMin()` is `true`                                |
 
-| Method                                 | Returns   | Description                                                     |
-| -------------------------------------- | --------- | --------------------------------------------------------------- |
-| `isNear(Angle angle, Angle tolerance)` | `Trigger` | Active when current angle is within `tolerance` of `angle`      |
-| `gte(Angle angle)`                     | `Trigger` | Active when current angle ≥ `angle`                             |
-| `lte(Angle angle)`                     | `Trigger` | Active when current angle ≤ `angle`                             |
-| `between(Angle start, Angle end)`      | `Trigger` | Active when current angle is in `[start, end]`                  |
-| `max()`                                | `Trigger` | Active when the arm has reached its configured upper hard limit |
-| `min()`                                | `Trigger` | Active when the arm has reached its configured lower hard limit |
-
-### `isNear`
-
-```java
-public Trigger isNear(Angle angle, Angle tolerance)
-```
-
-| Name        | Type    | Description                  |
-| ----------- | ------- | ---------------------------- |
-| `angle`     | `Angle` | Reference angle              |
-| `tolerance` | `Angle` | Acceptable angular deviation |
-
-Returns `Trigger`.
-
-### `gte`
+{% hint style="info" %}
+The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](#state-queries)).
+{% endhint %}
 
 ```java
-public Trigger gte(Angle angle)
+arm.near(Degrees.of(80), Degrees.of(2)).onTrue(shooter.run(RPM.of(3000)));
 ```
 
-| Name    | Type    | Description       |
-| ------- | ------- | ----------------- |
-| `angle` | `Angle` | Lower bound angle |
+## Commands v2 and Commands v3
 
-Returns `Trigger`.
+Both packages have the same method names and parameters. The difference is the return types and what the commands require:
 
-### `lte`
+|                | Commands v2 (`yams.commands2.mechanisms.Arm`)                  | Commands v3 (`yams.commands3.mechanisms.Arm`)                  |
+| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
+| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+| Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
+
+In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
 
 ```java
-public Trigger lte(Angle angle)
+public Command pickUp()
+{
+  return run(coroutine -> {
+    // The forked hold is a child of this command, so it ends as soon as the beam break trips.
+    coroutine.fork(arm.setAngle(PICKUP_ANGLE));
+    coroutine.waitUntil(this::getBeamBreak);
+  }).named("Arm Pick Up");
+}
 ```
-
-| Name    | Type    | Description       |
-| ------- | ------- | ----------------- |
-| `angle` | `Angle` | Upper bound angle |
-
-Returns `Trigger`.
-
-### `between`
-
-```java
-public Trigger between(Angle start, Angle end)
-```
-
-| Name    | Type    | Description              |
-| ------- | ------- | ------------------------ |
-| `start` | `Angle` | Lower bound of the range |
-| `end`   | `Angle` | Upper bound of the range |
-
-Returns `Trigger`.
-
-### `max`
-
-```java
-public Trigger max()
-```
-
-No parameters. Returns `Trigger` that is active when the arm is at its upper hard limit as configured in `ArmConfig`.
-
-### `min`
-
-```java
-public Trigger min()
-```
-
-No parameters. Returns `Trigger` that is active when the arm is at its lower hard limit as configured in `ArmConfig`.
 
 ## Visualization & Simulation
 
-| Method                   | Returns                | Description                                                           |
-| ------------------------ | ---------------------- | --------------------------------------------------------------------- |
-| `getMechanismLigament()` | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization                    |
-| `getMechanismRoot()`     | `MechanismRoot2d`      | The root of the Mechanism2d visualization                             |
-| `getMotor()`             | `SmartMotorController` | The underlying motor controller                                       |
-| `simIterate()`           | `void`                 | Advances the arm physics simulation by one loop iteration             |
-| `updateTelemetry()`      | `void`                 | Publishes current state to NetworkTables                              |
-| `visualizationUpdate()`  | `void`                 | Syncs the Mechanism2d ligament angle with the current encoder reading |
+| Method                           | Returns                | Description                                                                   |
+| -------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)          |
+| `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                   |
+| `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                      |
+| `getRelativeMechanismPosition()` | `Translation3d`        | Arm position relative to the robot, using the `MechanismPositionConfig`       |
+| `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                               |
+| `getName()`                      | `String`               | The arm telemetry name                                                        |
+| `simIterate()`                   | `void`                 | Advances the arm physics simulation by one loop and updates the visualization |
+| `updateTelemetry()`              | `void`                 | Publishes current state to NetworkTables                                      |
+| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current angle and setpoint           |
 
-Call `simIterate()` from your `simulationPeriodic()` method. Call `updateTelemetry()` and `visualizationUpdate()` from `periodic()`.
+Call `updateTelemetry()` from `periodic()` and `simIterate()` from `simulationPeriodic()`. `simIterate()` already calls `visualizationUpdate()`.
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_arm/java/frc/robot/subsystems/ArmSubsystem.java#L82-L91" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ArmSubsystem.java#L50-L85" %}
+
+Commands v3:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/ArmMechanism.java" %}
 
 ## See Also
 

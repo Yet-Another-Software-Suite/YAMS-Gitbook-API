@@ -1,6 +1,6 @@
 # Exceptions
 
-Package: `yams.exceptions`
+Package: `yams.core.exceptions`
 
 YAMS throws typed `RuntimeException` subclasses for configuration and runtime errors. All exceptions extend `RuntimeException` so they are unchecked; you do not need to declare or catch them unless you want to handle configuration problems gracefully.
 
@@ -20,7 +20,7 @@ Most exceptions are thrown during motor controller or mechanism construction if 
 | `PivotConfigurationException`                 | Required `PivotConfig` fields are missing                               |
 | `SmartMotorControllerConfigurationException`  | The `SmartMotorControllerConfig` is invalid or missing required options |
 | `SwerveDriveConfigurationException`           | Required `SwerveDriveConfig` fields are missing                         |
-| `MotorNotPresentException`                    | The mechanism was constructed without a motor controller                |
+| `MotorNotPresentException`                    | A mechanism has no motor controller (defined, but not currently thrown by YAMS itself) |
 | `InvalidStageGivenException`                  | A gear stage string is not in `"IN:OUT"` format                         |
 | `NoStagesGivenException`                      | A `GearBox` or `Sprocket` was constructed with an empty stage list      |
 
@@ -40,6 +40,14 @@ SomeConfigurationException(String message, String result, String remedyFunction)
 | `result`         | What behavior will be broken without this configuration |
 | `remedyFunction` | The builder method to call to fix the problem           |
 
+The remaining exceptions take simpler arguments:
+
+```java
+MotorNotPresentException(String mechanismType)
+InvalidStageGivenException(String stage)
+NoStagesGivenException()
+```
+
 ***
 
 ## Example error handling
@@ -47,7 +55,7 @@ SomeConfigurationException(String message, String result, String remedyFunction)
 ```java
 try {
     SmartMotorController motor = new SparkWrapper(
-        new SparkMax(1, MotorType.kBrushless),
+        new SparkMax(CANPort.CAN_S0, 1, MotorType.kBrushless),
         DCMotor.getNEO(1),
         config
     );

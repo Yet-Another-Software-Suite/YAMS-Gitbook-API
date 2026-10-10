@@ -1,9 +1,18 @@
 # FlyWheel
 
-**Package:** `yams.mechanisms.velocity`\
-**Extends:** `SmartVelocityMechanism`
+**Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
+**Extends:** `yams.core.mechanisms.velocity.FlyWheel` (which extends `SmartVelocityMechanism`)\
+**Implements:** `CommandMechanism`
 
-`FlyWheel` controls a continuously spinning wheel or roller at a target angular velocity. It is not position-controlled; hard limits do not apply.
+`FlyWheel` controls a continuously spinning wheel or roller at a target angular velocity. It is not position-controlled; hard limits do not apply. Use `FlyWheel` for shooters and also for intakes, rollers, feeders and indexers, even when they only run open loop with `set(double)`.
+
+Robot code imports `FlyWheel` from `yams.commands2.mechanisms` (or `yams.commands3.mechanisms`). The base class `yams.core.mechanisms.velocity.FlyWheel` holds the state, simulation and telemetry. Its constructor is protected, so it is not constructed directly.
+
+```java
+import yams.commands2.config.SmartMotorControllerConfig;
+import yams.commands2.mechanisms.FlyWheel;
+import yams.core.mechanisms.config.FlyWheelConfig;
+```
 
 **See also:** [FlyWheelConfig](../config/flywheel-config.md) | [C++ FlyWheel](../../c++-reference/mechanisms/flywheel.md)
 
@@ -15,63 +24,100 @@
 FlyWheel(FlyWheelConfig config, SmartMotorController smc)
 ```
 
-| Parameter | Type                   | Description                                                           |
-| --------- | ---------------------- | --------------------------------------------------------------------- |
-| `config`  | `FlyWheelConfig`       | Flywheel configuration including gear ratio and simulation parameters |
-| `smc`     | `SmartMotorController` | Motor controller driving the flywheel                                 |
+| Parameter | Type                   | Description                                                      |
+| --------- | ---------------------- | ---------------------------------------------------------------- |
+| `config`  | `FlyWheelConfig`       | Flywheel configuration (diameter, telemetry, simulation options) |
+| `smc`     | `SmartMotorController` | Motor controller driving the flywheel                            |
+
+The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) passed to the `SmartMotorControllerConfig` constructor, so build the motor controller with `yams.commands2.config.SmartMotorControllerConfig` or `yams.commands3.config.SmartMotorControllerConfig` to match the `FlyWheel` you import. The simulation uses the moment of inertia from `SmartMotorControllerConfig.withMomentOfInertia`.
 
 ***
 
 ## State Queries
 
-### `getSpeed()`
+These come from `yams.core.mechanisms.velocity.FlyWheel` and work outside of commands.
 
-```java
-public AngularVelocity getSpeed()
-```
-
-Returns the current wheel velocity from the encoder.
-
-| Name | Type | Description   |
-| ---- | ---- | ------------- |
-| N/A  | N/A  | No parameters |
-
-**Returns:** `AngularVelocity`: current wheel velocity.
+| Method                                                  | Returns                     | Description                                                                         |
+| ------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------- |
+| `getSpeed()`                                            | `AngularVelocity`           | Current wheel velocity from the encoder                                             |
+| `getLinearVelocity()`                                   | `LinearVelocity`            | Current surface speed. Throws `FlyWheelConfigurationException` without a diameter   |
+| `getMechanismSetpointVelocity()`                        | `Optional<AngularVelocity>` | The current closed-loop velocity setpoint, if any                                   |
+| `isNear(AngularVelocity speed, AngularVelocity within)` | `boolean`                   | `true` when the current speed is within `within` of `speed`                         |
+| `isGte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is greater than or equal to `speed`                   |
+| `isLte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is less than or equal to `speed`                      |
+| `isBetween(AngularVelocity start, AngularVelocity end)` | `boolean`                   | `true` when the current speed is in `[start, end]`                                  |
+| `getShooterConfig()`                                    | `FlyWheelConfig`            | The `FlyWheelConfig` used to build this flywheel                                    |
+| `getMotorController()`                                  | `SmartMotorController`      | The underlying motor controller                                                     |
 
 ***
 
 ## Command Factories
 
-### `run(AngularVelocity target)`
+### `run(AngularVelocity velocity)`
 
 ```java
-public Command run(AngularVelocity target)
+public Command run(AngularVelocity velocity)
 ```
 
-Spins the wheel at `target` indefinitely using closed-loop velocity control.
+Spins the wheel at `velocity` indefinitely using closed-loop velocity control.
 
-| Name     | Type              | Description            |
-| -------- | ----------------- | ---------------------- |
-| `target` | `AngularVelocity` | Desired wheel velocity |
+| Name       | Type              | Description            |
+| ---------- | ----------------- | ---------------------- |
+| `velocity` | `AngularVelocity` | Desired wheel velocity |
 
 **Returns:** `Command`: runs until interrupted.
 
 ***
 
-### `runTo(AngularVelocity target, AngularVelocity tolerance)`
+### `run(LinearVelocity speed)`
 
 ```java
-public Command runTo(AngularVelocity target, AngularVelocity tolerance)
+public Command run(LinearVelocity speed)
 ```
 
-Spins to `target` and ends when the wheel speed is within `tolerance` of the target.
+Spins the wheel at a surface speed indefinitely. The speed is converted with the `FlyWheelConfig` diameter.
 
-| Name        | Type              | Description                                      |
-| ----------- | ----------------- | ------------------------------------------------ |
-| `target`    | `AngularVelocity` | Desired wheel velocity                           |
-| `tolerance` | `AngularVelocity` | Acceptable speed error for the command to finish |
+| Name    | Type             | Description           |
+| ------- | ---------------- | --------------------- |
+| `speed` | `LinearVelocity` | Desired surface speed |
 
-**Returns:** `Command`: ends when within tolerance.
+**Returns:** `Command`: runs until interrupted. Throws `FlyWheelConfigurationException` if the diameter is not configured.
+
+***
+
+### `run(Supplier<T> velocity)`
+
+```java
+public <T> Command run(Supplier<T> velocity)
+```
+
+Spins the wheel at the supplied velocity, re-evaluated each loop. `T` must be `AngularVelocity` or `LinearVelocity`; the type is checked once, when the command is created.
+
+| Name       | Type          | Description                                                |
+| ---------- | ------------- | ---------------------------------------------------------- |
+| `velocity` | `Supplier<T>` | Supplier of an `AngularVelocity` or a `LinearVelocity`     |
+
+**Returns:** `Command`: runs until interrupted. Throws `IllegalArgumentException` if the supplied value is neither type, and `FlyWheelConfigurationException` for a `LinearVelocity` without a configured diameter.
+
+***
+
+### `runTo(AngularVelocity velocity, AngularVelocity tolerance)`
+
+```java
+public Command runTo(AngularVelocity velocity, AngularVelocity tolerance)
+public Command runTo(Supplier<AngularVelocity> velocity, AngularVelocity tolerance)
+public Command runTo(LinearVelocity velocity, LinearVelocity tolerance)
+public Command runTo(Supplier<LinearVelocity> velocity, LinearVelocity tolerance)
+```
+
+Sets the velocity setpoint and ends once the wheel is within `tolerance` (debounced 0.1 s). The setpoint stays active after the command ends, unless a default command replaces it. Supplier overloads read the supplier once when the command starts. `LinearVelocity` overloads need the `FlyWheelConfig` diameter.
+
+| Name        | Type                                    | Description                                      |
+| ----------- | --------------------------------------- | ------------------------------------------------ |
+| `velocity`  | `AngularVelocity` / `LinearVelocity`    | Desired wheel velocity                           |
+| `tolerance` | `AngularVelocity` / `LinearVelocity`    | Acceptable speed error for the command to finish |
+
+**Returns:** `Command`: ends when the wheel reaches the target speed.
 
 ***
 
@@ -79,31 +125,16 @@ Spins to `target` and ends when the wheel speed is within `tolerance` of the tar
 
 ```java
 public Command set(double dutycycle)
-```
-
-Runs the flywheel open-loop at the specified duty cycle indefinitely.
-
-| Name        | Type     | Description                            |
-| ----------- | -------- | -------------------------------------- |
-| `dutycycle` | `double` | Motor output in the range \[-1.0, 1.0] |
-
-**Returns:** `Command`: runs until interrupted.
-
-***
-
-### `set(Supplier<Double> dutycycle)`
-
-```java
 public Command set(Supplier<Double> dutycycle)
 ```
 
-Runs the flywheel open-loop with a duty cycle supplier; the supplier is re-evaluated each loop iteration.
+Open-loop duty cycle, runs until interrupted. The closed-loop controller is stopped while it runs and restarted when it ends. This is the usual command for open-loop rollers and intakes.
 
-| Name        | Type               | Description                                               |
-| ----------- | ------------------ | --------------------------------------------------------- |
-| `dutycycle` | `Supplier<Double>` | Supplier returning motor output in the range \[-1.0, 1.0] |
+| Name        | Type                          | Description                             |
+| ----------- | ----------------------------- | --------------------------------------- |
+| `dutycycle` | `double` / `Supplier<Double>` | Motor output in the range \[-1.0, 1.0]  |
 
-**Returns:** `Command`: runs until interrupted.
+**Returns:** `Command`
 
 ***
 
@@ -111,66 +142,43 @@ Runs the flywheel open-loop with a duty cycle supplier; the supplier is re-evalu
 
 ```java
 public Command setVoltage(Voltage volts)
-```
-
-Runs the flywheel open-loop at a fixed voltage indefinitely.
-
-| Name    | Type      | Description           |
-| ------- | --------- | --------------------- |
-| `volts` | `Voltage` | Applied motor voltage |
-
-**Returns:** `Command`: runs until interrupted.
-
-***
-
-### `setVoltage(Supplier<Voltage> volts)`
-
-```java
 public Command setVoltage(Supplier<Voltage> volts)
 ```
 
-Runs the flywheel open-loop with a voltage supplier; the supplier is re-evaluated each loop iteration.
+Open-loop voltage, runs until interrupted. The closed-loop controller is stopped while it runs and restarted when it ends.
 
-| Name    | Type                | Description                              |
-| ------- | ------------------- | ---------------------------------------- |
-| `volts` | `Supplier<Voltage>` | Supplier returning applied motor voltage |
+| Name    | Type                            | Description           |
+| ------- | ------------------------------- | --------------------- |
+| `volts` | `Voltage` / `Supplier<Voltage>` | Applied motor voltage |
 
-**Returns:** `Command`: runs until interrupted.
+**Returns:** `Command`
 
 ***
 
 ## Triggers
 
-### `isNear(AngularVelocity speed, AngularVelocity tolerance)`
+### `near(AngularVelocity speed, AngularVelocity within)`
 
 ```java
-public Trigger isNear(AngularVelocity speed, AngularVelocity tolerance)
+public Trigger near(AngularVelocity speed, AngularVelocity within)
 ```
 
-True when the current wheel speed is within `tolerance` of `speed`.
+Active when the current wheel speed is within `within` of `speed`.
 
-| Name        | Type              | Description                  |
-| ----------- | ----------------- | ---------------------------- |
-| `speed`     | `AngularVelocity` | Reference speed              |
-| `tolerance` | `AngularVelocity` | Maximum acceptable deviation |
-
-**Returns:** `Trigger`
-
-***
-
-### `atSpeed()`
-
-```java
-public Trigger atSpeed()
-```
-
-Shorthand for `isNear` using the configured target speed and a default 50 RPM tolerance.
+| Name     | Type              | Description                  |
+| -------- | ----------------- | ---------------------------- |
+| `speed`  | `AngularVelocity` | Reference speed              |
+| `within` | `AngularVelocity` | Maximum acceptable deviation |
 
 **Returns:** `Trigger`
 
 {% hint style="info" %}
-Use `atSpeed()` as a command prerequisite when sequencing shooter commands. The default 50 RPM tolerance works for most shooters; use `isNear` to set a tighter bound.
+The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean`. There is no `atSpeed()` trigger; use `near(...)` with your target speed.
 {% endhint %}
+
+```java
+shooter.near(RPM.of(3000), RPM.of(50)).onTrue(feeder.set(0.8));
+```
 
 ***
 
@@ -180,11 +188,7 @@ Use `atSpeed()` as a command prerequisite when sequencing shooter commands. The 
 public Trigger gte(AngularVelocity speed)
 ```
 
-True when the current wheel speed is greater than or equal to `speed`.
-
-| Name    | Type              | Description       |
-| ------- | ----------------- | ----------------- |
-| `speed` | `AngularVelocity` | Lower bound speed |
+Active when the current wheel speed is greater than or equal to `speed`.
 
 **Returns:** `Trigger`
 
@@ -196,11 +200,7 @@ True when the current wheel speed is greater than or equal to `speed`.
 public Trigger lte(AngularVelocity speed)
 ```
 
-True when the current wheel speed is less than or equal to `speed`.
-
-| Name    | Type              | Description       |
-| ------- | ----------------- | ----------------- |
-| `speed` | `AngularVelocity` | Upper bound speed |
+Active when the current wheel speed is less than or equal to `speed`.
 
 **Returns:** `Trigger`
 
@@ -212,7 +212,7 @@ True when the current wheel speed is less than or equal to `speed`.
 public Trigger between(AngularVelocity start, AngularVelocity end)
 ```
 
-True when the current wheel speed is in the inclusive range `[start, end]`.
+Active when the current wheel speed is in the inclusive range `[start, end]`.
 
 | Name    | Type              | Description              |
 | ------- | ----------------- | ------------------------ |
@@ -223,76 +223,52 @@ True when the current wheel speed is in the inclusive range `[start, end]`.
 
 ***
 
-### `max()`
+## Commands v2 and Commands v3
+
+Both packages have the same method names and parameters. The difference is the return types and what the commands require:
+
+|                | Commands v2 (`yams.commands2.mechanisms.FlyWheel`)             | Commands v3 (`yams.commands3.mechanisms.FlyWheel`)             |
+| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
+| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+| Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
+
+In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
 
 ```java
-public Trigger max()
+public Command hold(AngularVelocity speed)
+{
+  return run(coroutine -> coroutine.await(shooter.run(speed)))
+      .withPriority(Command.LOWEST_PRIORITY)
+      .named("Shooter Hold");
+}
 ```
-
-Not applicable to velocity mechanisms. Throws `UnsupportedOperationException`.
-
-**Returns:** `Trigger`: always throws; do not use.
-
-***
-
-### `min()`
-
-```java
-public Trigger min()
-```
-
-Not applicable to velocity mechanisms. Throws `UnsupportedOperationException`.
-
-**Returns:** `Trigger`: always throws; do not use.
 
 ***
 
 ## Visualization & Simulation
 
-### `getMotor()`
+| Method                           | Returns                | Description                                                                        |
+| -------------------------------- | ---------------------- | ---------------------------------------------------------------------------------- |
+| `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                                    |
+| `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)               |
+| `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                        |
+| `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                           |
+| `getRelativeMechanismPosition()` | `Translation3d`        | Flywheel position relative to the robot, using the `MechanismPositionConfig`       |
+| `getName()`                      | `String`               | The flywheel telemetry name                                                        |
+| `simIterate()`                   | `void`                 | Advances the flywheel physics simulation by one loop and updates the visualization |
+| `updateTelemetry()`              | `void`                 | Publishes the current flywheel state to NetworkTables                              |
+| `visualizationUpdate()`          | `void`                 | Updates the Mechanism2d visualization                                              |
 
-```java
-public SmartMotorController getMotor()
-```
-
-Returns the underlying motor controller.
-
-**Returns:** `SmartMotorController`
-
-***
-
-### `simIterate()`
-
-```java
-public void simIterate()
-```
-
-Advances the flywheel physics simulation by one loop iteration. Call this in `simulationPeriodic()`.
-
-***
-
-### `updateTelemetry()`
-
-```java
-public void updateTelemetry()
-```
-
-Publishes the current flywheel state to NetworkTables.
-
-***
-
-### `visualizationUpdate()`
-
-```java
-public void visualizationUpdate()
-```
-
-Updates the Mechanism2d visualization for Shuffleboard or AdvantageScope.
+Call `updateTelemetry()` from `periodic()` and `simIterate()` from `simulationPeriodic()`. `simIterate()` already calls `visualizationUpdate()`.
 
 ***
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/simple_shooter/java/frc/robot/subsystems/ShooterSubsystem.java#L150-L156" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ShooterSubsystem.java" %}
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/hooded_shooter/java/frc/robot/subsystems/FlywheelSubsystem.java#L102-L109" %}
+Commands v3:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/ShooterMechanism.java" %}

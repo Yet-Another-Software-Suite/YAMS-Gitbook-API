@@ -1,6 +1,6 @@
 # DerivativeTimeFilter
 
-**Package:** `yams.math`
+**Package:** `yams.core.math`
 
 `DerivativeTimeFilter` computes a numerical derivative of a signal while debouncing noise below a minimum rate of change. Useful for estimating velocity from a position signal.
 
@@ -19,8 +19,8 @@ DerivativeTimeFilter(Time debouncerPeriod)   // Initial value = 0
 
 | Method | Returns | Description |
 | ------ | ------- | ----------- |
-| `derivative(double current, Time dt)` | `double` | Computes derivative given explicit elapsed time `dt`. |
-| `derivative(double current)` | `double` | Computes derivative using FPGA clock elapsed time since last call. |
+| `derivative(double current, Time dt)` | `double` | Computes the derivative (per microsecond) given explicit elapsed time `dt`. Call it periodically at that `dt`. |
+| `derivative(double current)` | `double` | Computes the derivative (per microsecond) using the robot clock (`RobotController.getTime()`) elapsed since the last call. |
 
 ## Example
 

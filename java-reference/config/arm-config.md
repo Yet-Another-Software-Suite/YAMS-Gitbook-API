@@ -1,6 +1,6 @@
 # ArmConfig
 
-**Package:** `yams.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`
 
 `ArmConfig` configures a single-jointed arm mechanism. All builder methods return the `ArmConfig` instance for chaining.
 
@@ -19,14 +19,16 @@ ArmConfig clone()  // Deep copy
 
 ## Builder Methods
 
-> **Required for simulation:** `withLength()` must be set for `SingleJointedArmSim` to work correctly. All other methods are optional.
+> **Required for simulation:** `withLength()` and `withHardLimits()` must be set; `Arm` throws `ArmConfigurationException` in simulation without them. All other methods are optional.
+>
+> The moment of inertia and starting position are no longer part of `ArmConfig`. Set them on the motor controller config with `SmartMotorControllerConfig.withMomentOfInertia(...)` and `SmartMotorControllerConfig.withStartingPosition(Angle)`.
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
 | `withLength(Distance distance)` | `distance`: arm link length | **Required for simulation.** Sets the physical length of the arm link. Used by `SingleJointedArmSim`. Without this, the physics simulation cannot model the arm. |
-| `withHardLimits(Angle min, Angle max)` | `min`: lower bound, `max`: upper bound | Sets the physical rotation limits. The motor controller will not command positions outside these angles. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MEDIUM`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
-| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Defaults to a built-in color if not set. Optional. |
+| `withHardLimits(Angle min, Angle max)` | `min`: lower bound, `max`: upper bound | **Required for simulation.** Sets the physical rotation limits used by `SingleJointedArmSim` and the Mechanism2d visualization. For limits enforced by the motor controller, use `SmartMotorControllerConfig.withSoftLimits(...)`. |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
+| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Defaults to orange if not set. Optional. |
 | `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
 
 ---
@@ -40,7 +42,7 @@ ArmConfig clone()  // Deep copy
 | `getLength()` | `Optional<Distance>` | The arm length, or empty if not configured. |
 | `getLowerHardLimit()` | `Optional<Angle>` | Lower hard limit angle, or empty. |
 | `getUpperHardLimit()` | `Optional<Angle>` | Upper hard limit angle, or empty. |
-| `getSimColor()` | `Color8Bit` | The visualization color. Always returns a value; falls back to a built-in default. |
+| `getSimColor()` | `Color8Bit` | The visualization color. Always returns a value; defaults to orange. |
 | `getMechanismPositionConfig()` | `MechanismPositionConfig` | The position/plane configuration. |
 
 ---

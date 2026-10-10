@@ -1,6 +1,6 @@
 # SmartMath
 
-**Package:** `yams.math`
+**Package:** `yams.core.math`
 
 `SmartMath` contains static utility methods for gear ratio calculations. It cannot be instantiated.
 

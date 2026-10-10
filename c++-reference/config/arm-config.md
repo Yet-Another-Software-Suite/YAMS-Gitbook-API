@@ -1,6 +1,8 @@
 # ArmConfig
 
-**Namespace:** `yams::mechanisms::config` **Java equivalent:** [Java ArmConfig](../../java-reference/config/arm-config.md)
+**Namespace:** `yams::mechanisms::config`\
+**Header:** `<yams/mechanisms/config/ArmConfig.hpp>`\
+**Java equivalent:** [Java ArmConfig](../../java-reference/config/arm-config.md)
 
 `ArmConfig` holds physical and simulation parameters for an `Arm` mechanism.
 
@@ -18,15 +20,15 @@ ArmConfig() = default;
 
 All methods return `ArmConfig&` for chaining.
 
-> **Required for simulation:** `WithArmLength()` must be set for `SingleJointedArmSim` to work correctly. All other methods are optional.
+> **Required for simulation:** `WithArmLength()`, `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Arm` constructor throws in simulation. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`, or an external encoder zero offset) and an MOI (`WithMOI`). In 2027 MOI and starting position live on `SmartMotorControllerConfig`, not `ArmConfig`.
 
 | Method                                       | Required                    | Description                                                                                       |
 | -------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------- |
-| `WithArmLength(units::meter_t length)`       | **Required for simulation** | Arm length from pivot to end effector. Without this, the physics simulation cannot model the arm. |
-| `WithMinAngle(units::degree_t angle)`        | Optional                    | Minimum allowable mechanism angle                                                                 |
-| `WithMaxAngle(units::degree_t angle)`        | Optional                    | Maximum allowable mechanism angle                                                                 |
+| `WithArmLength(wpi::units::meter_t length)`       | **Required for simulation** | Arm length from pivot to end effector. Without this, the physics simulation cannot model the arm. |
+| `WithMinAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Minimum allowable mechanism angle; also applied as the motor controller lower limit                                                                 |
+| `WithMaxAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Maximum allowable mechanism angle; also applied as the motor controller upper limit                                                                 |
 | `WithTelemetryName(const std::string& name)` | Optional                    | Name used for SmartDashboard and log entries                                                      |
-| `WithSimColor(const frc::Color8Bit& color)`  | Optional                    | Color of the simulated arm ligament                                                               |
+| `WithSimColor(const wpi::util::Color8Bit& color)`  | Optional                    | Color of the simulated arm ligament                                                               |
 
 ***
 
@@ -34,10 +36,10 @@ All methods return `ArmConfig&` for chaining.
 
 ```cpp
 std::string GetTelemetryName() const;
-std::optional<units::degree_t> GetMinAngle() const;
-std::optional<units::degree_t> GetMaxAngle() const;
-std::optional<units::meter_t> GetArmLength() const;
-frc::Color8Bit GetSimColor() const;
+std::optional<wpi::units::degree_t> GetMinAngle() const;
+std::optional<wpi::units::degree_t> GetMaxAngle() const;
+std::optional<wpi::units::meter_t> GetArmLength() const;
+wpi::util::Color8Bit GetSimColor() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.
@@ -48,7 +50,7 @@ Getters for optional fields return `std::nullopt` if the corresponding setter wa
 
 | Exception                               | Thrown When                                                                       |
 | --------------------------------------- | --------------------------------------------------------------------------------- |
-| `exceptions::ArmConfigurationException` | Required fields are missing or values are invalid when used to construct an `Arm` |
+| `exceptions::ArmConfigurationException` | Required fields (on `ArmConfig` or the motor controller config) are missing when an `Arm` is constructed in simulation |
 
 ***
 

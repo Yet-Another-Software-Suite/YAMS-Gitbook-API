@@ -1,7 +1,7 @@
 # Simulation
 
 **Namespace:** `yams::motorcontrollers::simulation`\
-**Header:** `yams/motorcontrollers/simulation/Sensor.hpp`
+**Header:** `#include <yams/motorcontrollers/simulation/Sensor.hpp>`
 
 A `Sensor` models a named hardware sensor whose fields are readable from robot code and, in simulation, visible in the WPILib **Glass** GUI. Every field delegates to a real hardware supplier on a physical robot. In simulation, Glass can override any field's value, and trigger-based overrides can inject specific readings at scripted moments during automated testing.
 
@@ -35,7 +35,7 @@ The `SimSensorConfig` overload is the preferred way to create sensors; see [SimS
 
 | Method                                  | Returns               | Description                                                                             |
 | --------------------------------------- | --------------------- | --------------------------------------------------------------------------------------- |
-| `GetField(const std::string& name)`     | `SensorData&`         | Returns the named field. Throws `std::out_of_range` if not found.                       |
+| `GetField(const std::string& name)`     | `SensorData&` (or `const SensorData&` on a const `Sensor`) | Returns the named field. Throws `std::out_of_range` if not found. |
 | `GetAsDouble(const std::string& name)`  | `double`              | Typed accessor. Throws if not a double field.                                           |
 | `GetAsInt(const std::string& name)`     | `int`                 | Typed accessor. Throws if not an int field.                                             |
 | `GetAsBoolean(const std::string& name)` | `bool`                | Typed accessor. Throws if not a bool field.                                             |
@@ -59,6 +59,8 @@ SensorData(std::string name, std::function<double()> supplier, double defaultVal
 SensorData(std::string name, std::function<int()> supplier, int defaultVal)
 SensorData(std::string name, std::function<bool()> supplier, bool defaultVal)
 SensorData(std::string name, std::function<int64_t()> supplier, int64_t defaultVal)
+SensorData(std::string name, std::function<HAL_Value()> supplier, HAL_Value defaultValue,
+           HALValueType type)  // raw HAL form
 ```
 
 ### Typed getters
@@ -72,7 +74,7 @@ SensorData(std::string name, std::function<int64_t()> supplier, int64_t defaultV
 | `GetValue()`     | `HAL_Value`    | Raw value applying full priority logic. |
 | `GetDefault()`   | `HAL_Value`    | Default value from construction.        |
 | `GetName()`      | `std::string`  | Field name.                             |
-| `GetType()`      | `HALValueType` | `kDouble`, `kInt`, `kBoolean`, `kLong`. |
+| `GetType()`      | `HALValueType` | `kBoolean`, `kDouble`, `kEnum`, `kInt`, `kLong`. |
 
 ### Setters (simulation only)
 
@@ -101,7 +103,9 @@ Registers a conditional override directly on this field. Triggers are evaluated 
 | `SensorData::Convert(bool value)`                       |                                                     |
 | `SensorData::Convert(int64_t value)`                    |                                                     |
 | `SensorData::Convert(std::function<double()> supplier)` | Wraps a supplier in a `std::function<HAL_Value()>`. |
+| `SensorData::Convert(std::function<int()> supplier)`    |                                                     |
 | `SensorData::Convert(std::function<bool()> supplier)`   |                                                     |
+| `SensorData::Convert(std::function<int64_t()> supplier)` |                                                    |
 
 ## Example
 
@@ -109,12 +113,13 @@ Registers a conditional override directly on this field. Triggers are evaluated 
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
 #include <yams/motorcontrollers/simulation/Sensor.hpp>
 #include <yams/motorcontrollers/simulation/SensorData.hpp>
-#include <frc/DigitalInput.h>
+#include <wpi/hardware/discrete/DigitalInput.hpp>
+#include <wpi/driverstation/RobotState.hpp>
 
 using namespace yams::mechanisms::config;
 using namespace yams::motorcontrollers::simulation;
 
-frc::DigitalInput beamBreak{3};
+wpi::DigitalInput beamBreak{3};
 
 // --- Preferred: build via SimSensorConfig ---
 SimSensorConfig cfg{"Intake"};
@@ -130,7 +135,7 @@ bool isTriggered = sensor.GetAsBoolean("BeamBreak");
 sensor.AddSimTrigger(
     "BeamBreak",
     SensorData::Convert(true),
-    [] { return frc::DriverStation::IsAutonomous(); }
+    [] { return wpi::RobotState::IsAutonomous(); }
 );
 ```
 
@@ -145,6 +150,5 @@ The typed `GetAs*` accessors throw if the field was registered with a different 
 ## Related pages
 
 * [SimSensorConfig (C++)](../config/sim-sensor-config.md)
-* [SensorConfig (C++)](../../api/cpp/config/sensor-config.md): absolute encoder config (not simulation)
 * [Sensor (Java)](../../java-reference/sensor/)
 * [Tutorial: Using YAMS Sensors](../../guides/using-yams-sensors.md)

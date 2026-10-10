@@ -1,9 +1,17 @@
 # DoubleJointedArm
 
-**Package:** `yams.mechanisms.positional`\
-**Extends:** `SmartPositionalMechanism`
+**Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
+**Extends:** `yams.core.mechanisms.positional.DoubleJointedArm` (which extends `SmartPositionalMechanism`)
 
 `DoubleJointedArm` controls a serial two-joint arm: a lower link (shoulder) and an upper link (elbow). Each joint has its own `SmartMotorController`. The class provides both direct joint angle control and inverse kinematics to a Cartesian target.
+
+Robot code imports `DoubleJointedArm` from `yams.commands2.mechanisms` (or `yams.commands3.mechanisms`). The base class `yams.core.mechanisms.positional.DoubleJointedArm` holds the state, kinematics, simulation and telemetry. Its constructor is protected, so it is not constructed directly.
+
+```java
+import yams.commands2.config.SmartMotorControllerConfig;
+import yams.commands2.mechanisms.DoubleJointedArm;
+import yams.core.mechanisms.config.ArmConfig;
+```
 
 **See also:** [ArmConfig](../config/arm-config.md)
 
@@ -25,158 +33,149 @@ DoubleJointedArm(
 | `upperConfig` | `ArmConfig` | Configuration for the upper (elbow) joint, including arm length |
 | `upperSMC` | `SmartMotorController` | Motor controller for the upper joint |
 
+Throws `DoubleJointedArmConfigurationException` if:
+
+* either `SmartMotorControllerConfig` has no `withStartingPosition`,
+* either `ArmConfig` has no `withLength`,
+* the two motor controller configs were built with different `Subsystem`s (Commands v2) or `Mechanism`s (Commands v3),
+* in simulation, either `ArmConfig` is missing `withHardLimits`.
+
 ---
 
 ## State Queries
 
-### `getLowerAngle()`
+These come from `yams.core.mechanisms.positional.DoubleJointedArm` and work outside of commands.
 
-```java
-public Angle getLowerAngle()
-```
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `getLowerAngle()` | `Angle` | Current lower joint (shoulder) angle |
+| `getUpperAngle()` | `Angle` | Current upper joint (elbow) angle |
+| `getPosition()` | `Translation2d` | Current end-effector position from forward kinematics |
+| `getAnglesForPosition(Translation2d translation, boolean invert)` | `Pair<Angle, Angle>` | Inverse kinematics: shoulder angle then elbow angle for a target position |
+| `isNear(Translation2d target, Distance tolerance)` | `boolean` | `true` when the end-effector is within `tolerance` of `target` |
+| `getLowerMotorController()` | `SmartMotorController` | Lower (shoulder) motor controller |
+| `getUpperMotorController()` | `SmartMotorController` | Upper (elbow) motor controller |
+| `getLowerArmConfig()` | `ArmConfig` | Lower (shoulder) `ArmConfig` |
+| `getUpperArmConfig()` | `ArmConfig` | Upper (elbow) `ArmConfig` |
 
-Returns the current lower joint (shoulder) angle.
-
-**Returns:** `Angle`
-
----
-
-### `getUpperAngle()`
-
-```java
-public Angle getUpperAngle()
-```
-
-Returns the current upper joint (elbow) angle.
-
-**Returns:** `Angle`
-
----
-
-### `getPosition()`
-
-```java
-public Translation2d getPosition()
-```
-
-Returns the current end-effector position in Cartesian space, computed from forward kinematics.
-
-**Returns:** `Translation2d`
+`isAtMax()` and `isAtMin()` are not supported and always throw.
 
 ---
 
 ## Command Factories
 
-### `setAngle(Angle lower, Angle upper)`
+### `setAngle(Angle lowerAngle, Angle upperAngle)`
 
 ```java
-public Command setAngle(Angle lower, Angle upper)
+public Command setAngle(Angle lowerAngle, Angle upperAngle)
 ```
 
-Drives both joints to the target angles simultaneously. Runs indefinitely until interrupted.
+Drives both joints to the target angles simultaneously. Pass `null` to leave a joint alone. Runs indefinitely until interrupted.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `lower` | `Angle` | Target angle for the lower (shoulder) joint |
-| `upper` | `Angle` | Target angle for the upper (elbow) joint |
+| `lowerAngle` | `Angle` | Target angle for the lower (shoulder) joint |
+| `upperAngle` | `Angle` | Target angle for the upper (elbow) joint |
 
 **Returns:** `Command`: runs until interrupted.
 
 ---
 
-### `setPosition(Translation2d target, boolean allowMirror)`
+### `setPosition(Translation2d translation, boolean invert)`
 
 ```java
-public Command setPosition(Translation2d target, boolean allowMirror)
+public Command setPosition(Translation2d translation, boolean invert)
 ```
 
-Uses inverse kinematics to move the end-effector to `target` in Cartesian space. Runs indefinitely until interrupted.
+Uses inverse kinematics to move the end-effector to `translation` (X away from the root, Y up). The angles are computed when the command starts, then it behaves like `setAngle`. Runs indefinitely until interrupted.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `target` | `Translation2d` | Desired end-effector position |
-| `allowMirror` | `boolean` | When `true`, the IK solver may choose either elbow-up or elbow-down configuration; when `false`, only the primary configuration is used |
+| `translation` | `Translation2d` | Desired end-effector position |
+| `invert` | `boolean` | Invert the elbow direction |
 
 **Returns:** `Command`: runs until interrupted.
 
 ---
 
-### `runTo(Translation2d target, boolean allowMirror, Distance tolerance)`
+### `run`
 
 ```java
-public Command runTo(Translation2d target, boolean allowMirror, Distance tolerance)
+public Command run(Translation2d translation2d, boolean invert)
+public Command run(Supplier<Translation2d> translation, Supplier<Boolean> invert)
 ```
 
-Uses inverse kinematics to move to `target`, ending when the end-effector is within `tolerance` of the target position.
+Like `setPosition`, but recomputes the inverse kinematics every loop, so the target can change while the command runs.
+
+**Returns:** `Command`: runs until interrupted.
+
+---
+
+### `runTo`
+
+```java
+public Command runTo(Translation2d translation2d, boolean invert, Distance tolerance)
+public Command runTo(Supplier<Translation2d> translation, Supplier<Boolean> invert, Distance tolerance)
+```
+
+Moves to the target with inverse kinematics, ending when the end-effector is within `tolerance` of the target position. If the subsystem has a default command it takes over afterwards.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `target` | `Translation2d` | Desired end-effector position |
-| `allowMirror` | `boolean` | When `true`, the IK solver may choose either elbow-up or elbow-down configuration; when `false`, only the primary configuration is used |
+| `translation` | `Translation2d` / `Supplier<Translation2d>` | Desired end-effector position |
+| `invert` | `boolean` / `Supplier<Boolean>` | Invert the elbow direction |
 | `tolerance` | `Distance` | Maximum acceptable distance between current and target position for the command to end |
 
 **Returns:** `Command`: ends when within tolerance.
 
 ---
 
+### `set(Double lowerDutycycle, Double upperDutycycle)`
+
+```java
+public Command set(Double lowerDutycycle, Double upperDutycycle)
+```
+
+Open-loop duty cycle for each joint. Pass `null` to leave a joint alone. The closed-loop controller of each driven joint is stopped while it runs and restarted when it ends.
+
+**Returns:** `Command`: runs until interrupted.
+
+---
+
 ## Triggers
 
-### `isNear(Translation2d position, Distance tolerance)`
+`DoubleJointedArm` has no Trigger factories. Wrap the boolean check in a `Trigger` yourself:
 
 ```java
-public Trigger isNear(Translation2d position, Distance tolerance)
+new Trigger(() -> jointedArm.isNear(new Translation2d(0.5, 0.8), Inches.of(1)))
+    .onTrue(intake.set(0.5));
 ```
-
-True when the end-effector is within `tolerance` of `position`.
-
-| Name | Type | Description |
-|------|------|-------------|
-| `position` | `Translation2d` | Reference end-effector position |
-| `tolerance` | `Distance` | Maximum acceptable distance |
-
-**Returns:** `Trigger`
 
 ---
 
-### `max()`
+## Commands v2 and Commands v3
 
-```java
-public Trigger max()
-```
-
-True when either joint is at its upper hard limit.
-
-**Returns:** `Trigger`
-
----
-
-### `min()`
-
-```java
-public Trigger min()
-```
-
-True when either joint is at its lower hard limit.
-
-**Returns:** `Trigger`
+Both packages have the same method names and parameters. Commands v2 returns `org.wpilib.command2.Command` and requires the shared `Subsystem` (`getSubsystem()`); Commands v3 returns `org.wpilib.command3.Command` and requires the shared `Mechanism` (`getMechanism()`). In Commands v3, `setPosition` is a requirement-free command that `await`s `setAngle`, and the `Trigger` in the example above is `org.wpilib.command3.Trigger`.
 
 ---
 
 ## Visualization & Simulation
 
-The following methods share the same interface as the single-joint `Arm` class.
-
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `simIterate()` | `void` | Advances joint physics simulation one loop iteration; call in `simulationPeriodic()` |
-| `updateTelemetry()` | `void` | Publishes current joint angles and end-effector position to NetworkTables |
-| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization |
-| `getMechanismLigament()` | `MechanismLigament2d` | Returns the Mechanism2d ligament for the arm segments |
-| `getMechanismRoot()` | `MechanismRoot2d` | Returns the Mechanism2d root for the arm |
-| `getMotor()` | `SmartMotorController` | Returns the lower joint motor controller |
+| `simIterate()` | `void` | Advances joint physics simulation one loop and updates the visualization; call in `simulationPeriodic()` |
+| `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
+| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
+| `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
+| `getRelativeMechanismPosition()` | `Translation3d` | End-effector position relative to the robot |
+| `getName()` | `String` | The mechanism telemetry name |
 
 ---
 
 ## Examples
 
-{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/double_jointed_arm/java/frc/robot/subsystems/DoubleJointedArmSubsystem.java#L92-L145" %}
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/DoubleJointedArmSubsystem.java" %}
+
+Commands v3:
+
+{% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/DoubleJointedArmMechanism.java" %}

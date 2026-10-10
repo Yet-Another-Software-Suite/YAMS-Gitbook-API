@@ -1,9 +1,9 @@
 # BatterySim
 
 **Namespace:** `yams::motorcontrollers::simulation`\
-**Header:** `yams/motorcontrollers/simulation/BatterySim.hpp`
+**Header:** `#include <yams/motorcontrollers/simulation/BatterySim.hpp>`
 
-`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which is written to `frc::sim::RoboRioSim::SetVInVoltage(...)`, so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
+`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own supply current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation (using `wpi::sim::BatterySim::Calculate`), which the sim suppliers write to the simulated input voltage (`wpi::sim::RoboRioSim::SetVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 
 {% hint style="info" %}
 This class is entirely static and requires no setup for basic voltage sag under combined load: every built-in sim supplier and hardware wrapper registers with it automatically.
@@ -17,24 +17,38 @@ The current draw registered here comes directly out of each mechanism's physics 
 
 | Field                | Type              | Description                                                                              |
 | -------------------- | ----------------- | ------------------------------------------------------------------------------------------- |
-| `BatteryVoltage`     | `units::volt_t`   | Nominal open-circuit battery voltage used when discharge simulation is disabled. Default `12V`. |
-| `BatteryResistance`  | `units::ohm_t`    | Nominal internal resistance used when discharge simulation is disabled. Default `0.020` ohm.    |
+| `BatteryVoltage`     | `wpi::units::volt_t`   | Nominal open-circuit battery voltage used when discharge simulation is disabled. Default `12V`. |
+| `BatteryResistance`  | `wpi::units::ohm_t`    | Nominal internal resistance used when discharge simulation is disabled. Default `0.020` ohm.    |
 
 ## Voltage Calculation
 
 ```cpp
-static units::volt_t CalculateVoltage(const void* id, units::ampere_t current);
+static wpi::units::volt_t CalculateVoltage(const void* id, wpi::units::ampere_t current);
 ```
 
-Registers `current` under `id` and returns the resulting loaded battery voltage across every registered id. `id` should be a stable identity for the calling mechanism; YAMS's built-in sim suppliers and hardware wrappers pass their own `SimSupplier` instance address (`this` / `m_simSupplier.get()`).
+Registers `current` under `id` and returns the resulting loaded battery voltage across every registered id. `id` should be a stable identity for the calling mechanism; YAMS's built-in sim suppliers and hardware wrappers pass the address of the owning `SmartMotorController`, so each motor controller counts once.
+
+## Managing Registered Draws
+
+```cpp
+static void RemoveCurrent(const void* id);
+static void Reset();
+static bool HasCurrent(const void* id);
+```
+
+| Method          | Description                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| `RemoveCurrent` | Stops counting the given consumer's draw. `SmartMotorController` calls this for itself when it is closed.       |
+| `Reset`         | Clears every tracked draw and resets discharge simulation to a fresh, fully charged, disabled state.           |
+| `HasCurrent`    | Whether a draw is currently tracked for `id`.                                                                  |
 
 ## Discharge Simulation
 
-By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `frc::Timer::GetFPGATimestamp()`, derated by discharge rate; see [Capacity Derating](#capacity-derating) below), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
+By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `wpi::Timer::GetTimestamp()`, derated by discharge rate; see [Capacity Derating](#capacity-derating) below), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
 
 ```cpp
-static void EnableDischarge(double batteryCapacityAmpHours, units::volt_t nominalVoltage,
-                            units::ohm_t nominalResistance);
+static void EnableDischarge(double batteryCapacityAmpHours, wpi::units::volt_t nominalVoltage,
+                            wpi::units::ohm_t nominalResistance);
 static void DisableDischarge();
 static void ResetDischarge();
 static double GetStateOfCharge();
@@ -48,7 +62,7 @@ static double GetStateOfCharge();
 | `GetStateOfCharge`   | Current state of charge, from `0` (empty) to `1` (full).                                            |
 
 {% hint style="warning" %}
-Discharge simulation only affects `CalculateVoltage(...)`. It has no effect on a real robot, where `frc::RobotController::GetBatteryVoltage()` reflects actual hardware.
+Discharge simulation only affects `CalculateVoltage(...)`. It has no effect on a real robot, where the SystemCore's measured battery voltage reflects actual hardware.
 {% endhint %}
 
 ## Custom Discharge Curves
@@ -77,7 +91,7 @@ std::map<double, double> wornBatteryCurve{
 yams::motorcontrollers::simulation::BatterySim::ReplaceSOCInterpolation(wornBatteryCurve);
 // Pair with a reduced usable capacity and higher resistance to match a worn battery.
 yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
-    15.0, units::volt_t{12.6}, units::ohm_t{0.028});
+    15.0, wpi::units::volt_t{12.6}, wpi::units::ohm_t{0.028});
 ```
 
 {% hint style="info" %}
@@ -119,7 +133,7 @@ std::map<double, double> measuredDerating{
 
 yams::motorcontrollers::simulation::BatterySim::ReplaceCapacityDerating(measuredDerating);
 yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
-    18.0, units::volt_t{12.9}, units::ohm_t{0.020});
+    18.0, wpi::units::volt_t{12.9}, wpi::units::ohm_t{0.020});
 ```
 
 {% hint style="info" %}
@@ -131,13 +145,13 @@ Discharge currents outside the range you define clamp to the nearest endpoint's 
 ```cpp
 #include <yams/motorcontrollers/simulation/BatterySim.hpp>
 
-void Robot::RobotInit() {
+Robot::Robot() {
   // Model an 18Ah battery starting at a full 12.9V, 20 mOhm nominal.
   yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
-      18.0, units::volt_t{12.9}, units::ohm_t{0.020});
+      18.0, wpi::units::volt_t{12.9}, wpi::units::ohm_t{0.020});
 }
 
-void Robot::TestInit() {
+void Robot::UtilityInit() {
   // Start every test run from a full charge.
   yams::motorcontrollers::simulation::BatterySim::ResetDischarge();
 }
