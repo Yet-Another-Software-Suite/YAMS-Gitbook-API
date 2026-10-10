@@ -84,8 +84,8 @@ The motor's relative encoder counts rotor rotations, which is the turret angle m
 
 ```java
 // Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
-// 20 tooth pinion, which is driven through a 10:1 gearbox.
-MechanismGearing turretGearing = new MechanismGearing(GearBox.fromReductionStages(10, 200.0 / 20));
+// 40 tooth drive gear, which is driven through a 10:1 gearbox.
+MechanismGearing turretGearing = new MechanismGearing(GearBox.fromReductionStages(10, 200.0 / 40));
 EasyCRT crt = new EasyCRT(200, 19, 21);
 
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)

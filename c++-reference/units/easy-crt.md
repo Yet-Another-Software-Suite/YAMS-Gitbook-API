@@ -99,9 +99,9 @@ The motor's relative encoder counts rotor rotations, which is the turret angle m
 #include <yams/units/EasyCRT.hpp>
 
 // Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
-// 20 tooth pinion, which is driven through a 10:1 gearbox.
+// 40 tooth drive gear, which is driven through a 10:1 gearbox.
 yams::gearing::MechanismGearing turretGearing{
-    yams::gearing::GearBox::FromReductionStages({10.0, 200.0 / 20.0})};
+    yams::gearing::GearBox::FromReductionStages({10.0, 200.0 / 40.0})};
 yams::units::EasyCRT crt{200, 19, 21};
 
 // motor is a yams::motorcontrollers::SmartMotorController whose config has
