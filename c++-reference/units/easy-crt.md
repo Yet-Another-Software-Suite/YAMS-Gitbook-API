@@ -85,6 +85,10 @@ auto offCenter = crt.Solve(encoderA.GetAbsolutePosition().GetValue(),
                            wpi::units::turn_t{0.0}, wpi::units::turn_t{1.5});
 ```
 
+{% hint style="info" %}
+The pinions can mesh with the turret gear, the motor drive gear, or their own common gear. See [Gear layouts](https://yams.yassrobotics.com/documentation/understanding/easycrt#gear-layouts) in the EasyCRT guide for a drawing and an example of each.
+{% endhint %}
+
 ### Seeding a `SmartMotorController` with `MechanismGearing`
 
 The motor's relative encoder counts rotor rotations, which is the turret angle multiplied by the reduction between the motor and the turret. Put that reduction in a `MechanismGearing`, give it to the `SmartMotorController` config, and `SetEncoderPosition(...)` does the multiplication for you. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
