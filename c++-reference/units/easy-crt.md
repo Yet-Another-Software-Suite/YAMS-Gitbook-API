@@ -4,113 +4,91 @@
 **Header:** `#include <yams/units/EasyCRT.hpp>`\
 **Java equivalent:** [Java EasyCRT](../../java-reference/units/easy-crt.md)
 
-`EasyCRT` computes absolute mechanism position from two absolute encoders with coprime gear ratios using the Chinese Remainder Theorem. The C++ API uses a struct-based config rather than Java's builder class.
+`EasyCRT` finds the absolute angle of a gear that turns more than once, from two absolute encoders on pinions with different tooth counts that both mesh with it. Each encoder only knows its angle within one of its own rotations, but the two readings together are unique over `GetUniqueRange()`, which is `lcm(encoderATeeth, encoderBTeeth) / sharedGearTeeth` rotations of the shared gear.
+
+There is no config struct. The whole API is one constructor and three methods, the same as Java. `EasyCRT.hpp` is not pulled in by `yams/YAMS.hpp`; include it directly.
 
 ***
 
-## EasyCRTConfig Struct
+## Constructor
 
 ```cpp
-struct EasyCRTConfig {
-    std::function<wpi::units::turn_t()> enc1;   // First absolute encoder supplier
-    std::function<wpi::units::turn_t()> enc2;   // Second absolute encoder supplier
-    int enc1Teeth = 19;                    // Must be coprime with enc2Teeth
-    int enc2Teeth = 21;
-    double commonK = 1.0;                  // Mechanism-to-encoder scale factor
-    double offset1 = 0.0;                  // Software offset for enc1 (turns)
-    double offset2 = 0.0;                  // Software offset for enc2 (turns)
-    double minRot = 0.0;                   // Valid mechanism range minimum (turns)
-    double maxRot = 1.0;                   // Valid mechanism range maximum (turns)
-    double tolerance = 0.005;             // Max combined encoder error to accept
-    bool inv1 = false;                    // Invert enc1
-    bool inv2 = false;                    // Invert enc2
-
-    EasyCRTConfig& WithTeeth(int t1, int t2, double k);
-    EasyCRTConfig& WithOffsets(double o1, double o2);
-    EasyCRTConfig& WithRange(double minR, double maxR);
-    EasyCRTConfig& WithTolerance(double tol);
-    EasyCRTConfig& WithInversions(bool i1, bool i2);
-};
+EasyCRT(int sharedGearTeeth, int encoderATeeth, int encoderBTeeth)
 ```
 
-`enc1Teeth` and `enc2Teeth` must be coprime (GCD = 1). The usable range of the mechanism in turns is `[minRot, maxRot]`.
+| Parameter         | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `sharedGearTeeth` | Teeth on the gear both encoder pinions mesh with. The solved angle is the angle of this gear. |
+| `encoderATeeth`   | Teeth on the pinion of encoder A.                                                            |
+| `encoderBTeeth`   | Teeth on the pinion of encoder B.                                                            |
+
+Throws `std::invalid_argument` if any tooth count is zero or negative.
 
 ***
 
-## Helper Functions
-
-Free functions in `yams::units`:
+## Methods
 
 ```cpp
-inline int CrtGcd(int a, int b)
-inline int CrtLcm(int a, int b)
-inline bool CrtIsCoprime(int a, int b)
-inline double CrtRatioFromChain(std::initializer_list<int> teeth)
-inline double CrtRatioFromStages(std::initializer_list<int> pairs)
-inline double CrtCommonK(double commonRatio, int driveTeeth)
+std::optional<wpi::units::turn_t> Solve(wpi::units::turn_t encoderA,
+                                        wpi::units::turn_t encoderB) const;
+
+std::optional<wpi::units::turn_t> Solve(wpi::units::turn_t encoderA, wpi::units::turn_t encoderB,
+                                        wpi::units::turn_t minAngle,
+                                        wpi::units::turn_t maxAngle) const;
+
+wpi::units::turn_t GetUniqueRange() const;
 ```
 
-| Function             | Description                                                                             |
-| -------------------- | --------------------------------------------------------------------------------------- |
-| `CrtGcd`             | Greatest common divisor of two integers                                                 |
-| `CrtLcm`             | Least common multiple of two integers                                                   |
-| `CrtIsCoprime`       | Returns `true` if `CrtGcd(a, b) == 1`                                                   |
-| `CrtRatioFromChain`  | Ratio of a simple gear chain in mesh order (`first / last`; idlers cancel out)          |
-| `CrtRatioFromStages` | Product of `driver / driven` over consecutive (driver, driven) tooth-count pairs         |
-| `CrtCommonK`         | Computes the scale factor K from a common gear ratio and driving sprocket tooth count   |
+| Method | Returns | Description |
+| ------ | ------- | ----------- |
+| `Solve(encoderA, encoderB) const` | `std::optional<wpi::units::turn_t>` | Solves for the angle of the shared gear, assuming its travel is centered on zero. The result is within half of `GetUniqueRange()` either side of zero. `std::nullopt` if the two readings do not agree on one angle. |
+| `Solve(encoderA, encoderB, minAngle, maxAngle) const` | `std::optional<wpi::units::turn_t>` | Solves for the angle of the shared gear when its travel is not centered on zero. `minAngle` and `maxAngle` are the lowest and highest angle the shared gear can be at. `std::nullopt` if the two readings do not agree on one angle. Throws `std::invalid_argument` if the travel is longer than `GetUniqueRange()`, or `maxAngle` is below `minAngle`. |
+| `GetUniqueRange() const` | `wpi::units::turn_t` | How far the shared gear can turn before the pair of encoder readings repeats. |
 
 ***
 
-## EasyCRT Class
+## Behavior
 
-### Status Enum
-
-```cpp
-enum class Status {
-    NotAttempted,  // No solve run since construction
-    Ok,            // Solve succeeded
-    NoSolution,    // No candidate within range/tolerance
-    Ambiguous,     // Two tied candidates, result suppressed
-    InvalidConfig  // Inconsistent configuration (e.g., non-coprime teeth)
-};
-```
-
-### Constructor
-
-```cpp
-explicit EasyCRT(EasyCRTConfig cfg)
-```
-
-### Methods
-
-| Method                      | Returns                        | Description                                                               |
-| --------------------------- | ------------------------------ | ------------------------------------------------------------------------- |
-| `GetAngle()`                | `std::optional<wpi::units::turn_t>` | Solves and returns mechanism position. Returns `std::nullopt` on failure. |
-| `GetStatus() const`         | `Status`                       | Status of the most recent solve attempt                                   |
-| `GetLastError() const`      | `double`                       | Combined encoder residual from the most recent solve                      |
-| `GetLastIterations() const` | `int`                          | Number of CRT candidates evaluated in the most recent solve               |
+* **Readings are used as they are.** `EasyCRT` has no offset or inversion settings. Both encoders must be zeroed with the mechanism at zero, and both must read increasing angles when the mechanism moves in its positive direction. Set the offset and inversion on the encoders themselves, or adjust the readings before passing them in.
+* **The result is the angle of the shared gear.** If the mechanism is geared to that gear, convert the result yourself.
+* **Not a textbook Chinese Remainder Theorem solve.** Every angle consistent with encoder A is tried, and the one whose predicted encoder B reading is closest to the real one wins, which stays stable with backlash and sensor noise.
+* **The tolerance comes from the gears.** Neighboring candidates predict encoder B readings `gcd(encoderATeeth, encoderBTeeth) / encoderBTeeth` of a rotation apart. A match is accepted when encoder B is within a quarter of that gap of its prediction.
+* **`std::nullopt` instead of a guess.** `Solve` returns `std::nullopt` when the two readings do not agree on one angle.
+* **No state.** `EasyCRT` holds no suppliers and keeps nothing between calls. There are no status, error or iteration getters, and the `Crt...` helper functions are gone.
 
 ***
 
 ## Example
 
 ```cpp
-yams::units::EasyCRTConfig cfg;
-cfg.enc1 = [this] { return wpi::units::turn_t{encoder1.GetAbsolutePosition()}; };
-cfg.enc2 = [this] { return wpi::units::turn_t{encoder2.GetAbsolutePosition()}; };
-cfg.WithTeeth(19, 21, 1.0)
-   .WithRange(0.0, 10.0)
-   .WithTolerance(0.005);
+#include <optional>
 
-yams::units::EasyCRT crt{cfg};
+#include <yams/units/EasyCRT.hpp>
 
-// In periodic:
-auto pos = crt.GetAngle();
-if (pos.has_value()) {
-    double turns = pos.value().value();
+// 100 tooth turret gear, 19 tooth pinion on encoder A, 21 tooth pinion on encoder B.
+yams::units::EasyCRT crt{100, 19, 21};
+
+wpi::units::turn_t range = crt.GetUniqueRange();  // lcm(19, 21) / 100 = 3.99 turns
+
+// Read once at startup, while the mechanism is not moving.
+std::optional<wpi::units::turn_t> turretAngle =
+    crt.Solve(encoderA.GetAbsolutePosition().GetValue(),
+              encoderB.GetAbsolutePosition().GetValue());
+
+if (turretAngle.has_value()) {
+  double turns = turretAngle.value().value();
 }
+
+// Travel that is not centered on zero: 0 to 1.5 turns.
+auto offCenter = crt.Solve(encoderA.GetAbsolutePosition().GetValue(),
+                           encoderB.GetAbsolutePosition().GetValue(),
+                           wpi::units::turn_t{0.0}, wpi::units::turn_t{1.5});
 ```
 
+{% hint style="warning" %}
+Solve once at startup while the mechanism is still, and handle `std::nullopt`. The two readings are taken one after the other, so any motion between them looks like disagreement. Do not use `EasyCRT` as closed loop feedback.
+{% endhint %}
+
 {% hint style="info" %}
-`enc1Teeth` and `enc2Teeth` must be coprime. Call `CrtIsCoprime(t1, t2)` to verify before constructing. The solve range `[minRot, maxRot]` must be narrower than the CRT period (`LCM(enc1Teeth, enc2Teeth) / commonK`) for the solution to be unambiguous.
+Pick pinion tooth counts with no common factor (19 and 21, 17 and 19, 30 and 31), so the unique range is as long as possible. Sharing a factor throws range away: 20 and 30 teeth only cover 60 teeth of the shared gear, not 600.
 {% endhint %}

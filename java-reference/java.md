@@ -28,7 +28,7 @@ Install exactly one YAMS vendordep: `https://cdn.yassrobotics.com/yams_commands2
 | `yams.core.telemetry.enums` | TelemetryVerbosity |
 | `yams.core.gearing` | GearBox, Sprocket, MechanismGearing |
 | `yams.core.math` | SmartMath, ExponentialProfilePIDController, LQRConfig, LQRController, DerivativeTimeFilter |
-| `yams.core.units` | YUnits, EasyCRT, EasyCRTConfig |
+| `yams.core.units` | YUnits, EasyCRT |
 | `yams.core.exceptions` | Configuration exceptions |
 
 {% hint style="info" %}
