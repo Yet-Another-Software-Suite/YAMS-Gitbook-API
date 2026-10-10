@@ -13,7 +13,7 @@ Use `withClosedLoopController` for the closed-loop PID and `withFeedforward(Simp
 ```java
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withMotorInverted(false)
-    .withIdleMode(MotorMode.COAST)
+    .withZeroPower(MotorMode.COAST)
     .withGearing(new MechanismGearing(GearBox.fromRatio(1.5)))
     .withClosedLoopController(0.0003, 0.0, 0.0)
     .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))
@@ -64,7 +64,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.COAST)
+            .withZeroPower(MotorMode.COAST)
             .withGearing(new MechanismGearing(GearBox.fromRatio(1.5)))
             .withClosedLoopController(0.0003, 0.0, 0.0)
             .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))

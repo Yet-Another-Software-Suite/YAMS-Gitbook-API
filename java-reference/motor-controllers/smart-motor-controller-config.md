@@ -44,7 +44,7 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withMotorInverted(boolean inverted)` | `inverted` | Reverses motor output direction. |
 | `withEncoderInverted(boolean inverted)` | `inverted` | Reverses the reported encoder direction. |
 | `withExternalEncoderInverted(boolean inverted)` | `inverted` | Reverses the external encoder reading direction. |
-| `withIdleMode(MotorMode mode)` | `mode` | Sets coast or brake mode. |
+| `withZeroPower(MotorMode mode)` | `mode` | Sets coast or brake mode. |
 | `withStatorCurrentLimit(Current limit)` | `limit` | Maximum motor output current. |
 | `withOutputCurrentLimit(Current stallCurrent)` | `stallCurrent` | Alias for `withStatorCurrentLimit`. Use when thinking in terms of output current rather than stator current. |
 | `withSupplyCurrentLimit(Current limit)` | `limit` | Maximum current drawn from the battery. |

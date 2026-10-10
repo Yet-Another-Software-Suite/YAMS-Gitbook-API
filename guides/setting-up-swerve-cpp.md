@@ -31,7 +31,7 @@ Each swerve module needs two `SmartMotorController` instances: one for the drive
 // Drive motor config: velocity PID + feedforward
 yams::motorcontrollers::SmartMotorControllerConfig driveConfig;
 driveConfig
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(6.75))
     .WithFeedback(0.1, 0.0, 0.0)
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
@@ -44,7 +44,7 @@ driveConfig
 // Azimuth motor config: position PID, continuous wrapping
 yams::motorcontrollers::SmartMotorControllerConfig azimuthConfig;
 azimuthConfig
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(12.8))
     .WithFeedback(7.0, 0.0, 0.3)
     .WithExternalEncoderDiscontinuityPoint(0.5_tr)

@@ -77,7 +77,7 @@ These methods apply changes immediately without requiring a full `ApplyConfig` c
 
 | Method                            | Signature                                                                     | Description                                                                                            |
 | --------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `SetIdleMode`                     | `void SetIdleMode(MotorMode mode)`                                            | Coast or Brake.                                                                                        |
+| `SetZeroPower`                     | `void SetZeroPower(MotorMode mode)`                                            | Coast or Brake.                                                                                        |
 | `SetMotorInverted`                | `void SetMotorInverted(bool inverted)`                                        | Invert motor output direction.                                                                         |
 | `SetFeedback`                     | `void SetFeedback(double kP, double kI, double kD)`                           | Update PID gains in the active slot.                                                                   |
 | `SetFeedforward`                  | `void SetFeedforward(double kS, double kV, double kA, double kG)`             | Update feedforward gains in the active slot.                                                           |
@@ -232,7 +232,7 @@ cfg.WithSubsystem(this)
    .WithTrapezoidProfile(units::turns_per_second_t{0.5},
                          units::turns_per_second_squared_t{0.25})
    .WithMotorGearing(MechanismGearing{GearBox::FromReductionStages({3.0, 4.0})})
-   .WithIdleMode(Cfg::MotorMode::BRAKE)
+   .WithZeroPower(Cfg::MotorMode::BRAKE)
    .WithStatorCurrentLimit(40.0_A)
    .WithMotorInverted(false)
    .WithFeedforward(frc::ArmFeedforward{0.0_V, 0.0_V,
@@ -280,7 +280,7 @@ cfg.WithSubsystem(this)
    .WithTrapezoidProfile(units::turns_per_second_t{0.5},
                          units::turns_per_second_squared_t{0.25})
    .WithMotorGearing(MechanismGearing{GearBox::FromReductionStages({3.0, 4.0})})
-   .WithIdleMode(Cfg::MotorMode::BRAKE)
+   .WithZeroPower(Cfg::MotorMode::BRAKE)
    .WithStatorCurrentLimit(40.0_A)
    .WithMotorInverted(false)
    .WithVendorConfig(talonSConfig)

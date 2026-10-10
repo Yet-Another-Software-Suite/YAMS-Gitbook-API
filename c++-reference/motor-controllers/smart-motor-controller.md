@@ -78,7 +78,7 @@ virtual frc::DCMotor GetDCMotor() = 0;
 
 | Method                            | Signature                                                                       | Description                       |
 | --------------------------------- | ------------------------------------------------------------------------------- | --------------------------------- |
-| `SetIdleMode`                     | `virtual void SetIdleMode(MotorMode mode) = 0`                                  | Coast or Brake                    |
+| `SetZeroPower`                     | `virtual void SetZeroPower(MotorMode mode) = 0`                                  | Coast or Brake                    |
 | `SetMotorInverted`                | `virtual void SetMotorInverted(bool inverted) = 0`                              | Invert motor direction            |
 | `SetEncoderInverted`              | `virtual void SetEncoderInverted(bool inverted) = 0`                            | Invert encoder direction          |
 | `SetKp`                           | `virtual void SetKp(double kP) = 0`                                             | Proportional PID gain             |

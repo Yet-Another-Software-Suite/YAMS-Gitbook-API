@@ -51,7 +51,7 @@ All methods return `SwerveModuleConfig&` for chaining.
 | `WithLocation` | `units::meter_t distance, units::degree_t angle` | Module position via polar coordinates from the center of rotation. |
 | `WithWheelRadius` | `units::meter_t radius` | Wheel radius; derives the circumference used for linear-distance conversion. |
 | `WithWheelDiameter` | `units::meter_t diameter` | Wheel diameter; derives the circumference used for linear-distance conversion. |
-| `WithMinimumVelocity` | `units::meters_per_second_t speed` | Below this speed, the module holds its current azimuth instead of tracking. |
+| `WithVelocityDeadband` | `units::meters_per_second_t speed` | Below this speed, the module holds its current azimuth instead of tracking. |
 | `WithOptimization` | `bool enable` | Enables/disables `SwerveModuleState` optimization (flip by 180° to minimize rotation). Default `true`. |
 | `WithTelemetry` | `const std::string& name, TelemetryVerbosity verbosity` | Sets the telemetry name and verbosity for this module's own fields (absolute encoder angle, `SwerveModuleState`). |
 | `WithTelemetry` | `const std::string& name, telemetry::SwerveModuleTelemetryConfig telemetryConfig` | Sets the telemetry name plus an explicit `SwerveModuleTelemetryConfig`, taking precedence over `WithTelemetry(name, TelemetryVerbosity)`. |

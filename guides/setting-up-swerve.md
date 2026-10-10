@@ -61,14 +61,14 @@ public class DriveSubsystem extends SubsystemBase {
 
         // --- Front Left ---
         SmartMotorControllerConfig driveConfigFL = new SmartMotorControllerConfig(this)
-            .withIdleMode(MotorMode.BRAKE)
+            .withZeroPower(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromRatio(6.75)))
             .withClosedLoopController(0.1, 0.0, 0.0)
             .withFeedforward(new SimpleMotorFeedforward(0.12, 2.2, 0.3))
             .withStatorCurrentLimit(Amps.of(60));
 
         SmartMotorControllerConfig azimuthConfigFL = new SmartMotorControllerConfig(this)
-            .withIdleMode(MotorMode.Brake)
+            .withZeroPower(MotorMode.Brake)
             .withGearing(new MechanismGearing(GearBox.fromRatio(12.8)))
             .withClosedLoopController(7.0, 0.0, 0.3)
             .withExternalEncoderDiscontinuityPoint(Rotations.of(0.5))

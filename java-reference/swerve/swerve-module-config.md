@@ -39,7 +39,7 @@ All builder methods return `SwerveModuleConfig` for chaining.
 | `withDistanceFromCenterOfRotation(Distance front, Distance left)` | `front`, `left` | Equivalent to `withLocation(Distance, Distance)`. |
 | `withWheelRadius(Distance radius)` | `radius`: wheel radius | Drive wheel radius used for velocity and position conversion. |
 | `withWheelDiameter(Distance diameter)` | `diameter` | Drive wheel diameter used for velocity and position conversion. |
-| `withMinimumVelocity(LinearVelocity speed)` | `speed` | Below this speed, the module holds its current azimuth instead of tracking. |
+| `withVelocityDeadband(LinearVelocity speed)` | `speed` | Below this speed, the module holds its current azimuth instead of tracking. |
 | `withOptimization(boolean swerveModuleStateOptimization)` | `swerveModuleStateOptimization` | Enables/disables `SwerveModuleState.optimize()` (flip by 180° to minimize rotation). |
 | `withTelemetry(String telemetryName, TelemetryVerbosity telemetryVerbosity)` | `telemetryName`, `telemetryVerbosity` | NetworkTables key prefix and verbosity for this module's own fields (absolute encoder angle, `SwerveModuleState`). |
 | `withTelemetry(String telemetryName, SwerveModuleTelemetryConfig telemetryConfig)` | `telemetryName`, `telemetryConfig` | NetworkTables key prefix plus an explicit [`SwerveModuleTelemetryConfig`](../../java-reference/swerve/swerve-module.md), taking precedence over `withTelemetry(String, TelemetryVerbosity)`. |

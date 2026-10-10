@@ -45,7 +45,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     public ShoulderSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.BRAKE)
+            .withZeroPower(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
             .withClosedLoopController(0.5, 0.0, 0.01)
             .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))

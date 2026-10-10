@@ -37,7 +37,7 @@ Use `WithFeedforward(const frc::ArmFeedforward&)` and angular position limits. T
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
     .WithMotorInverted(false)
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
     .WithFeedback(0.5, 0.0, 0.01)
     .WithFeedforward(frc::ArmFeedforward{           // kS, kG, kV, kA
@@ -95,7 +95,7 @@ public:
     ShoulderSubsystem() {
         motorConfig_
             .WithMotorInverted(false)
-            .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+            .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
             .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
             .WithFeedback(0.5, 0.0, 0.01)
             .WithFeedforward(frc::ArmFeedforward{
@@ -170,7 +170,7 @@ Drum circumference converts rotations to linear distance. Set it on `SmartMotorC
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(9.0))
     .WithMechanismCircumference(units::meter_t{2 * std::numbers::pi * 0.025})  // 2π × drum radius
     .WithFeedback(1.2, 0.0, 0.05)
@@ -241,7 +241,7 @@ A `Pivot` is a single-jointed rotational mechanism (similar to `Arm`) without a 
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(60.0))
     .WithFeedback(4.0, 0.0, 0.1)
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{

@@ -22,12 +22,12 @@
 {% step %}
 #### Configure the motor for velocity control
 
-Use `WithFeedback` for velocity PID and `WithFeedforward(const frc::SimpleMotorFeedforward<units::turns>&)` for steady-state tracking. Set the idle mode to `COAST` so the wheel decelerates freely.
+Use `WithFeedback` for velocity PID and `WithFeedforward(const frc::SimpleMotorFeedforward<units::turns>&)` for steady-state tracking. Set the zero power mode to `COAST` so the wheel decelerates freely.
 
 ```cpp
 yams::motorcontrollers::SmartMotorControllerConfig motorConfig;
 motorConfig
-    .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
+    .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
     .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
     .WithFeedback(0.0003, 0.0, 0.0)
     .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{
@@ -90,7 +90,7 @@ public:
 
     ShooterSubsystem() {
         motorConfig_
-            .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
+            .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
             .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
             .WithFeedback(0.0003, 0.0, 0.0)
             .WithFeedforward(frc::SimpleMotorFeedforward<units::turns>{

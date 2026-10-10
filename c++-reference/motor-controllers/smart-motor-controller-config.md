@@ -96,7 +96,7 @@
 
 | Method                                                         | Description                                     |
 | -------------------------------------------------------------- | ----------------------------------------------- |
-| `WithIdleMode(MotorMode mode)`                                 | Coast or Brake                                  |
+| `WithZeroPower(MotorMode mode)`                                 | Coast or Brake                                  |
 | `WithClosedLoopMode()`                                         | Select closed-loop control                      |
 | `WithOpenLoopMode()`                                           | Select open-loop control                        |
 | `WithClosedLoopControlPeriod(units::second_t period)`          | Loop period for software PID                    |
@@ -164,7 +164,7 @@ config.WithMotorInverted(false)
                                           units::unit_t<frc::ArmFeedforward::ka_unit>{0.01}},
                        ClosedLoopControllerSlot::SLOT_0)
       .WithMechanismLimits(-90_deg, 90_deg)
-      .WithIdleMode(MotorMode::BRAKE)
+      .WithZeroPower(MotorMode::BRAKE)
       .WithTelemetry("ArmMotor", TelemetryVerbosity::HIGH);
 ```
 

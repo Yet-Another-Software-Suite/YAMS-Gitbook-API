@@ -16,7 +16,7 @@ The motor config must account for how rotations convert to linear distance. Eith
 ```java
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
     .withMotorInverted(false)
-    .withIdleMode(MotorMode.BRAKE)
+    .withZeroPower(MotorMode.BRAKE)
     .withGearing(new MechanismGearing(GearBox.fromRatio(9.0)))
     .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
     .withCascadingElevatorStages(2)                               // 2-stage cascade
@@ -71,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.BRAKE)
+            .withZeroPower(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromRatio(9.0)))
             .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
             .withCascadingElevatorStages(2)                               // 2-stage cascade

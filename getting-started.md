@@ -28,7 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
         SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
-            .withIdleMode(MotorMode.BRAKE)
+            .withZeroPower(MotorMode.BRAKE)
             .withGearing(Constants.ARM_GEARING)
             .withClosedLoopController(0.5, 0.0, 0.01)
             .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
@@ -75,7 +75,7 @@ public:
     ArmSubsystem() {
         motorConfig
             .WithSubsystem(this)
-            .WithIdleMode(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
+            .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
             .WithMotorGearing(Constants::kArmGearing)
             .WithFeedback(0.5, 0.0, 0.01)
             .WithFeedforward(frc::ArmFeedforward{0.1_V, 0.0_V,

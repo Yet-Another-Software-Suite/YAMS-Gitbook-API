@@ -19,14 +19,14 @@ Add the appropriate vendordep to your project before proceeding.
 {% step %}
 #### Create a `SmartMotorControllerConfig` and chain builder methods
 
-`SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and idle mode.
+`SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and zero power mode.
 
 **Java: SPARK MAX with arm control**
 
 ```java
 SmartMotorControllerConfig config = new SmartMotorControllerConfig()
     .withMotorInverted(false)
-    .withIdleMode(MotorMode.Brake)
+    .withZeroPower(MotorMode.Brake)
     .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
     .withClosedLoopController(0.5, 0.0, 0.01)
     .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
@@ -41,7 +41,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig()
 ```cpp
 motorcontrollers::SmartMotorControllerConfig config;
 config.WithMotorInverted(false)
-      .WithIdleMode(MotorMode::BRAKE)
+      .WithZeroPower(MotorMode::BRAKE)
       .WithMotorGearing(gearing::MechanismGearing{
           gearing::GearBox::FromTeeth({14, 72})})
       .WithFeedback(0.5, 0.0, 0.01)
