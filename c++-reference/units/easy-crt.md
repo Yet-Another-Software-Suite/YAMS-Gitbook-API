@@ -85,6 +85,32 @@ auto offCenter = crt.Solve(encoderA.GetAbsolutePosition().GetValue(),
                            wpi::units::turn_t{0.0}, wpi::units::turn_t{1.5});
 ```
 
+### Setting a relative encoder with `MechanismGearing`
+
+To set the motor's own relative encoder yourself, convert the turret angle to the angle of the motor's rotor with the `MechanismGearing` between the motor and the turret. `GetMechanismToRotorRatio()` is the reduction, so multiply the solved angle by it. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
+
+```cpp
+#include <yams/gearing/GearBox.hpp>
+#include <yams/gearing/MechanismGearing.hpp>
+#include <yams/units/EasyCRT.hpp>
+
+// Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
+// 20 tooth pinion, which is driven through a 10:1 gearbox.
+yams::gearing::MechanismGearing turretGearing{
+    yams::gearing::GearBox::FromReductionStages({10.0, 200.0 / 20.0})};
+yams::units::EasyCRT crt{200, 19, 21};
+
+if (auto turretAngle = crt.Solve(encoderA, encoderB)) {
+  // The turret gear is the shared gear, so the solved angle is already the turret angle.
+  // Turret angle times the reduction is the angle of the motor's rotor.
+  wpi::units::turn_t rotorAngle = *turretAngle * turretGearing.GetMechanismToRotorRatio();
+
+  talonFX.SetPosition(rotorAngle);
+}
+```
+
+Use the same `MechanismGearing` you pass to `SmartMotorControllerConfig::WithMotorGearing(...)`, so the seeded position and the closed loop agree. If the pinions mesh with a gear that is not the mechanism, convert the solved angle to the mechanism angle first (divide by the ratio between them), then multiply.
+
 {% hint style="warning" %}
 Solve once at startup while the mechanism is still, and handle `std::nullopt`. The two readings are taken one after the other, so any motion between them looks like disagreement. Do not use `EasyCRT` as closed loop feedback.
 {% endhint %}

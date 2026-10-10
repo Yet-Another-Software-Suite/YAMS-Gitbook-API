@@ -70,9 +70,31 @@ Optional<Angle> turretAngle = crt.solve(encoderA.get(), encoderB.get());
 // Travel that is not centered on zero.
 Optional<Angle> offCenter = crt.solve(encoderA.get(), encoderB.get(), Degrees.of(0), Degrees.of(540));
 
-// Seed a SmartMotorController with the result.
+// Seed a SmartMotorController with the result. It takes the mechanism angle.
 turretAngle.ifPresent(motor::setEncoderPosition);
 ```
+
+### Setting a relative encoder with `MechanismGearing`
+
+To set the motor's own relative encoder yourself, convert the turret angle to the angle of the motor's rotor with the `MechanismGearing` between the motor and the turret. `getMechanismToRotorRatio()` is the reduction, so multiply the solved angle by it with `.times(...)`. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
+
+```java
+// Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
+// 20 tooth pinion, which is driven through a 10:1 gearbox.
+MechanismGearing turretGearing = new MechanismGearing(GearBox.fromReductionStages(10, 200.0 / 20));
+EasyCRT crt = new EasyCRT(200, 19, 21);
+
+crt.solve(encoderA.get(), encoderB.get()).ifPresent(turretAngle -> {
+  // The turret gear is the shared gear, so the solved angle is already the turret angle.
+  // Turret angle times the reduction is the angle of the motor's rotor.
+  Angle rotorAngle = turretAngle.times(turretGearing.getMechanismToRotorRatio());
+
+  sparkMax.getEncoder().setPosition(rotorAngle.in(Rotations)); // REV
+  // talonFX.setPosition(rotorAngle);                           // CTRE
+});
+```
+
+Use the same `MechanismGearing` you pass to `SmartMotorControllerConfig.withGearing(...)`, so the seeded position and the closed loop agree. If the pinions mesh with a gear that is not the mechanism, convert the solved angle to the mechanism angle first (divide by the ratio between them), then multiply.
 
 {% hint style="warning" %}
 Solve once at startup while the mechanism is still, and handle an empty result. The two readings are taken one after the other, so any motion between them looks like disagreement. Do not use `EasyCRT` as closed loop feedback.
