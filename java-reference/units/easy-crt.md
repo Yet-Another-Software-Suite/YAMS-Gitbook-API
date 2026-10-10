@@ -75,7 +75,7 @@ turretAngle.ifPresent(motor::setEncoderPosition);
 ```
 
 {% hint style="info" %}
-The pinions can mesh with the turret gear, the motor drive gear, or their own common gear. See [Gear layouts](https://yams.yassrobotics.com/documentation/understanding/easycrt#gear-layouts) in the EasyCRT guide for a drawing and an example of each.
+The pinions can mesh with the turret gear, the motor drive gear, their own common gear, or a second gear on the drive shaft. See [Gear layouts](https://yams.yassrobotics.com/documentation/understanding/easycrt#gear-layouts) in the EasyCRT guide for a drawing and an example of each.
 {% endhint %}
 
 ### Seeding a `SmartMotorController` with `MechanismGearing`
