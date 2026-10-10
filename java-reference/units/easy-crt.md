@@ -74,9 +74,9 @@ Optional<Angle> offCenter = crt.solve(encoderA.get(), encoderB.get(), Degrees.of
 turretAngle.ifPresent(motor::setEncoderPosition);
 ```
 
-### Setting a relative encoder with `MechanismGearing`
+### Seeding a `SmartMotorController` with `MechanismGearing`
 
-To set the motor's own relative encoder yourself, convert the turret angle to the angle of the motor's rotor with the `MechanismGearing` between the motor and the turret. `getMechanismToRotorRatio()` is the reduction, so multiply the solved angle by it with `.times(...)`. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
+The motor's relative encoder counts rotor rotations, which is the turret angle multiplied by the reduction between the motor and the turret. Put that reduction in a `MechanismGearing`, give it to the `SmartMotorController` config, and `setEncoderPosition(...)` does the multiplication for you. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
 
 ```java
 // Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
@@ -84,17 +84,24 @@ To set the motor's own relative encoder yourself, convert the turret angle to th
 MechanismGearing turretGearing = new MechanismGearing(GearBox.fromReductionStages(10, 200.0 / 20));
 EasyCRT crt = new EasyCRT(200, 19, 21);
 
+SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    .withGearing(turretGearing)
+    .withControlMode(ControlMode.CLOSED_LOOP)
+    .withClosedLoopController(20, 0, 0);
+SmartMotorController motor = new SparkWrapper(sparkMax, DCMotor.getNEO(1), motorConfig);
+
 crt.solve(encoderA.get(), encoderB.get()).ifPresent(turretAngle -> {
   // The turret gear is the shared gear, so the solved angle is already the turret angle.
-  // Turret angle times the reduction is the angle of the motor's rotor.
-  Angle rotorAngle = turretAngle.times(turretGearing.getMechanismToRotorRatio());
+  // setEncoderPosition takes the mechanism angle and sets the motor's relative encoder to
+  // turretAngle.times(turretGearing.getMechanismToRotorRatio()) for you.
+  motor.setEncoderPosition(turretAngle);
 
-  sparkMax.getEncoder().setPosition(rotorAngle.in(Rotations)); // REV
-  // talonFX.setPosition(rotorAngle);                           // CTRE
+  // The same conversion, if you want the rotor angle yourself (for logging or a sanity check):
+  Angle rotorAngle = turretAngle.times(turretGearing.getMechanismToRotorRatio());
 });
 ```
 
-Use the same `MechanismGearing` you pass to `SmartMotorControllerConfig.withGearing(...)`, so the seeded position and the closed loop agree. If the pinions mesh with a gear that is not the mechanism, convert the solved angle to the mechanism angle first (divide by the ratio between them), then multiply.
+Pass `setEncoderPosition(...)` the mechanism angle, not the rotor angle: it applies the `MechanismGearing` from the config, so multiplying first would apply the gearing twice. `turretAngle.times(turretGearing.getMechanismToRotorRatio())` is the rotor angle it ends up setting. If the pinions mesh with a gear that is not the mechanism, convert the solved angle to the mechanism angle first (divide by the ratio between them).
 
 {% hint style="warning" %}
 Solve once at startup while the mechanism is still, and handle an empty result. The two readings are taken one after the other, so any motion between them looks like disagreement. Do not use `EasyCRT` as closed loop feedback.
