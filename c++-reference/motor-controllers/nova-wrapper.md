@@ -52,7 +52,7 @@ In closed-loop mode the wrapper starts the closed-loop notifier and raises an al
 | Option                                                         | Behavior                                                                                                      |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `WithOpenLoopRampRate` together with `WithClosedLoopRampRate`  | The Nova has one ramp rate. Different open and closed loop values throw `SmartMotorControllerConfigurationException`. |
-| `WithEncoderInverted(true)` / `SetEncoderInverted`             | The Nova's internal encoder cannot be inverted. Throws.                                                       |
+| `WithEncoderInverted(true)` / `SetEncoderInverted`             | The Nova's internal encoder cannot be inverted. `WithEncoderInverted` throws a `std::invalid_argument` when the config is applied, and `SetEncoderInverted` throws a `std::runtime_error`.                                                       |
 | `WithVendorControlRequest`                                     | Not supported on the Nova. Throws `SmartMotorControllerConfigurationException`.                               |
 | `SetEncoderVelocity` (on a real robot)                         | Throws `std::runtime_error`; the Nova cannot have its encoder velocity set.                                   |
 | Closed loop tolerance with an LQR                              | Throws `std::invalid_argument`.                                                                               |
@@ -71,7 +71,7 @@ Pass one of the following to `WithExternalEncoder(...)`:
 
 Any other value throws `std::invalid_argument`.
 
-The external encoder discontinuity point (absolute and CAN encoders) accepts 0.5 rotations, which reports `[-0.5, 0.5)`, or 1 rotation (the default), which reports `[0, 1)`. Zero offset and discontinuity point are only available for absolute encoders and throw for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
+The external encoder discontinuity point (absolute and CAN encoders) accepts 0.5 rotations, which reports `[-0.5, 0.5)`, or 1 rotation (the default), which reports `[0, 1)`. Zero offset and discontinuity point are only available for absolute encoders and throw a `SmartMotorControllerConfigurationException` for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
 
 `WithExternalEncoderZeroOffset`, `WithExternalEncoderDiscontinuityPoint`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
 

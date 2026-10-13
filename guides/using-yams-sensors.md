@@ -290,7 +290,7 @@ YAMS Sensors do not depend on any `SmartMotorController`; they work as standalon
 {% endhint %}
 
 {% hint style="warning" %}
-The typed `getAs*` / `GetAs*` methods throw if the field type does not match. Register boolean hardware with a `BooleanSupplier` / `std::function<bool()>`, and always read it with `getAsBoolean` / `GetAsBoolean`.
+The typed `getAs*` / `GetAs*` methods throw if the field type does not match: an `IllegalStateException` in Java and a `std::logic_error` in C++. Register boolean hardware with a `BooleanSupplier` / `std::function<bool()>`, and always read it with `getAsBoolean` / `GetAsBoolean`.
 {% endhint %}
 
 ***

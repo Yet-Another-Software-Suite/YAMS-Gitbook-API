@@ -20,7 +20,7 @@ ArmConfig() = default;
 
 All methods return `ArmConfig&` for chaining.
 
-> **Required for simulation:** `WithArmLength()`, `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Arm` constructor throws in simulation. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`, or an external encoder zero offset) and an MOI (`WithMOI`). In 2027 MOI and starting position live on `SmartMotorControllerConfig`, not `ArmConfig`.
+> **Required for simulation:** `WithArmLength()`, `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Arm` constructor throws an `ArmConfigurationException` in simulation. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`, or an external encoder zero offset) and an MOI (`WithMOI`). In 2027 MOI and starting position live on `SmartMotorControllerConfig`, not `ArmConfig`.
 
 | Method                                       | Required                    | Description                                                                                       |
 | -------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------- |

@@ -36,10 +36,10 @@ The `SimSensorConfig` overload is the preferred way to create sensors; see [SimS
 | Method                                  | Returns               | Description                                                                             |
 | --------------------------------------- | --------------------- | --------------------------------------------------------------------------------------- |
 | `GetField(const std::string& name)`     | `SensorData&` (or `const SensorData&` on a const `Sensor`) | Returns the named field. Throws `std::out_of_range` if not found. |
-| `GetAsDouble(const std::string& name)`  | `double`              | Typed accessor. Throws if not a double field.                                           |
-| `GetAsInt(const std::string& name)`     | `int`                 | Typed accessor. Throws if not an int field.                                             |
-| `GetAsBoolean(const std::string& name)` | `bool`                | Typed accessor. Throws if not a bool field.                                             |
-| `GetAsLong(const std::string& name)`    | `int64_t`             | Typed accessor. Throws if not a long field.                                             |
+| `GetAsDouble(const std::string& name)`  | `double`              | Typed accessor. Throws a `std::logic_error` if not a double field.                                           |
+| `GetAsInt(const std::string& name)`     | `int`                 | Typed accessor. Throws a `std::logic_error` if not an int field.                                             |
+| `GetAsBoolean(const std::string& name)` | `bool`                | Typed accessor. Throws a `std::logic_error` if not a bool field.                                             |
+| `GetAsLong(const std::string& name)`    | `int64_t`             | Typed accessor. Throws a `std::logic_error` if not a long field.                                             |
 | `GetDevice()`                           | `HAL_SimDeviceHandle` | The underlying WPILib SimDevice handle. Invalid (`HAL_kInvalidHandle`) on a real robot. |
 
 ## Simulation methods
@@ -67,7 +67,7 @@ SensorData(std::string name, std::function<HAL_Value()> supplier, HAL_Value defa
 
 | Method           | Returns        | Notes                                   |
 | ---------------- | -------------- | --------------------------------------- |
-| `GetAsDouble()`  | `double`       | Throws on type mismatch.                |
+| `GetAsDouble()`  | `double`       | Throws a `std::logic_error` on type mismatch. |
 | `GetAsInt()`     | `int`          |                                         |
 | `GetAsBoolean()` | `bool`         |                                         |
 | `GetAsLong()`    | `int64_t`      |                                         |
@@ -144,7 +144,7 @@ sensor.AddSimTrigger(
 {% endhint %}
 
 {% hint style="warning" %}
-The typed `GetAs*` accessors throw if the field was registered with a different type. Register a `bool` field with a `std::function<bool()>` supplier and read it with `GetAsBoolean`.
+The typed `GetAs*` accessors throw a `std::logic_error` if the field was registered with a different type. Register a `bool` field with a `std::function<bool()>` supplier and read it with `GetAsBoolean`.
 {% endhint %}
 
 ## Related pages

@@ -30,7 +30,7 @@ All methods return `ElevatorConfig&` for chaining.
 | `WithSimColor(const wpi::util::Color8Bit& color)`  | Color of the simulated elevator (default: orange)                              |
 | `WithAngle(wpi::units::degree_t angle)`           | Angle of the elevator ligament in Mechanism2d (default: `90_deg`, vertical)    |
 
-> **Note:** Drum or sprocket size is configured on `SmartMotorControllerConfig` via `.WithMechanismCircumference(circumference)` or `.WithMechanismCircumference(gearPitch, teeth)`, and the starting height via `.WithStartingPosition(wpi::units::meter_t)`. In simulation the `Elevator` constructor throws if the carriage mass, minimum height, maximum height, starting position or mechanism circumference is missing. Cascading elevator stages are configured via `SmartMotorControllerConfig::WithCascadingElevatorStages(int stages)`.
+> **Note:** Drum or sprocket size is configured on `SmartMotorControllerConfig` via `.WithMechanismCircumference(circumference)` or `.WithMechanismCircumference(gearPitch, teeth)`, and the starting height via `.WithStartingPosition(wpi::units::meter_t)`. In simulation the `Elevator` constructor throws an `ElevatorConfigurationException` if the carriage mass, minimum height, maximum height, starting position or mechanism circumference is missing. Cascading elevator stages are configured via `SmartMotorControllerConfig::WithCascadingElevatorStages(int stages)`.
 
 ***
 

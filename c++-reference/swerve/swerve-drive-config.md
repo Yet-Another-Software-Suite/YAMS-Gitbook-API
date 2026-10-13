@@ -59,7 +59,7 @@ All methods return `SwerveDriveConfig&` for chaining.
 {% endhint %}
 
 {% hint style="info" %}
-`WithGyro` is required. Omitting it causes `GetGyroAngle()` to throw and prevents field-relative control and odometry from functioning correctly.
+`WithGyro` is required. Omitting it causes `GetGyroAngle()` to throw a `std::runtime_error` and prevents field-relative control and odometry from functioning correctly.
 
 Both `WithTelemetry` overloads require a name; there is no name-less `WithTelemetry(...)` or standalone `WithTelemetryName(...)` on `SwerveDriveConfig` (unlike, say, `SmartMotorControllerConfig`). `SwerveDriveConfig` also has no `WithDataLogName(...)`/`GetDataLogName()` of its own: DataLog output is configured on a `SwerveDriveTelemetryConfig` instead. See below.
 {% endhint %}
@@ -105,7 +105,7 @@ driveConfig.WithSubsystem(this)
 | `GetTelemetryName` | `const std::string& GetTelemetryName() const` | Telemetry name prefix for the drive (defaults to `"swerve"`). |
 | `GetSwerveDriveTelemetryConfig` | `std::optional<telemetry::SwerveDriveTelemetryConfig> GetSwerveDriveTelemetryConfig()` | The explicit config passed to `WithTelemetry(name, SwerveDriveTelemetryConfig)`, if any. Moves it out; intended to be called exactly once, by `SwerveDrive` itself. |
 | `GetGyroOffset` | `wpi::units::degree_t GetGyroOffset() const` | Stored gyro offset (zero if never set). |
-| `GetGyroAngle` | `wpi::units::degree_t GetGyroAngle() const` | Gyro angle with inversion and offset applied. Throws if no gyro supplier was configured. |
+| `GetGyroAngle` | `wpi::units::degree_t GetGyroAngle() const` | Gyro angle with inversion and offset applied. Throws a `std::runtime_error` if no gyro supplier was configured. |
 | `GetTranslationPID` | `std::optional<std::reference_wrapper<wpi::math::PIDController>> GetTranslationPID()` | Active translation controller (sim variant if simulating and configured), or `std::nullopt` if none was configured. |
 | `GetRotationPID` | `std::optional<std::reference_wrapper<wpi::math::PIDController>> GetRotationPID()` | Active rotation controller (sim variant if simulating and configured), or `std::nullopt` if none was configured. |
 | `OptimizeRobotRelativeChassisSpeeds` | `wpi::math::ChassisVelocities OptimizeRobotRelativeChassisSpeeds(wpi::math::ChassisVelocities speeds) const` | Applies angular-velocity skew correction (when a scale factor and `WithGyroVelocity` are both set) and discretization (when `WithDiscretizationTime` is set). `SwerveDrive` calls this before converting speeds into module states. |

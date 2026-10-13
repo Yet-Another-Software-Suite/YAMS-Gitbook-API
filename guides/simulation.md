@@ -139,7 +139,7 @@ The three sim suppliers YAMS provides internally are `ArmSimSupplier`, `Elevator
 {% endhint %}
 
 {% hint style="warning" %}
-In simulation, the `Arm` constructor throws an `ArmConfigurationException` if the arm length, hard limits, or starting position are missing, and the `Elevator` constructor throws if the carriage weight, hard limits, or starting position are missing. The starting position must also lie inside the hard limits.
+In simulation, the `Arm` constructor throws an `ArmConfigurationException` if the arm length, hard limits, or starting position are missing, and the `Elevator` constructor throws an `ElevatorConfigurationException` if the carriage weight or hard limits are missing, or, in Java, a `SmartMotorControllerConfigurationException` if the starting position is (C++ throws an `ElevatorConfigurationException` for that too). The starting position must also lie inside the hard limits.
 {% endhint %}
 
 ***

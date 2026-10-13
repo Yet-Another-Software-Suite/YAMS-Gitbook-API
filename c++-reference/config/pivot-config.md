@@ -20,7 +20,7 @@ PivotConfig() = default;
 
 All methods return `PivotConfig&` for chaining.
 
-> **Required for simulation:** `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Pivot` constructor throws in simulation. A pivot does not use arm length in its physics model. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`) and an MOI (`WithMOI`); in 2027 both live on `SmartMotorControllerConfig`.
+> **Required for simulation:** `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Pivot` constructor throws a `PivotConfigurationException` in simulation. A pivot does not use arm length in its physics model. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`) and an MOI (`WithMOI`); in 2027 both live on `SmartMotorControllerConfig`.
 
 | Method                                       | Required | Description                                                          |
 | -------------------------------------------- | -------- | -------------------------------------------------------------------- |

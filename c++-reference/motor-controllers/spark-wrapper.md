@@ -62,7 +62,7 @@ The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the
 
 | Option                                              | Behavior                                                                                         |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `WithSupplyCurrentLimit` / `SetSupplyCurrentLimit`  | SPARKs have no supply current limit. `ApplyConfig` throws for `WithSupplyCurrentLimit` (use `WithStatorCurrentLimit`); `SetSupplyCurrentLimit` does nothing. |
+| `WithSupplyCurrentLimit` / `SetSupplyCurrentLimit`  | SPARKs have no supply current limit. `ApplyConfig` throws a `SmartMotorControllerConfigurationException` for `WithSupplyCurrentLimit` (use `WithStatorCurrentLimit`); `SetSupplyCurrentLimit` does nothing. |
 | `GetSupplyCurrent()`                                | Always returns `std::nullopt`. The supply current telemetry fields are not published.            |
 | `WithEncoderInverted(true)`                         | The SPARK's relative encoder cannot be inverted. Throws `std::invalid_argument`.                 |
 | `WithVendorControlRequest`                          | Not supported on SPARKs. Throws `SmartMotorControllerConfigurationException`.                    |
@@ -77,7 +77,7 @@ Pass a pointer to the encoder with `WithExternalEncoder(...)`:
 | Encoder type                                                                   | Notes                                                                    |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
 | `rev::spark::SparkAbsoluteEncoder*`                                            | Absolute encoder on the SPARK data port. Supports zero offset and discontinuity point. |
-| `rev::spark::SparkMaxAlternateEncoder*` / `rev::spark::SparkFlexExternalEncoder*` | Quadrature encoder. Zero offset and discontinuity point are not available and throw. |
+| `rev::spark::SparkMaxAlternateEncoder*` / `rev::spark::SparkFlexExternalEncoder*` | Quadrature encoder. Zero offset and discontinuity point are not available and throw a `SmartMotorControllerConfigurationException`. |
 | `rev::detached::DetachedEncoder*` / `rev::detached::SplineEncoder*`            | Encoder read over CAN.                                                   |
 
 The external encoder discontinuity point (absolute and detached encoders) accepts 0.5 rotations, which reports `[-0.5, 0.5)`, or 1 rotation (the default), which reports `[0, 1)`.

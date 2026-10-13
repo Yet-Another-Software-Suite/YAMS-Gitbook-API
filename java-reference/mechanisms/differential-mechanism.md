@@ -45,7 +45,7 @@ These come from `yams.core.mechanisms.positional.DifferentialMechanism` and work
 | `getRightMotorController()` | `SmartMotorController` | Right motor controller |
 | `getDifferentialMechanismConfig()` | `DifferentialMechanismConfig` | The config used to build this mechanism |
 
-`isAtMax()` and `isAtMin()` are not supported and always throw.
+`isAtMax()` and `isAtMin()` are not supported and always throw a `RuntimeException`.
 
 ---
 

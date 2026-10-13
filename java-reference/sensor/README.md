@@ -38,9 +38,9 @@ The `SensorConfig` overload is the preferred way to create sensors; see [SensorC
 | --------------------------- | --------------------- | ---------------------------------------------------------------------------------------- |
 | `getField(String name)`     | `SensorData`          | Returns the named field. Throws `IllegalArgumentException` if the name does not exist.   |
 | `getAsDouble(String name)`  | `double`              | Typed convenience accessor. Throws `IllegalStateException` if the field is not a double. |
-| `getAsInt(String name)`     | `int`                 | Typed convenience accessor. Throws if not an int field.                                  |
-| `getAsBoolean(String name)` | `boolean`             | Typed convenience accessor. Throws if not a boolean field.                               |
-| `getAsLong(String name)`    | `long`                | Typed convenience accessor. Throws if not a long field.                                  |
+| `getAsInt(String name)`     | `int`                 | Typed convenience accessor. Throws an `IllegalStateException` if not an int field.                                  |
+| `getAsBoolean(String name)` | `boolean`             | Typed convenience accessor. Throws an `IllegalStateException` if not a boolean field.                               |
+| `getAsLong(String name)`    | `long`                | Typed convenience accessor. Throws an `IllegalStateException` if not a long field.                                  |
 | `getDevice()`               | `Optional<SimDevice>` | The underlying WPILib `SimDevice`. Empty on a real robot.                                |
 
 ## Simulation methods

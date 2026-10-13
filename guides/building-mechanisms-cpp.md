@@ -342,7 +342,7 @@ void SimulationPeriodic() override { pivot_->SimIterate(); }
 {% endhint %}
 
 {% hint style="warning" %}
-When running in simulation, the mechanism constructors throw a configuration exception if a value the physics model needs is missing: hard limits, starting position, and MOI for `Arm` and `Pivot` (plus arm length for `Arm`); carriage mass, height limits, starting position, and mechanism circumference for `Elevator`.
+When running in simulation, the mechanism constructors throw their own configuration exception (`ArmConfigurationException`, `PivotConfigurationException` or `ElevatorConfigurationException`) if a value the physics model needs is missing: hard limits, starting position, and MOI for `Arm` and `Pivot` (plus arm length for `Arm`); carriage mass, height limits, starting position, and mechanism circumference for `Elevator`.
 {% endhint %}
 
 ***

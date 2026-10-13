@@ -58,7 +58,7 @@ These come from `yams.core.mechanisms.positional.DoubleJointedArm` and work outs
 | `getLowerArmConfig()` | `ArmConfig` | Lower (shoulder) `ArmConfig` |
 | `getUpperArmConfig()` | `ArmConfig` | Upper (elbow) `ArmConfig` |
 
-`isAtMax()` and `isAtMin()` are not supported and always throw.
+`isAtMax()` and `isAtMin()` are not supported and always throw a `RuntimeException`.
 
 ---
 

@@ -29,7 +29,7 @@ FlyWheelConfig clone()  // Deep copy
 |--------|-----------|-------------|
 | `withDiameter(Distance diameter)` | `diameter`: wheel/roller outer diameter | Wheel size used for angular-to-linear velocity conversion (`getLinearVelocity`, `getAngularVelocity`) and the visualization. |
 | `withSpeedometerSimulation(AngularVelocity maxVelocity)` | `maxVelocity`: maximum simulated velocity | Enables a simulated speedometer gauge capped at `maxVelocity`. |
-| `withSpeedometerSimulation()` | _(none)_ | Enables the speedometer with the previously configured max velocity. Throws if max velocity was not set first. |
+| `withSpeedometerSimulation()` | _(none)_ | Enables the speedometer with the previously configured max velocity. Throws a `FlyWheelConfigurationException` if max velocity was not set first. |
 | `disableSpeedometerSimulation()` | _(none)_ | Disables the speedometer simulation. |
 | `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
 | `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |

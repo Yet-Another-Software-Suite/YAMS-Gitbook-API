@@ -189,7 +189,7 @@ Live tuning is registered automatically at `TelemetryVerbosity::HIGH` when a sub
 
 | Method                                                                      | Description                                                  |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `WithSubsystem(wpi::cmd::SubsystemBase* subsystem)`                         | Associate with a Commands v2 subsystem (throws if already set) |
+| `WithSubsystem(wpi::cmd::SubsystemBase* subsystem)`                         | Associate with a Commands v2 subsystem (throws a `SmartMotorControllerConfigurationException` if already set) |
 | `WithFollowers(std::vector<std::pair<std::any, bool>> followers)`           | Tightly coupled vendor followers: (hardware pointer, oppose master) pairs |
 | `WithLooselyCoupledFollowers(std::vector<SmartMotorController*> followers)` | YAMS-managed followers that mirror setpoints                 |
 | `WithVendorConfig(std::any cfg)`                                            | Vendor config applied first; YAMS options override it        |

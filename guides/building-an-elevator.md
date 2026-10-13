@@ -51,7 +51,7 @@ ElevatorConfig elevatorConfig = new ElevatorConfig()
 ```
 
 {% hint style="info" %}
-Carriage weight, hard limits, and a starting position (`SmartMotorControllerConfig.withStartingPosition(Distance)`) are required for simulation. Without them, the `Elevator` constructor throws a configuration exception when running in simulation. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
+Carriage weight, hard limits, and a starting position (`SmartMotorControllerConfig.withStartingPosition(Distance)`) are required for simulation. Without them, the `Elevator` constructor throws when running in simulation: an `ElevatorConfigurationException` for the carriage weight or hard limits, and a `SmartMotorControllerConfigurationException` for the starting position. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
 {% endhint %}
 {% endstep %}
 
