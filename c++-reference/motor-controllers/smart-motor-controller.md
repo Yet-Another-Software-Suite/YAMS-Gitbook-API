@@ -166,7 +166,7 @@ SimSupplier* GetSimSupplier() const;
 
 ### Closed-Loop Controller Thread
 
-Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an LQR, an exponential profile on a SPARK, or any closed loop on a Thrifty Nova).
+Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), an exponential profile on a SPARK, or any closed loop on a Thrifty Nova).
 
 ```cpp
 void StartClosedLoopController();

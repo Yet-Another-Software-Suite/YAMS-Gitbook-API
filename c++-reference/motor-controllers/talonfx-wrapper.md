@@ -326,7 +326,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 **Phoenix 6 required.** YAMS only supports Phoenix 6 for TalonFX and TalonFXS. Phoenix 5 is not supported.
 
-**Motion Magic.** When a trapezoidal or exponential profile is configured via `WithTrapezoidProfile` or `WithExponentialProfile`, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate FOC variant). Phoenix 6 has no LQR, so when an LQR is configured the closed loop runs on the SystemCore instead and an alert reports it.
+**Motion Magic.** When a trapezoidal or exponential profile is configured via `WithTrapezoidProfile` or `WithExponentialProfile`, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate FOC variant). Phoenix 6 has no [LQR](../math/lqr-controller.md), so when an LQR is configured the closed loop runs on the SystemCore instead and an alert reports it.
 
 **FOC support.** Both wrappers support Field-Oriented Control for Kraken X60 and other FOC-capable motors. Call `EnableFOC()` / `DisableFOC()` on the wrapper to toggle FOC for the position and velocity control requests. Unlicensed devices ignore it (CTRE requires a Phoenix Pro license for FOC).
 
@@ -338,7 +338,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 **Telemetry and live tuning.** Both wrappers support every telemetry field. `TelemetryVerbosity::HIGH` together with `WithSubsystem(this)` registers the `Live Tuning` command automatically; see [SmartMotorController](smart-motor-controller.md#telemetry-and-live-tuning).
 
-**Alerts.** Both wrappers raise alerts in the `YAMS` group: `closed loop controller is running on the SystemCore` (LQR configured), `starting position is not applied because an external encoder is used`, `zero offset is not supported without an external encoder`, and `discontinuity point is not supported without an external encoder`.
+**Alerts.** Both wrappers raise alerts in the `YAMS` group: `closed loop controller is running on the SystemCore` ([LQR](../math/lqr-controller.md) configured), `starting position is not applied because an external encoder is used`, `zero offset is not supported without an external encoder`, and `discontinuity point is not supported without an external encoder`.
 
 **No rotor offset.** `WithExternalEncoderZeroOffset` applies to the external encoder only. The TalonFX rotor is not offset; without an external encoder a zero offset raises the alert above.
 

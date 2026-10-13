@@ -45,9 +45,9 @@ The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | PID, with or without a feedforward     | On the SPARK.                                                                                                              |
 | Trapezoidal profile                    | On the SPARK, using MAXMotion position or velocity control.                                                                |
-| Exponential profile or LQR             | On the SystemCore. YAMS runs the loop in a notifier and sends voltages to the SPARK. An alert reports this (see [Alerts](#alerts)). |
+| Exponential profile or [LQR](../math/lqr-controller.md)             | On the SystemCore. YAMS runs the loop in a notifier and sends voltages to the SPARK. An alert reports this (see [Alerts](#alerts)). |
 
-`WithClosedLoopControlPeriod`, `WithClosedLoopMaxVoltage` and `WithFeedbackSynchronizationThreshold` are only valid when the loop runs on the SystemCore (exponential profile or LQR); otherwise `ApplyConfig` throws `SmartMotorControllerConfigurationException`.
+`WithClosedLoopControlPeriod`, `WithClosedLoopMaxVoltage` and `WithFeedbackSynchronizationThreshold` are only valid when the loop runs on the SystemCore (exponential profile or [LQR](../math/lqr-controller.md)); otherwise `ApplyConfig` throws `SmartMotorControllerConfigurationException`.
 
 ### Encoder Reads
 
@@ -104,7 +104,7 @@ Alerts are published in the `YAMS` alert group and cleared when the wrapper is d
 
 | Alert                                                                                                   | When                                                                                 |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `<name> closed loop controller is running on the SystemCore.`                                           | An exponential profile or LQR is configured, so the loop runs on the SystemCore.     |
+| `<name> closed loop controller is running on the SystemCore.`                                           | An exponential profile or [LQR](../math/lqr-controller.md) is configured, so the loop runs on the SystemCore.     |
 | `<name> external encoder gearing set while ExternalEncoderDiscontinuityPoint is also set; ...`          | External encoder gearing and a discontinuity point are both configured. The discontinuity point is not moved by the gearing, so wrapping is non-uniform. |
 
 ***

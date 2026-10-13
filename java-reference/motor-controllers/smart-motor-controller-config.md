@@ -121,7 +121,7 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | N/A | Same as above for a specific slot. |
 | `withClosedLoopController(PIDController controller)` | `controller` | Attaches an existing `PIDController` to SLOT_0. |
 | `withClosedLoopController(PIDController controller, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
-| `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an LQR controller. Clears all PID slots. |
+| `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an [LQR controller](../math/lqr-controller.md). Clears all PID slots. |
 | `withClosedLoopControlPeriod(Time time)` | `time` | Period of the software closed-loop thread. Default: 20 ms. |
 | `withClosedLoopControlPeriod(Frequency freq)` | `freq` | Sets the period from a frequency. |
 | `withClosedLoopControllerMaximumVoltage(Voltage volts)` | `volts` | Clamps the closed-loop voltage output to ±`volts`. |
@@ -159,7 +159,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withSimClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withSimClosedLoopController(PIDController controller)` | `controller` | `PIDController` used only in simulation. |
 | `withSimClosedLoopController(PIDController controller, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
-| `withSimClosedLoopController(LQRController controller)` | `controller` | LQR controller used only in simulation. |
+| `withSimClosedLoopController(LQRController controller)` | `controller` | [LQR controller](../math/lqr-controller.md) used only in simulation. |
 | `withSimFeedforward(ArmFeedforward ff)` | `ff` | Arm feedforward used only in simulation. |
 | `withSimFeedforward(ElevatorFeedforward ff)` | `ff` | Elevator feedforward used only in simulation. |
 | `withSimFeedforward(SimpleMotorFeedforward ff)` | `ff` | Simple feedforward used only in simulation. |

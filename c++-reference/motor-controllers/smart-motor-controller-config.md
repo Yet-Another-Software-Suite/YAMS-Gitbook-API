@@ -15,7 +15,7 @@
 
 | Value         | Description                         |
 | ------------- | ----------------------------------- |
-| `CLOSED_LOOP` | Closed-loop PID/LQR control         |
+| `CLOSED_LOOP` | Closed-loop PID/[LQR](../math/lqr-controller.md) control         |
 | `OPEN_LOOP`   | Direct duty cycle or voltage output |
 
 ### `MotorMode`
@@ -52,7 +52,7 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 | `WithFeedforward(const wpi::math::ArmFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)`                               | Arm feedforward (gravity as a function of angle) |
 | `WithFeedforward(const wpi::math::ElevatorFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)`                          | Elevator feedforward (constant gravity load)     |
 | `WithFeedforward(const wpi::math::SimpleMotorFeedforward<wpi::units::turns>& ff, ClosedLoopControllerSlot slot = SLOT_0)`    | Simple motor feedforward                         |
-| `WithLQR(const math::LQRConfig& lqrConfig, ClosedLoopControllerSlot slot = SLOT_0)`                                          | LQR controller in place of PID (runs on the SystemCore) |
+| `WithLQR(const math::LQRConfig& lqrConfig, ClosedLoopControllerSlot slot = SLOT_0)`                                          | [LQR controller](../math/lqr-controller.md) in place of PID (runs on the SystemCore) |
 | `WithLinearClosedLoopController(bool linear)`                                                                                | Run the closed loop in meters instead of rotations (needs a circumference) |
 | `WithClosedLoopTolerance(wpi::units::turn_t tolerance)`                                                                      | Software PID tolerance in mechanism rotations    |
 | `WithClosedLoopTolerance(wpi::units::meter_t tolerance)`                                                                     | Software PID tolerance as a distance             |
@@ -163,7 +163,7 @@ Accepted external encoder types per wrapper:
 | `WithSimStartingPosition(wpi::units::degree_t startingAngle)`                                                                | Starting angle used only in simulation            |
 | `WithSimStartingPosition(wpi::units::meter_t startingDistance)`                                                              | Starting distance used only in simulation         |
 | `WithSimClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot = SLOT_0)`                       | PID gains used only in simulation                 |
-| `WithSimClosedLoopController(const math::LQRConfig& lqrConfig, ClosedLoopControllerSlot slot = SLOT_0)`                      | LQR used only in simulation                       |
+| `WithSimClosedLoopController(const math::LQRConfig& lqrConfig, ClosedLoopControllerSlot slot = SLOT_0)`                      | [LQR](../math/lqr-controller.md) used only in simulation                       |
 | `WithSimFeedforward(const wpi::math::ArmFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)`                            | Sim-only arm feedforward                          |
 | `WithSimFeedforward(const wpi::math::ElevatorFeedforward& ff, ClosedLoopControllerSlot slot = SLOT_0)`                       | Sim-only elevator feedforward                     |
 | `WithSimFeedforward(const wpi::math::SimpleMotorFeedforward<wpi::units::turns>& ff, ClosedLoopControllerSlot slot = SLOT_0)` | Sim-only simple motor feedforward                 |

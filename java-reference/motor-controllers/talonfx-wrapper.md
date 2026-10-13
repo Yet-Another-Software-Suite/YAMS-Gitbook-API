@@ -91,7 +91,7 @@ SmartMotorController motor = new TalonFXSWrapper(
 Without a vendor config that explicitly sets the sensor source, YAMS has no way to know which of the two PWM ports the CANdi encoder is connected to and the feedback loop will not work.
 {% endhint %}
 
-**Motion Magic.** When a trapezoidal or exponential profile is configured, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate current-mode variant). When an LQR controller is configured, the closed loop runs on the SystemCore instead and YAMS raises a `closed loop controller is running on the SystemCore` alert.
+**Motion Magic.** When a trapezoidal or exponential profile is configured, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate current-mode variant). When an [LQR controller](../math/lqr-controller.md) is configured, the closed loop runs on the SystemCore instead and YAMS raises a `closed loop controller is running on the SystemCore` alert.
 
 **Control requests.** TalonFX uses Phoenix 6 control request objects. YAMS selects the appropriate request type (duty cycle, voltage, position, velocity, torque-current FOC) based on the configuration. Advanced users can inject a custom control request via `withVendorControlRequest(ControlRequest)` in the config.
 

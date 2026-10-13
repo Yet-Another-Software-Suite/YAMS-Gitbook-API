@@ -34,7 +34,7 @@ A vendor config passed with `WithVendorConfig` must be a `thrifty::NovaConfigBat
 
 ### Closed-Loop Control
 
-The closed-loop controller always runs on the SystemCore and commands the Nova with voltage, the same way the profiled controllers of the other wrappers do. ThriftyLib's simulation ignores the Nova's onboard PID gains, so running the loop on the SystemCore keeps simulation and the real robot the same. PID, feedforward, trapezoidal and exponential profiles, and LQR are all evaluated by YAMS.
+The closed-loop controller always runs on the SystemCore and commands the Nova with voltage, the same way the profiled controllers of the other wrappers do. ThriftyLib's simulation ignores the Nova's onboard PID gains, so running the loop on the SystemCore keeps simulation and the real robot the same. PID, feedforward, trapezoidal and exponential profiles, and [LQR](../math/lqr-controller.md) are all evaluated by YAMS.
 
 In closed-loop mode the wrapper starts the closed-loop notifier and raises an alert (see [Alerts](#alerts)). Set the loop period with `WithClosedLoopControlPeriod(...)` (default 20 ms); it is only valid in closed-loop mode.
 
@@ -55,7 +55,7 @@ In closed-loop mode the wrapper starts the closed-loop notifier and raises an al
 | `WithEncoderInverted(true)` / `SetEncoderInverted`             | The Nova's internal encoder cannot be inverted. `WithEncoderInverted` throws a `std::invalid_argument` when the config is applied, and `SetEncoderInverted` throws a `std::runtime_error`.                                                       |
 | `WithVendorControlRequest`                                     | Not supported on the Nova. Throws `SmartMotorControllerConfigurationException`.                               |
 | `SetEncoderVelocity` (on a real robot)                         | Throws `std::runtime_error`; the Nova cannot have its encoder velocity set.                                   |
-| Closed loop tolerance with an LQR                              | Throws `std::invalid_argument`.                                                                               |
+| Closed loop tolerance with an [LQR](../math/lqr-controller.md)                              | Throws `std::invalid_argument`.                                                                               |
 
 ***
 

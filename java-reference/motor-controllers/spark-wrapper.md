@@ -54,7 +54,7 @@ It is recommended to call `withExternalEncoderDiscontinuityPoint` when using a `
 
 **NEO 550 safety.** `checkConfigSafety()` throws `SmartMotorControllerConfigurationException` if no stator current limit is set for a NEO 550, or if the limit exceeds 40 A.
 
-**MAXMotion.** When a trapezoidal profile is configured and the onboard SPARK closed-loop controller is used, YAMS translates the profile to MAXMotion position and velocity control. When the closed loop runs on the SystemCore instead (for example with an exponential profile or an LQR controller), YAMS raises a `closed loop controller is running on the SystemCore` alert.
+**MAXMotion.** When a trapezoidal profile is configured and the onboard SPARK closed-loop controller is used, YAMS translates the profile to MAXMotion position and velocity control. When the closed loop runs on the SystemCore instead (for example with an exponential profile or an [LQR controller](../math/lqr-controller.md)), YAMS raises a `closed loop controller is running on the SystemCore` alert.
 
 **Simulation.** Uses `DCMotorSim` with the configured moment of inertia. The simulated SPARK closes its loop every 1 ms (1 kHz), like the real SPARK, stepping through each `withSimulationPeriod` period. Because REVLib's MAXMotion simulation does not follow the profile, YAMS runs the trapezoidal profile in `simIterate()` and has the simulated SPARK hold each point with position control. The `SimSupplier` can be replaced at runtime via `setSimSupplier`.
 
