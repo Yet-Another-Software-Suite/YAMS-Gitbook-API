@@ -85,6 +85,13 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 | --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `WithHeadingControl`  | `WithHeadingControl(std::function<bool()> trigger)`                              | Enables heading-angle control mode when trigger returns `true`. Requires `WithControllerHeadingAxis()` or `WithHeading()`. |
 | `WithAim`             | `WithAim(std::function<wpi::math::Pose2d()> aimTarget, std::function<bool()> trigger)` | Rotates the robot to face `aimTarget` while translating. Enables `AIM` mode when trigger is `true`.     |
+| `WithAimLookahead` | `WithAimLookahead(wpi::units::second_t lookahead)` | Aims from where the robot will be after the lookahead time, moving the pose along its field relative velocity. |
+| `WithAimFeedforward` | `WithAimFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::radians> feedforward)` | Adds a feedforward to the aim rotation so the robot keeps up with a target whose direction is changing. |
+| `WithAimHeadingOffset` | `WithAimHeadingOffset(wpi::math::Rotation2d offset)` | Rotates the aim heading, for a shooter that does not point out of the front of the robot. |
+| `WithAimHeadingOffset` | `WithAimHeadingOffset(wpi::math::Rotation2d offset, std::function<bool()> enabled)` | Rotates the aim heading while `enabled` returns `true`. |
+| `IsAimLocked` | `IsAimLocked(wpi::units::radian_t tolerance)` | Whether the robot is aiming and within the tolerance of the aim heading. |
+| `GetTargetVector` | `GetTargetVector(const wpi::math::Pose2d& target)` | Field relative vector from the robot to the target, from the looked ahead position if a lookahead is set. |
+| `CalculateAngularVelocity` | `CalculateAngularVelocity(wpi::units::radian_t target)` | Angular velocity that turns the robot to a heading, from the rotation controller and the aim feedforward. |
 | `WithTranslationOnly` | `WithTranslationOnly(std::function<bool()> trigger)`                             | Suppresses rotation and locks the current heading while trigger returns `true`.                         |
 
 {% hint style="warning" %}

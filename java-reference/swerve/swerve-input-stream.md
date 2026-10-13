@@ -77,6 +77,14 @@ Heading, aim and translation-only control need a rotation controller on the driv
 | ----------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------- |
 | `withHeadingControl(BooleanSupplier trigger)`               | `trigger`           | Enables heading-angle control mode while trigger returns `true`. Requires `withControllerHeadingAxis()` or `withHeading()`. |
 | `withAim(Supplier<Pose2d> target, BooleanSupplier trigger)` | `target`, `trigger` | Rotates the robot to face the target pose while translating. Enables AIM mode while trigger is `true`.   |
+| `withAimLookahead(Time lookahead)` | `lookahead` | Aims from where the robot will be after the lookahead time, moving the pose along its field relative velocity. |
+| `withAimFeedforward(SimpleMotorFeedforward feedforward)` | `feedforward` | Adds a feedforward to the aim rotation so the robot keeps up with a target whose direction is changing. |
+| `withAimHeadingOffset(Rotation2d offset)` | `offset` | Rotates the aim heading, for a shooter that does not point out of the front of the robot. |
+| `withAimHeadingOffset(Rotation2d offset, BooleanSupplier enabled)` | `offset`, `enabled` | Rotates the aim heading while `enabled` is `true`. |
+| `aimLock(Angle tolerance)` | `tolerance` | Returns a `Trigger` that is true while aiming and within the tolerance of the aim heading. |
+| `isAimLocked(Angle tolerance)` | `tolerance` | Whether the robot is aiming and within the tolerance of the aim heading. |
+| `getTargetVector(Pose2d target)` | `target` | Field relative vector from the robot to the target, from the looked ahead position if a lookahead is set. |
+| `calculateAngularVelocity(Angle target)` | `target` | Angular velocity that turns the robot to a heading, from the rotation controller and the aim feedforward. |
 | `withTranslationOnly(BooleanSupplier trigger)`              | `trigger`           | Suppresses rotation and holds the heading the robot had when enabled while trigger returns `true`.      |
 
 ### Field Orientation
