@@ -36,7 +36,7 @@ SwerveModule(SwerveModuleConfig config)
 |--------|---------|-------------|
 | `setSwerveModuleState(SwerveModuleVelocity state)` | `SwerveModuleVelocity` | Commands a drive speed and azimuth angle. Returns the optimized state actually sent. |
 | `setSwerveModuleState(SwerveModuleVelocity state, Force feedforwardForce)` | `SwerveModuleVelocity` | Same, plus a drive-wheel feedforward `Force` applied on top (e.g. from a PathPlanner set-point generator). The force is reversed when optimization turns the wheel around and scaled by cosine compensation when enabled. |
-| `lock(Rotation2d angle)` | `SwerveModuleVelocity` | Turns the wheel to `angle` without driving it, as for locking the drive in place. Unlike `setSwerveModuleState`, the velocity deadband does not hold the wheel where it is (see [`SwerveModuleConfig.getLockedState(...)`](swerve-module-config.md#state-helpers)). Used by `SwerveDrive.lockPose()`. |
+| `setAzimuthAngle(Rotation2d angle)` | `SwerveModuleVelocity` | Turns the wheel to `angle` without driving it, as for locking the drive in place or tuning the azimuth motor. Unlike `setSwerveModuleState`, the velocity deadband does not hold the wheel where it is (see [`SwerveModuleConfig.getLockedState(...)`](swerve-module-config.md#state-helpers)). Used by `SwerveDrive.lockPose()` and `SwerveDrive.setAzimuthAngles(Rotation2d)`. |
 | `seedAzimuthEncoder()` | `void` | Reads the absolute encoder and seeds the relative encoder to match. Call on robot enable. |
 
 ---

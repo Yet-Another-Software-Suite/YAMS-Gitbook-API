@@ -60,7 +60,8 @@ The command factories differ between the two frameworks.
 | `setSwerveModuleStates(SwerveModuleVelocity[] states)`   | `void`    | Directly commands module states, bypassing chassis-velocities-to-states kinematics.  |
 | `setSwerveModuleStates(SwerveModuleVelocity[] states, Force[] feedforwardForces)` | `void` | Same, plus a per-module drive-wheel feedforward `Force` (FL/FR/BL/BR order).  |
 | `getStateFromRobotRelativeChassisSpeeds(ChassisVelocities speeds)` | `SwerveModuleVelocity[]` | Converts robot-relative velocities to module states, desaturated by `withMaximumModuleSpeed(...)` (and `withMaximumChassisSpeed(...)` if set). |
-| `lockPose()`                                          | `void`    | Turns every module toward the robot center without driving it (the X pattern), making the robot hard to push. Uses `SwerveModule.lock(Rotation2d)`, which skips the velocity deadband, so the wheels actually turn. Call it every loop while locking, e.g. from a command. |
+| `lockPose()`                                          | `void`    | Turns every module toward the robot center without driving it (the X pattern), making the robot hard to push. Uses `SwerveModule.setAzimuthAngle(Rotation2d)`, which skips the velocity deadband, so the wheels actually turn. Call it every loop while locking, e.g. from a command. |
+| `setAzimuthAngles(Rotation2d angle)`                 | `void`    | Turns every module to `angle` without driving it, as for tuning the azimuth motors. Uses `SwerveModule.setAzimuthAngle(Rotation2d)`, so the velocity deadband does not hold the wheels where they are, and records the desired states for telemetry. Used by swerve azimuth live tuning. |
 
 ***
 

@@ -60,7 +60,7 @@ All builder methods return `SwerveModuleConfig` for chaining.
 |--------|---------|-------------|
 | `getOptimizedState(SwerveModuleVelocity state)` | `SwerveModuleVelocity` | Applies the velocity deadband, optimization and cosine compensation, measuring the wheel with the azimuth motor. |
 | `getOptimizedState(SwerveModuleVelocity state, SwerveModuleVelocityWithAzimuth measured)` | `SwerveModuleVelocity` | Same, against a given measured state. |
-| `getLockedState(Rotation2d angle, SwerveModuleVelocityWithAzimuth measured)` | `SwerveModuleVelocity` | Zero-speed state that turns the wheel to `angle` without driving it, as for locking the drive in place. Unlike `getOptimizedState`, the velocity deadband does not hold the wheel where it is. With optimization enabled the wheel turns to whichever of `angle` and its opposite is nearer. Used by `SwerveModule.lock(Rotation2d)` and `SwerveDrive.lockPose()`. |
+| `getLockedState(Rotation2d angle, SwerveModuleVelocityWithAzimuth measured)` | `SwerveModuleVelocity` | Zero-speed state that turns the wheel to `angle` without driving it, as for locking the drive in place. Unlike `getOptimizedState`, the velocity deadband does not hold the wheel where it is. With optimization enabled the wheel turns to whichever of `angle` and its opposite is nearer. Used by `SwerveModule.setAzimuthAngle(Rotation2d)`, `SwerveDrive.lockPose()` and `SwerveDrive.setAzimuthAngles(Rotation2d)`. |
 | `getCosineCompensationScalar(Rotation2d desiredAngle)` | `double` | Cosine compensation factor from 0 to 1 against the current azimuth angle, or 1 if cosine compensation is disabled. |
 
 ---
