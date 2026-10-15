@@ -1,8 +1,8 @@
 # BatterySim
 
-**Package:** `yams.motorcontrollers.simulation`
+**Package:** `yams.core.motorcontrollers.simulation`
 
-`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation and is written to `RoboRioSim.setVInVoltage(...)`, so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
+`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which the sim suppliers write to the simulated SystemCore input voltage (WPILib's `RoboRioSim.setVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 
 {% hint style="info" %}
 This class is entirely static and requires no setup for basic voltage sag under combined load; every built-in sim supplier and hardware wrapper registers with it automatically.
@@ -22,6 +22,13 @@ By default, before `enableDischarge(...)` is ever called, `BatterySim` holds a c
 | `calculateVoltage(UUID id, Current current)` | `double` | `Current`-typed overload of the above.                                                                             |
 
 `id` should be a stable identity for the calling mechanism; YAMS uses each `SmartMotorController`'s `m_batterySimUUID` field internally, generated once per controller instance.
+
+## Managing Registered Draws
+
+| Method | Returns | Description |
+| ------ | ------- | ----------- |
+| `removeCurrent(UUID id)` | `void` | Stops counting `id`'s draw toward the shared load. `SmartMotorController.close()` calls this automatically. |
+| `reset()` | `void` | Clears every registered draw and resets discharge simulation to a fresh, fully-charged, disabled state. Useful between unit tests. |
 
 ## Discharge Simulation
 
@@ -53,10 +60,10 @@ Reach for this when:
 * **You measured a real curve.** If you've put a battery on a load tester and have actual voltage-vs-state-of-charge data, feeding that in directly gives the most accurate brownout predictions for *your* battery.
 
 ```java
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import yams.motorcontrollers.simulation.BatterySim;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Milliohms;
+import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
+import yams.core.motorcontrollers.simulation.BatterySim;
+import static org.wpilib.units.Units.Volts;
+import static org.wpilib.units.Units.MilliOhms;
 
 // Model a well-used competition battery that sags earlier and more severely than a new one.
 InterpolatingDoubleTreeMap wornBatteryCurve = new InterpolatingDoubleTreeMap();
@@ -72,7 +79,7 @@ wornBatteryCurve.put(1.00, 12.6);
 
 BatterySim.replaceSOCInterpolation(wornBatteryCurve);
 // Pair with a reduced usable capacity and higher resistance to match a worn battery.
-BatterySim.enableDischarge(15.0, Volts.of(12.6), Milliohms.of(28));
+BatterySim.enableDischarge(15.0, Volts.of(12.6), MilliOhms.of(28));
 ```
 
 {% hint style="info" %}
@@ -101,8 +108,10 @@ The default table is averaged from discharge testing across five FRC battery man
 Reach for `replaceCapacityDerating(...)` if you have measured discharge-rate-vs-capacity data for your specific battery rather than the averaged multi-manufacturer defaults. Call it before `enableDischarge(...)` so discharge simulation uses the new curve from the start.
 
 ```java
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import yams.motorcontrollers.simulation.BatterySim;
+import org.wpilib.math.interpolation.InterpolatingDoubleTreeMap;
+import yams.core.motorcontrollers.simulation.BatterySim;
+import static org.wpilib.units.Units.Volts;
+import static org.wpilib.units.Units.MilliOhms;
 
 InterpolatingDoubleTreeMap measuredDerating = new InterpolatingDoubleTreeMap();
 measuredDerating.put(0.9, 1.000);
@@ -111,7 +120,7 @@ measuredDerating.put(40.0, 0.65);
 measuredDerating.put(60.0, 0.55);
 
 BatterySim.replaceCapacityDerating(measuredDerating);
-BatterySim.enableDischarge(18.0, Volts.of(12.9), Milliohms.of(20));
+BatterySim.enableDischarge(18.0, Volts.of(12.9), MilliOhms.of(20));
 ```
 
 {% hint style="info" %}
@@ -121,19 +130,18 @@ Discharge currents outside the range you define clamp to the nearest endpoint's 
 ## Example
 
 ```java
-import yams.motorcontrollers.simulation.BatterySim;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.Milliohms;
+import yams.core.motorcontrollers.simulation.BatterySim;
+import static org.wpilib.units.Units.Volts;
+import static org.wpilib.units.Units.MilliOhms;
 
-@Override
-public void robotInit() {
+public Robot() {
   // Model an 18Ah battery starting at a full 12.9V, 20 mOhm nominal.
-  BatterySim.enableDischarge(18.0, Volts.of(12.9), Milliohms.of(20));
+  BatterySim.enableDischarge(18.0, Volts.of(12.9), MilliOhms.of(20));
 }
 
 @Override
-public void testInit() {
-  // Start every test run from a full charge.
+public void utilityInit() {
+  // Start every utility (formerly test) mode run from a full charge.
   BatterySim.resetDischarge();
 }
 ```

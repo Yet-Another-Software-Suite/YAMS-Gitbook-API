@@ -1,8 +1,10 @@
 # EasyCRT
 
-Package: `yams.units`
+Package: `yams.core.units`
 
-`EasyCRT` (Easy Chinese Remainder Theorem) computes the absolute mechanism position from two absolute encoders with coprime gear ratios. This solves the problem of absolute encoders that only read 0–1 rotation: by using two encoders with slightly different gear reductions, the combined reading uniquely identifies position over a larger range.
+`EasyCRT` finds the absolute angle of a gear that turns more than once, from two absolute encoders on pinions with different tooth counts that both mesh with it. Each encoder only knows its angle within one of its own rotations, but the two readings together are unique over `getUniqueRange()`, which is `lcm(encoderATeeth, encoderBTeeth) / sharedGearTeeth` rotations of the shared gear.
+
+There is no config class. The whole API is one constructor and three methods.
 
 ***
 
@@ -10,91 +12,107 @@ Package: `yams.units`
 
 Use `EasyCRT` when:
 
-* Your mechanism travels more than one full revolution
-* You need absolute position without homing
-* You have two absolute encoders driven by coprime sprocket pairs from a common input shaft
+* Your mechanism travels more than one full revolution (usually a turret)
+* You need absolute position at startup without homing
+* You have two absolute encoders on pinions with different tooth counts, both meshing with the same gear
 
 ***
 
-## EasyCRTConfig
-
-Builder class for `EasyCRT` configuration.
+## Constructor
 
 ```java
-EasyCRTConfig(Supplier<Angle> encoder1, Supplier<Angle> encoder2)
+EasyCRT(int sharedGearTeeth, int encoderATeeth, int encoderBTeeth)
 ```
 
-| Parameter  | Description                                                           |
-| ---------- | --------------------------------------------------------------------- |
-| `encoder1` | Supplier returning the current reading of the first absolute encoder  |
-| `encoder2` | Supplier returning the current reading of the second absolute encoder |
+| Parameter         | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `sharedGearTeeth` | Teeth on the gear both encoder pinions mesh with. The solved angle is the angle of this gear. |
+| `encoderATeeth`   | Teeth on encoder A's pinion.                                                                 |
+| `encoderBTeeth`   | Teeth on encoder B's pinion.                                                                 |
 
-### Builder Methods
-
-All methods return `EasyCRTConfig` for chaining.
-
-| Method                                                                                      | Description                                                                                                                               |
-| ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `withCommonDriveGear(double reduction, int inputTeeth, int outputTeeth1, int outputTeeth2)` | Configures a common input gear driving two output sprockets. `inputTeeth` drives both; `outputTeeth1` and `outputTeeth2` must be coprime. |
-| `withEncoder1Gearing(double ratio)`                                                         | Override gearing for encoder 1 independently.                                                                                             |
-| `withEncoder2Gearing(double ratio)`                                                         | Override gearing for encoder 2 independently.                                                                                             |
-| `withMechanismRange(Angle min, Angle max)`                                                  | Valid mechanism range. Solutions outside this range are rejected.                                                                         |
-| `withMatchTolerance(Angle tolerance)`                                                       | Maximum combined encoder error for a solution to be accepted.                                                                             |
-| `withEncoder1Offset(Angle offset)`                                                          | Software offset added to encoder 1 readings.                                                                                              |
-| `withEncoder2Offset(Angle offset)`                                                          | Software offset added to encoder 2 readings.                                                                                              |
+Throws `IllegalArgumentException` if any tooth count is zero or negative.
 
 ***
 
-## EasyCRT
+## Methods
 
-```java
-EasyCRT(EasyCRTConfig config)
-```
-
-### Methods
-
-| Method                    | Returns           | Description                                                         |
-| ------------------------- | ----------------- | ------------------------------------------------------------------- |
-| `getAngleOptional()`      | `Optional<Angle>` | Returns the resolved mechanism angle, or empty if the solve failed. |
-| `getLastStatus()`         | `CRTStatus`       | The result of the most recent solve attempt.                        |
-| `getLastErrorRotations()` | `double`          | The combined encoder residual error from the last solve.            |
-| `getLastIterations()`     | `int`             | Number of candidates evaluated in the last solve.                   |
+| Method | Returns | Description |
+| ------ | ------- | ----------- |
+| `solve(Angle encoderA, Angle encoderB)` | `Optional<Angle>` | Solves for the angle of the shared gear, assuming its travel is centered on zero. The result is within half of `getUniqueRange()` either side of zero. Empty if the two readings do not agree on one angle. |
+| `solve(Angle encoderA, Angle encoderB, Angle minAngle, Angle maxAngle)` | `Optional<Angle>` | Solves for the angle of the shared gear when its travel is not centered on zero. `minAngle` and `maxAngle` are the lowest and highest angle the shared gear can be at. Empty if the two readings do not agree on one angle. Throws `IllegalArgumentException` if the travel is longer than `getUniqueRange()`, or `maxAngle` is below `minAngle`. |
+| `getUniqueRange()` | `Angle` | How far the shared gear can turn before the pair of encoder readings repeats. |
 
 ***
 
-## Enum: CRTStatus
+## Behavior
 
-| Value            | Description                                                                    |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `OK`             | Solve succeeded; `getAngleOptional()` returns a valid result                   |
-| `NO_SOLUTION`    | No candidate was within the valid range and tolerance                          |
-| `AMBIGUOUS`      | Two or more candidates tied; result is suppressed                              |
-| `NOT_ATTEMPTED`  | No solve has been run since construction                                       |
-| `INVALID_CONFIG` | The configuration has inconsistent parameters (e.g., non-coprime tooth counts) |
+* **Readings are used as they are.** `EasyCRT` has no offset or inversion settings. Both encoders must be zeroed with the mechanism at zero, and both must read increasing angles when the mechanism moves in its positive direction. Set the offset and inversion on the encoders themselves, or adjust the readings before passing them in.
+* **Readings are wrapped for you.** Each reading is wrapped into one rotation before solving, so signed or multi-turn readings are fine.
+* **The result is the angle of the shared gear.** If the mechanism is geared to that gear, convert the result yourself.
+* **Not a textbook Chinese Remainder Theorem solve.** Every angle consistent with encoder A is tried, and the one whose predicted encoder B reading is closest to the real one wins, which stays stable with backlash and sensor noise.
+* **The tolerance comes from the gears.** Neighboring candidates predict encoder B readings `gcd(encoderATeeth, encoderBTeeth) / encoderBTeeth` of a rotation apart. A match is accepted when encoder B is within a quarter of that gap of its prediction.
+* **Empty instead of a guess.** `solve` returns an empty `Optional` when no candidate is within the tolerance, when two candidates are (which happens at the very ends of the unique range), or when a reading is not finite.
+* **No state.** `EasyCRT` holds no suppliers and keeps nothing between calls. There are no status, error or iteration getters.
 
 ***
 
 ## Example
 
 ```java
-EasyCRTConfig config = new EasyCRTConfig(
-        () -> Rotations.of(encoder1.getAbsolutePosition()),
-        () -> Rotations.of(encoder2.getAbsolutePosition()))
-    .withCommonDriveGear(1.0, 18, 19, 21)   // 19T and 21T are coprime
-    .withMechanismRange(Rotations.of(0), Rotations.of(10))
-    .withMatchTolerance(Degrees.of(2));
+// 100 tooth turret gear, 19 tooth pinion on encoder A, 21 tooth pinion on encoder B.
+EasyCRT crt = new EasyCRT(100, 19, 21);
 
-EasyCRT crt = new EasyCRT(config);
+Angle range = crt.getUniqueRange(); // lcm(19, 21) / 100 = 3.99 rotations
 
-// In periodic():
-Optional<Angle> position = crt.getAngleOptional();
-if (position.isPresent()) {
-    double mechanismRotations = position.get().in(Rotations);
-}
+// Read once at startup, while the mechanism is not moving.
+Optional<Angle> turretAngle = crt.solve(encoderA.get(), encoderB.get());
+
+// Travel that is not centered on zero.
+Optional<Angle> offCenter = crt.solve(encoderA.get(), encoderB.get(), Degrees.of(0), Degrees.of(540));
+
+// Seed a SmartMotorController with the result. It takes the mechanism angle.
+turretAngle.ifPresent(motor::setEncoderPosition);
 ```
 
+{% hint style="info" %}
+The pinions can mesh with the turret gear, the motor drive gear, their own common gear, or a second gear on the drive shaft. See [Gear layouts](https://yams.yassrobotics.com/documentation/understanding/easycrt#gear-layouts) in the EasyCRT guide for a drawing and an example of each.
+{% endhint %}
+
+### Seeding a `SmartMotorController` with `MechanismGearing`
+
+The motor's relative encoder counts rotor rotations, which is the turret angle multiplied by the reduction between the motor and the turret. Put that reduction in a `MechanismGearing`, give it to the `SmartMotorController` config, and `setEncoderPosition(...)` does the multiplication for you. This is the usual layout when three gears mesh with the turret gear: the two encoder pinions and the motor's pinion.
+
+```java
+// Three gears mesh with the 200 tooth turret gear: the two encoder pinions and the motor's
+// 40 tooth drive gear, which is driven through a 10:1 gearbox.
+MechanismGearing turretGearing = new MechanismGearing(GearBox.fromReductionStages(10, 200.0 / 40));
+EasyCRT crt = new EasyCRT(200, 19, 21);
+
+SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    .withGearing(turretGearing)
+    .withControlMode(ControlMode.CLOSED_LOOP)
+    .withClosedLoopController(20, 0, 0);
+SmartMotorController motor = new SparkWrapper(sparkMax, DCMotor.getNEO(1), motorConfig);
+
+crt.solve(encoderA.get(), encoderB.get()).ifPresent(turretAngle -> {
+  // The turret gear is the shared gear, so the solved angle is already the turret angle.
+  // setEncoderPosition takes the mechanism angle and sets the motor's relative encoder to
+  // turretAngle.times(turretGearing.getMechanismToRotorRatio()) for you.
+  motor.setEncoderPosition(turretAngle);
+
+  // The same conversion, if you want the rotor angle yourself (for logging or a sanity check):
+  Angle rotorAngle = turretAngle.times(turretGearing.getMechanismToRotorRatio());
+});
+```
+
+Pass `setEncoderPosition(...)` the mechanism angle, not the rotor angle: it applies the `MechanismGearing` from the config, so multiplying first would apply the gearing twice. `turretAngle.times(turretGearing.getMechanismToRotorRatio())` is the rotor angle it ends up setting. If the pinions mesh with a gear that is not the mechanism, convert the solved angle to the mechanism angle first (divide by the ratio between them).
+
 {% hint style="warning" %}
-The two output sprocket tooth counts (`outputTeeth1` and `outputTeeth2`) must be coprime: their greatest common divisor must be 1. Common coprime pairs: 19 & 21, 17 & 19, 18 & 19. Using non-coprime pairs causes `AMBIGUOUS` or `NO_SOLUTION` results.
+Solve once at startup while the mechanism is still, and handle an empty result. The two readings are taken one after the other, so any motion between them looks like disagreement. Do not use `EasyCRT` as closed loop feedback.
+{% endhint %}
+
+{% hint style="info" %}
+Pick pinion tooth counts with no common factor (19 and 21, 17 and 19, 30 and 31), so the unique range is as long as possible. Sharing a factor throws range away: 20 and 30 teeth only cover 60 teeth of the shared gear, not 600.
 {% endhint %}
 
 ***

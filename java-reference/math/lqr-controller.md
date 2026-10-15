@@ -1,6 +1,6 @@
 # LQRController
 
-**Package:** `yams.math`
+**Package:** `yams.core.math`
 
 `LQRController` wraps a `LinearSystemLoop` and provides type-safe `calculate()` overloads for different mechanism types.
 
@@ -37,14 +37,16 @@ LQRController(LQRType type, LinearSystemLoop<?, ?, ?> loop, Time period)
 
 ## Usage with SmartMotorControllerConfig
 
+Pass the controller to `SmartMotorControllerConfig.withClosedLoopController(LQRController)` (this clears any configured PID). `withSimClosedLoopController(LQRController)` sets one for simulation only.
+
 ```java
 LQRConfig lqrCfg = new LQRConfig(DCMotor.getNEO(1), gearing, moi)
     .withArm(Degrees.of(5), DegreesPerSecond.of(10),
              Degrees.of(1), DegreesPerSecond.of(5), Degrees.of(0.5))
     .withControlEffort(Volts.of(12));
 
-SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig()
-    .withLQRController(lqrCfg);
+SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    .withClosedLoopController(new LQRController(lqrCfg));
 ```
 
 ## See Also

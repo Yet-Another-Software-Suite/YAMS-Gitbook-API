@@ -1,6 +1,6 @@
 # Talon Wrapper
 
-**Package:** `yams.motorcontrollers.remote`\
+**Package:** `yams.core.motorcontrollers.remote`\
 **Extends:** `SmartMotorController`
 
 `SmartMotorController` implementations for CTRE TalonFX and TalonFXS controllers. `TalonFXWrapper` targets the TalonFX (Falcon 500, Kraken X60). `TalonFXSWrapper` targets the TalonFXS.
@@ -8,8 +8,8 @@
 ## Constructors
 
 ```java
-TalonFXWrapper(TalonFX talonFX, DCMotor motor, SmartMotorControllerConfig config)
-TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig config)
+TalonFXWrapper(TalonFX talonFX, DCMotor motor, SmartMotorControllerConfig<?> config)
+TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig<?> config)
 ```
 
 ## Supported Hardware
@@ -23,14 +23,14 @@ TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig con
 ## Example
 
 ```java
-SmartMotorControllerConfig config = new SmartMotorControllerConfig()
+SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withMotorInverted(false)
     .withStatorCurrentLimit(Amps.of(60))
     .withSupplyCurrentLimit(Amps.of(80))
     .withClosedLoopController(0.3, 0.0, 0.0);
 
 SmartMotorController motor = new TalonFXWrapper(
-    new TalonFX(5),
+    new TalonFX(5, new CANBus(CANPort.CAN_S0)),
     DCMotor.getKrakenX60(1),
     config
 );
@@ -38,7 +38,7 @@ SmartMotorController motor = new TalonFXWrapper(
 
 ## CTRE-Specific Notes
 
-**Phoenix 6 required.** YAMS only supports Phoenix 6 for TalonFX and TalonFXS. Phoenix 5 is not supported.
+**Phoenix 6 required.** YAMS only supports Phoenix 6 (26.70 alpha for WPILib 2027) for TalonFX and TalonFXS. Phoenix 5 is not supported. Phoenix 6 devices take a `CANBus`, e.g. `new CANBus(CANPort.CAN_S0)` for a SystemCore CAN port.
 
 **CANcoder support.** Pass a `CANcoder` via `withExternalEncoder(CANcoder)`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source. A discontinuity point is optional for `CANcoder`; when set it maps to `AbsoluteSensorDiscontinuityPoint` in the CANcoder configuration. CANcoder does not have the same dead-zone constraint as SPARK absolute encoders.
 
@@ -59,7 +59,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withGearing(new MechanismGearing(GearBox.fromRatio(10.0)));
 
 SmartMotorController motor = new TalonFXWrapper(
-    new TalonFX(5),
+    new TalonFX(5, new CANBus(CANPort.CAN_S0)),
     DCMotor.getKrakenX60(1),
     config
 );
@@ -81,7 +81,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withGearing(new MechanismGearing(GearBox.fromRatio(10.0)));
 
 SmartMotorController motor = new TalonFXSWrapper(
-    new TalonFXS(6),
+    new TalonFXS(6, new CANBus(CANPort.CAN_S0)),
     DCMotor.getKrakenX60(1),
     config
 );
@@ -91,11 +91,13 @@ SmartMotorController motor = new TalonFXSWrapper(
 Without a vendor config that explicitly sets the sensor source, YAMS has no way to know which of the two PWM ports the CANdi encoder is connected to and the feedback loop will not work.
 {% endhint %}
 
-**Motion Magic.** When a trapezoidal or exponential profile is configured, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate current-mode variant). When the software PID is active instead, profiling runs on the roboRIO.
+**Motion Magic.** When a trapezoidal or exponential profile is configured, YAMS uses CTRE Motion Magic control requests internally (`MotionMagicVoltage`, `MotionMagicExpoVoltage`, or the appropriate current-mode variant). When an [LQR controller](../math/lqr-controller.md) is configured, the closed loop runs on the SystemCore instead and YAMS raises a `closed loop controller is running on the SystemCore` alert.
 
 **Control requests.** TalonFX uses Phoenix 6 control request objects. YAMS selects the appropriate request type (duty cycle, voltage, position, velocity, torque-current FOC) based on the configuration. Advanced users can inject a custom control request via `withVendorControlRequest(ControlRequest)` in the config.
 
 **Configuration.** `TalonFXConfiguration` is built from `SmartMotorControllerConfig` and applied via `TalonFXConfigurator`. YAMS retries configuration on failure.
+
+**Starting position and zero offset.** `withStartingPosition` is not applied when an external encoder is used for feedback; YAMS raises an alert and the external encoder position is used instead. `withExternalEncoderZeroOffset` is applied to the CANcoder/CANdi, not as a rotor offset; without an external encoder YAMS raises an alert.
 
 **Simulation.** Uses `DCMotorSim` with the configured moment of inertia.
 
@@ -104,4 +106,5 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
+* [NovaWrapper](nova-wrapper.md)
 * [C++ SmartMotorController](../../c++-reference/motor-controllers/smart-motor-controller.md)

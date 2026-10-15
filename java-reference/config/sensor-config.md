@@ -1,6 +1,6 @@
 # SensorConfig
 
-**Package:** `yams.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`
 
 Builder for a simulated sensor that bridges real hardware I/O and the YAMS simulation framework. Attach typed fields backed by live hardware suppliers, then inject override values during simulation by match-time window or an arbitrary trigger.
 
@@ -49,7 +49,7 @@ SensorConfig withSimulatedValue(String fieldName, Time start, Time end, boolean 
 | Parameter   | Description                                             |
 | ----------- | ------------------------------------------------------- |
 | `fieldName` | Name of a previously registered field.                  |
-| `start`     | Match time at which the simulated value becomes active. |
+| `start`     | Match time (`Timer.getMatchTime()`) at which the simulated value becomes active. |
 | `end`       | Match time at which the simulated value deactivates.    |
 | `value`     | Value to inject while active.                           |
 
@@ -77,9 +77,11 @@ SensorConfig withSimulatedValue(String fieldName, BooleanSupplier trigger, boole
 ## Example
 
 ```java
-import static edu.wpi.first.units.Units.Seconds;
-import yams.mechanisms.config.SensorConfig;
-import edu.wpi.first.wpilibj.DigitalInput;
+import static org.wpilib.units.Units.Degrees;
+import static org.wpilib.units.Units.Seconds;
+import org.wpilib.hardware.discrete.DigitalInput;
+import yams.core.mechanisms.config.SensorConfig;
+import yams.core.motorcontrollers.simulation.Sensor;
 
 // Hardware limit switch on DIO 0
 DigitalInput limitSwitch = new DigitalInput(0);
@@ -89,12 +91,12 @@ SensorConfig forwardLimit = new SensorConfig("ForwardLimitSwitch")
     // Simulate the switch being pressed from 10 s to 12 s into the match
     .withSimulatedValue("triggered", Seconds.of(10), Seconds.of(12), true);
 
-// Custom encoder exposing position and velocity
-SensorConfig encoderConfig = new SensorConfig("ArmEncoder")
-    .withField("positionRotations", myEncoder::getPosition, 0.0)
-    .withField("velocityRPM",       myEncoder::getVelocity, 0.0)
-    // Override position to 2.5 rotations whenever a test condition fires
-    .withSimulatedValue("positionRotations", () -> Robot.isInTest(), 2.5);
+// Beam break that reads "blocked" in simulation whenever the arm is near 40 degrees
+DigitalInput beamBreak = new DigitalInput(1);
+Sensor coralSensor = new SensorConfig("CoralDetectorBeamBreak")
+    .withField("Beam", beamBreak::get, false)
+    .withSimulatedValue("Beam", () -> arm.isNear(Degrees.of(40), Degrees.of(2)), true)
+    .getSensor();
 ```
 
 {% hint style="info" %}
@@ -107,5 +109,5 @@ Multiple `withSimulatedValue` calls on the same field are all registered. The fi
 
 ## Related Pages
 
-* [SensorConfig (C++)](../../api/cpp/config/sensor-config.md)
+* [SensorConfig (C++)](../../c++-reference/config/sensorconfig.md)
 * [SimSensorConfig (C++)](../../c++-reference/config/sim-sensor-config.md)

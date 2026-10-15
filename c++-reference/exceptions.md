@@ -1,6 +1,8 @@
 # Exceptions
 
-**Namespace:** `yams::exceptions` **Java equivalent:** [Java Exceptions](../java/exceptions.md)
+**Namespace:** `yams::exceptions`\
+**Header:** `#include <yams/exceptions.hpp>`\
+**Java equivalent:** [Java Exceptions](../java-reference/exceptions.md)
 
 All YAMS C++ exceptions extend `yams::exceptions::YamsException`, which extends `std::runtime_error`.
 
@@ -57,16 +59,24 @@ explicit SwerveDriveConfigurationException(const std::string& message)
 
 Takes a single message string rather than the three-argument pattern.
 
+### Gearing exceptions
+
+```cpp
+NoStagesGivenException()
+explicit InvalidStageGivenException(const std::string& stage)
+```
+
 ***
 
 ## Example
 
 ```cpp
 try {
-    positional::Arm arm{&armConfig, motor};
-} catch (const exceptions::ArmConfigurationException& e) {
+    // motor is a SmartMotorController (e.g. a SparkWrapper or TalonFXWrapper)
+    yams::mechanisms::positional::Arm arm{&armConfig, &motor};
+} catch (const yams::exceptions::ArmConfigurationException& e) {
     fmt::print("Arm config error: {}\n", e.what());
-} catch (const exceptions::YamsException& e) {
+} catch (const yams::exceptions::YamsException& e) {
     fmt::print("YAMS error: {}\n", e.what());
 }
 ```

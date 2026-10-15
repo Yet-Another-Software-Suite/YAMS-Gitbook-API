@@ -1,6 +1,8 @@
 # MechanismGearing
 
-**Namespace:** `yams::gearing` **Java equivalent:** [Java MechanismGearing](../../java-reference/gearing/mechanism-gearing.md)
+**Namespace:** `yams::gearing`\
+**Header:** `#include <yams/gearing/MechanismGearing.hpp>`\
+**Java equivalent:** [Java MechanismGearing](../../java-reference/gearing/mechanism-gearing.md)
 
 `MechanismGearing` is the composite gearing type accepted by `SmartMotorControllerConfig::WithMotorGearing()`. It may combine a `GearBox` with an optional `Sprocket`.
 
@@ -17,7 +19,7 @@ static const MechanismGearing kOne;  // 1:1 direct drive
 ## Constructors
 
 ```cpp
-explicit MechanismGearing(double reductionRatio)
+explicit MechanismGearing(double reductionRatio)  // same as GearBox::FromReductionStages({reductionRatio})
 explicit MechanismGearing(const GearBox& gearBox)
 MechanismGearing(const GearBox& gearBox, const Sprocket& sprockets)
 ```
@@ -28,18 +30,20 @@ MechanismGearing(const GearBox& gearBox, const Sprocket& sprockets)
 
 | Method                             | Returns             | Description                                                     |
 | ---------------------------------- | ------------------- | --------------------------------------------------------------- |
-| `GetRotorToMechanismRatio() const` | `double`            | Motor rotations per mechanism rotation (IN/OUT)                 |
-| `GetMechanismToRotorRatio() const` | `double`            | Mechanism rotations per motor rotation (OUT/IN)                 |
-| `Div(double i)`                    | `MechanismGearing&` | Divides the overall ratio by `i`. Returns `*this` for chaining. |
+| `GetRotorToMechanismRatio() const` | `double`            | Mechanism rotations per motor rotation (less than 1 for a reduction) |
+| `GetMechanismToRotorRatio() const` | `double`            | Motor rotations per mechanism rotation (the overall reduction, greater than 1 for a reduction) |
+| `Div(double i)`                    | `MechanismGearing&` | Calls `GearBox::Div(i)` on the gearbox stage (multiplies the reduction by `i`). Returns `*this` for chaining. |
 
 ***
 
 ## Example
 
 ```cpp
-auto gearing = gearing::MechanismGearing{
-    gearing::GearBox::FromTeeth({14, 72}),    // 5.14:1
-    gearing::Sprocket::FromStages({"18:24"})  // 1.33:1
+using namespace yams::gearing;
+
+auto gearing = MechanismGearing{
+    GearBox::FromTeeth({14, 72}),    // 5.14:1
+    Sprocket::FromStages({"24:18"})  // 1.33:1
 };
 // Total: ~6.85:1
 
@@ -47,5 +51,5 @@ config.WithMotorGearing(gearing);
 ```
 
 {% hint style="info" %}
-`GetRotorToMechanismRatio()` returns the value WPILib expects for the `rotorToMechanismRatio` field of motor controller configs (motor rotations per mechanism rotation, i.e., IN/OUT, greater than 1 for reductions).
+`GetMechanismToRotorRatio()` is the overall reduction (motor rotations per mechanism rotation, greater than 1 for reductions). YAMS passes it as the gearing to the WPILib physics simulations. `GetRotorToMechanismRatio()` is its reciprocal.
 {% endhint %}

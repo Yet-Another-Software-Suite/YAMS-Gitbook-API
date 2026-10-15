@@ -1,6 +1,8 @@
 # PivotConfig
 
-**Namespace:** `yams::mechanisms::config` **Java equivalent:** [Java PivotConfig](../../java-reference/config/pivot-config.md)
+**Namespace:** `yams::mechanisms::config`\
+**Header:** `<yams/mechanisms/config/PivotConfig.hpp>`\
+**Java equivalent:** [Java PivotConfig](../../java-reference/config/pivot-config.md)
 
 `PivotConfig` holds physical and simulation parameters for a `Pivot` mechanism. A pivot is a single-jointed rotational mechanism without a load-bearing length (use `ArmConfig` if arm length affects simulation accuracy).
 
@@ -18,14 +20,14 @@ PivotConfig() = default;
 
 All methods return `PivotConfig&` for chaining.
 
-> **All methods are optional.** Unlike `ArmConfig`, `PivotConfig` has no simulation-required parameters: a pivot does not use arm length in its physics model.
+> **Required for simulation:** `WithMinAngle()` and `WithMaxAngle()` must be set, or the `Pivot` constructor throws a `PivotConfigurationException` in simulation. A pivot does not use arm length in its physics model. The `SmartMotorControllerConfig` must also set a starting position (`WithStartingPosition`) and an MOI (`WithMOI`); in 2027 both live on `SmartMotorControllerConfig`.
 
 | Method                                       | Required | Description                                                          |
 | -------------------------------------------- | -------- | -------------------------------------------------------------------- |
 | `WithTelemetryName(const std::string& name)` | Optional | Name used for SmartDashboard and log entries                         |
-| `WithMinAngle(units::degree_t angle)`        | Optional | Minimum allowable mechanism angle                                    |
-| `WithMaxAngle(units::degree_t angle)`        | Optional | Maximum allowable mechanism angle                                    |
-| `WithSimColor(const frc::Color8Bit& color)`  | Optional | Color of the simulated pivot ligament. Defaults to green if not set. |
+| `WithMinAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Minimum allowable mechanism angle; also applied as the motor controller lower limit                                    |
+| `WithMaxAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Maximum allowable mechanism angle; also applied as the motor controller upper limit                                    |
+| `WithSimColor(const wpi::util::Color8Bit& color)`  | Optional | Color of the simulated pivot ligament. Defaults to green if not set. |
 
 ***
 
@@ -33,9 +35,9 @@ All methods return `PivotConfig&` for chaining.
 
 ```cpp
 std::string GetTelemetryName() const;
-std::optional<units::degree_t> GetMinAngle() const;
-std::optional<units::degree_t> GetMaxAngle() const;
-frc::Color8Bit GetSimColor() const;
+std::optional<wpi::units::degree_t> GetMinAngle() const;
+std::optional<wpi::units::degree_t> GetMaxAngle() const;
+wpi::util::Color8Bit GetSimColor() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called. `GetSimColor()` always returns a value (defaults to green).
@@ -46,7 +48,7 @@ Getters for optional fields return `std::nullopt` if the corresponding setter wa
 
 | Exception                                 | Thrown When                                                                                  |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `exceptions::PivotConfigurationException` | Values are invalid when used to construct a `Pivot` (e.g., min angle greater than max angle) |
+| `exceptions::PivotConfigurationException` | Required fields (on `PivotConfig` or the motor controller config) are missing when a `Pivot` is constructed in simulation |
 
 ***
 

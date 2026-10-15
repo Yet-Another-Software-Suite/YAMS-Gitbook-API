@@ -1,10 +1,10 @@
 # SmartMotorControllerTelemetryConfig
 
-**Package:** `yams.telemetry`
+**Package:** `yams.core.telemetry`
 
 Fine-grained telemetry configuration for a [SmartMotorController](smart-motor-controller.md). Every field is **disabled by default**. Opt-in using `withTelemetryVerbosity()` for a preset bundle, individual `with*()` methods for specific fields, or both to supplement a preset.
 
-For most use-cases, passing a name and verbosity to `SmartMotorControllerConfig.withTelemetry(String, TelemetryVerbosity)` is sufficient. Use this class only when you need to override which specific fields are published or to route telemetry to DataLog instead of NetworkTables.
+For most use-cases, passing a name and verbosity to `SmartMotorControllerConfig.withTelemetry(String, TelemetryVerbosity)` is sufficient. Pass a `SmartMotorControllerTelemetryConfig` with `SmartMotorControllerConfig.withTelemetry(String, SmartMotorControllerTelemetryConfig)`; this sets the verbosity to `HIGH`, so live tuning is registered for the motor. Use this class only when you need to override which specific fields are published or to route telemetry to DataLog instead of NetworkTables.
 
 ## Constructor
 
@@ -77,8 +77,8 @@ Each method enables a single numeric (double) field.
 | `withCustom(DoubleTelemetryField[] fields, boolean value)`      | Enables or disables every numeric field in the array with one call.     |
 
 ```java
-import yams.telemetry.SmartMotorControllerTelemetry.BooleanTelemetryField;
-import yams.telemetry.SmartMotorControllerTelemetry.DoubleTelemetryField;
+import yams.core.telemetry.SmartMotorControllerTelemetry.BooleanTelemetryField;
+import yams.core.telemetry.SmartMotorControllerTelemetry.DoubleTelemetryField;
 
 SmartMotorControllerTelemetryConfig telemetryCfg =
     new SmartMotorControllerTelemetryConfig()
@@ -95,8 +95,8 @@ SmartMotorControllerTelemetryConfig telemetryCfg =
 ## Example
 
 ```java
-import yams.telemetry.SmartMotorControllerTelemetryConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.core.telemetry.SmartMotorControllerTelemetryConfig;
+import yams.core.telemetry.enums.TelemetryVerbosity;
 
 // Start from a MID preset and add individual fields on top
 SmartMotorControllerTelemetryConfig telemetryCfg =
@@ -109,8 +109,9 @@ SmartMotorControllerTelemetryConfig telemetryCfg =
         .withDataLogName("motors/shoulder")
         .withoutNetworkTables();   // log-only during matches
 
-// Apply to a constructed motor controller
-motor.withTelemetry(telemetryCfg);
+// Apply through the motor controller config
+SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
+    .withTelemetry("ShoulderMotor", telemetryCfg);
 ```
 
 {% hint style="info" %}

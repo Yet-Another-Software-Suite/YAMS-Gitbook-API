@@ -1,6 +1,6 @@
 # MechanismGearing
 
-**Package:** `yams.gearing`
+**Package:** `yams.core.gearing`
 
 `MechanismGearing` is the type accepted by `SmartMotorControllerConfig.withGearing()`. It combines a `GearBox` and an optional `Sprocket` into a single ratio describing the motor-to-mechanism reduction.
 

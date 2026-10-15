@@ -1,12 +1,31 @@
 # SmartMotorControllerConfig
 
-**Package:** `yams.motorcontrollers`
+**Package:** `yams.commands2.config` (Commands v2) or `yams.commands3.config` (Commands v3)\
+**Extends:** `yams.core.motorcontrollers.SmartMotorControllerConfig<T>`
 
-Configuration class for [SmartMotorController](smart-motor-controller.md). All builder methods return the `SmartMotorControllerConfig` instance for chaining. Pass the completed config to a `SmartMotorController` constructor or factory.
+Configuration class for [SmartMotorController](smart-motor-controller.md). All builder methods return the `SmartMotorControllerConfig` instance for chaining. Pass the completed config to a `SmartMotorController` wrapper constructor.
+
+Robot code imports the config from the command framework package it uses. Both classes extend the abstract `yams.core.motorcontrollers.SmartMotorControllerConfig<T>`, which holds every builder method on this page. They only differ in what the config is bound to: a `Subsystem` in Commands v2, a `Mechanism` in Commands v3. The binding is used to register the `Live Tuning` command.
+
+{% tabs %}
+{% tab title="Commands v2" %}
+```java
+import yams.commands2.config.SmartMotorControllerConfig;
+```
+{% endtab %}
+
+{% tab title="Commands v3" %}
+```java
+import yams.commands3.config.SmartMotorControllerConfig;
+```
+{% endtab %}
+{% endtabs %}
 
 ## Enums
 
 ### ControlMode
+
+`yams.core.motorcontrollers.enums.ControlMode`
 
 | Value | Description |
 |-------|-------------|
@@ -15,12 +34,16 @@ Configuration class for [SmartMotorController](smart-motor-controller.md). All b
 
 ### MotorMode
 
+`yams.core.motorcontrollers.enums.MotorMode`
+
 | Value | Description |
 |-------|-------------|
 | `BRAKE` | Motor actively resists motion when not commanded. |
 | `COAST` | Motor freewheels when not commanded. |
 
 ### TelemetryVerbosity
+
+`yams.core.telemetry.enums.TelemetryVerbosity`
 
 | Value | Description |
 |-------|-------------|
@@ -30,12 +53,25 @@ Configuration class for [SmartMotorController](smart-motor-controller.md). All b
 
 ## Constructors
 
+{% tabs %}
+{% tab title="Commands v2" %}
 ```java
 SmartMotorControllerConfig()
 SmartMotorControllerConfig(Subsystem subsystem)
 ```
 
 The no-argument constructor is valid; call `withSubsystem(Subsystem)` before passing the config to a `SmartMotorController`.
+{% endtab %}
+
+{% tab title="Commands v3" %}
+```java
+SmartMotorControllerConfig()
+SmartMotorControllerConfig(Mechanism mechanism)
+```
+
+`Mechanism` is `org.wpilib.command3.Mechanism`. The no-argument constructor is valid; call `withMechanism(Mechanism)` before passing the config to a `SmartMotorController`.
+{% endtab %}
+{% endtabs %}
 
 ## Builder Methods: Motor Settings
 
@@ -44,7 +80,7 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withMotorInverted(boolean inverted)` | `inverted` | Reverses motor output direction. |
 | `withEncoderInverted(boolean inverted)` | `inverted` | Reverses the reported encoder direction. |
 | `withExternalEncoderInverted(boolean inverted)` | `inverted` | Reverses the external encoder reading direction. |
-| `withIdleMode(MotorMode mode)` | `mode` | Sets coast or brake mode. |
+| `withZeroPower(MotorMode mode)` | `mode` | Sets coast or brake mode. |
 | `withStatorCurrentLimit(Current limit)` | `limit` | Maximum motor output current. |
 | `withOutputCurrentLimit(Current stallCurrent)` | `stallCurrent` | Alias for `withStatorCurrentLimit`. Use when thinking in terms of output current rather than stator current. |
 | `withSupplyCurrentLimit(Current limit)` | `limit` | Maximum current drawn from the battery. |
@@ -68,11 +104,9 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withDrumRadius(Distance radius)` | `radius` | Alias for `withWheelRadius`. Intended for elevator drums. |
 | `withDrumRadius(Distance chainPitch, int teeth)` | `chainPitch`, `teeth` | Computes radius from chain pitch and sprocket tooth count. |
 | `withCascadingElevatorStages(int stages)` | `stages` | Divides the configured gearing by `stages` to account for a cascading elevator. |
-| `withMechanismUpperLimit(Angle angle)` | `angle` | Mechanism-space upper soft limit. |
-| `withMechanismLowerLimit(Angle angle)` | `angle` | Mechanism-space lower soft limit. |
 | `withSoftLimits(Angle lower, Angle upper)` | `lower`, `upper` | Sets both mechanism soft limits. Lower must be less than upper. |
 | `withSoftLimits(Distance low, Distance high)` | `low`, `high` | Sets soft limits in distance units. Requires `withMechanismCircumference`. |
-| `withExternalEncoderZeroOffset(Angle offset)` | `offset` | Applies a zero offset to the external encoder reading. Negative values are automatically wrapped. |
+| `withExternalEncoderZeroOffset(Angle offset)` | `offset` | Applies a zero offset to the external encoder reading. Negative values are automatically wrapped. Read it back with `getExternalEncoderZeroOffset()` (formerly `getZeroOffset()`). |
 | `withExternalEncoderZeroOffset(Distance distance)` | `distance` | Zero offset in distance units. Requires `withMechanismCircumference`. |
 | `withContinuousWrapping(Angle min, Angle max)` | `min`, `max` | Enables continuous input for the closed-loop controller. Incompatible with soft limits and distance-based mechanisms. Requires `withClosedLoopController` to be called first. |
 | `withClosedLoopTolerance(Angle tolerance)` | `tolerance` | Sets the position tolerance for the PID controller. |
@@ -86,7 +120,8 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withClosedLoopController(double kP, double kI, double kD)` | N/A | Sets position PID gains for SLOT_0. Units: rotations in, volts out (meters in if linear). |
 | `withClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | N/A | Same as above for a specific slot. |
 | `withClosedLoopController(PIDController controller)` | `controller` | Attaches an existing `PIDController` to SLOT_0. |
-| `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an LQR controller. Clears all PID slots. |
+| `withClosedLoopController(PIDController controller, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
+| `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an [LQR controller](../math/lqr-controller.md). Clears all PID slots. |
 | `withClosedLoopControlPeriod(Time time)` | `time` | Period of the software closed-loop thread. Default: 20 ms. |
 | `withClosedLoopControlPeriod(Frequency freq)` | `freq` | Sets the period from a frequency. |
 | `withClosedLoopControllerMaximumVoltage(Voltage volts)` | `volts` | Clamps the closed-loop voltage output to ±`volts`. |
@@ -106,6 +141,9 @@ The no-argument constructor is valid; call `withSubsystem(Subsystem)` before pas
 | `withTrapezoidalProfile(AngularAcceleration maxAccel, Velocity<AngularAccelerationUnit> maxJerk)` | N/A | Trapezoidal profile for angular velocity control. |
 | `withTrapezoidalProfile(LinearAcceleration maxAccel, Velocity<LinearAccelerationUnit> maxJerk)` | N/A | Trapezoidal profile for linear velocity control. |
 | `withVelocityTrapezoidalProfile(boolean enabled)` | `enabled` | Marks the trapezoidal profile as a velocity profile explicitly. |
+| `withTrapezoidalProfileConstraints(TrapezoidProfile.Constraints constraints)` | `constraints` | Sets trapezoidal constraints directly, in rotations or meters per second (per second squared for a velocity profile). |
+| `withProfile(TrapezoidProfile.Constraints profile)` | `profile` | Sets a trapezoidal profile from raw constraints (rotations/s and rotations/s², or meters for a linear controller). Clears any exponential profile. |
+| `withProfile(ExponentialProfile.Constraints profile)` | `profile` | Sets an exponential profile from raw constraints. Clears any trapezoidal profile. |
 
 {% hint style="info" %}
 `withClosedLoopController` must be called before `withContinuousWrapping` or `withClosedLoopTolerance`. The PID controller must exist to configure those options.
@@ -118,10 +156,15 @@ These methods set values used only when running in simulation. If no sim-specifi
 | Method | Parameters | Description |
 |--------|-----------|-------------|
 | `withSimClosedLoopController(double kP, double kI, double kD)` | N/A | PID gains used only in simulation. |
-| `withSimClosedLoopController(LQRController controller)` | `controller` | LQR controller used only in simulation. |
+| `withSimClosedLoopController(double kP, double kI, double kD, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
+| `withSimClosedLoopController(PIDController controller)` | `controller` | `PIDController` used only in simulation. |
+| `withSimClosedLoopController(PIDController controller, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
+| `withSimClosedLoopController(LQRController controller)` | `controller` | [LQR controller](../math/lqr-controller.md) used only in simulation. |
 | `withSimFeedforward(ArmFeedforward ff)` | `ff` | Arm feedforward used only in simulation. |
 | `withSimFeedforward(ElevatorFeedforward ff)` | `ff` | Elevator feedforward used only in simulation. |
 | `withSimFeedforward(SimpleMotorFeedforward ff)` | `ff` | Simple feedforward used only in simulation. |
+| `withSimFeedforward(<feedforward> ff, ClosedLoopControllerSlot slot)` | N/A | Each `withSimFeedforward` overload also takes a slot. |
+| `withSimulationPeriod(Time time)` | `time` | Period at which the simulated physics is stepped, independent of `withClosedLoopControlPeriod`. Default: 20 ms. |
 | `withSimStartingPosition(Angle angle)` | `angle` | Seeds the simulated encoder to this angle at startup (simulation only). |
 | `withSimStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance (simulation only). |
 
@@ -129,8 +172,9 @@ These methods set values used only when running in simulation. If no sim-specifi
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withExternalEncoder(Object encoder)` | `encoder` | Attaches an external absolute encoder (`SparkAbsoluteEncoder`, `CANcoder`, `CANdi`). |
+| `withExternalEncoder(Object encoder)` | `encoder` | Attaches an external encoder. SPARK MAX/Flex: the SPARK's absolute encoder, the SPARK MAX alternate encoder, the SPARK Flex external encoder, or a REVLib `DetachedEncoder`. TalonFX/TalonFXS: a `CANcoder` or `CANdi`. Thrifty Nova: `FeedbackSensorType.ABS`, `FeedbackSensorType.QUAD` or a `CanEncoder` (see [NovaWrapper](nova-wrapper.md)). |
 | `withExternalEncoderGearing(MechanismGearing gearing)` | `gearing` | Gear ratio between the external encoder and the mechanism. |
+| `withExternalEncoderGearing(double reductionRatio)` | `reductionRatio` | Shorthand for a single reduction, e.g. `3` for 3:1 or `0.5` for 1:2. |
 | `withExternalEncoderDiscontinuityPoint(Angle discontinuity)` | `discontinuity` | Sets the absolute encoder wraparound point. Must be `Rotations.of(0.5)` or `Rotations.of(1.0)`. Required for `SparkAbsoluteEncoder`. Optional for `CANcoder`. |
 | `withUseExternalFeedbackEncoder(boolean use)` | `use` | When `true` (default), the external encoder is used as the PID feedback source. |
 
@@ -143,14 +187,16 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withStartingPosition(Angle angle)` | `angle` | Seeds the encoder to this angle at startup (real hardware and simulation). |
 | `withStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance. |
 
-## Builder Methods: Subsystem & Telemetry
+## Builder Methods: Subsystem/Mechanism & Telemetry
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withSubsystem(Subsystem subsystem)` | `subsystem` | Associates this motor with a WPILib `Subsystem`. Must be called exactly once if not provided in the constructor. |
+| `withSubsystem(Subsystem subsystem)` | `subsystem` | Commands v2 only. Associates this motor with a WPILib `Subsystem`. Must be called exactly once if not provided in the constructor. |
+| `withMechanism(Mechanism mechanism)` | `mechanism` | Commands v3 only. Associates this motor with a Commands v3 `Mechanism`. Must be called exactly once if not provided in the constructor. |
 | `withTelemetry(String name, TelemetryVerbosity verbosity)` | N/A | Enables NetworkTables telemetry. Publishes under `Mechanisms/<name>`. |
 | `withTelemetry(TelemetryVerbosity verbosity)` | `verbosity` | Enables telemetry with the default name `"motor"`. |
-| `withTelemetry(String name, SmartMotorControllerTelemetryConfig telemetryConfig)` | N/A | Enables telemetry with a custom field selection. |
+| `withTelemetry(String name, SmartMotorControllerTelemetryConfig telemetryConfig)` | N/A | Enables telemetry with a custom field selection. Sets the verbosity to `HIGH`. |
+| `setupLiveTuning()` | N/A | Registers the `Live Tuning` command for the motor controller this config is attached to, on the config's `Subsystem` (v2) or `Mechanism` (v3). Called automatically at `TelemetryVerbosity.HIGH`; call it yourself to opt in at other verbosities. Returns `void`. |
 | `withFollowers(Pair<Object, Boolean>... followers)` | `followers` | Adds native follower motors (varargs). Each `Pair` contains the vendor motor controller object and an inversion boolean relative to the leader. Followers must be the same vendor as the leader. |
 | `withLooselyCoupledFollowers(SmartMotorController... followers)` | `followers` | Adds `SmartMotorController` followers. Only position and velocity requests are forwarded; configurations are not transferred. |
 | `withVendorConfig(Object vendorConfig)` | `vendorConfig` | Provides a vendor-specific base configuration. YAMS options applied via this class always take precedence and overwrite it. |
@@ -160,17 +206,18 @@ These methods set values used only when running in simulation. If no sim-specifi
 
 | Method                                                                              | Returns   | Description                                                                                                                                                                                     |
 | ------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `convertToVoltage(DCMotor motor, AngularVelocity mechanismVelocity, Force force)`   | `Voltage` | Converts a feedforward `Force` applied at the mechanism into the motor voltage needed to produce it at `mechanismVelocity`, using the configured `withGearing`/`withMechanismCircumference`. Speed-dependent (includes back-EMF), so it's the correct feedforward for voltage-mode closed-loop control. |
-| `convertToCurrent(DCMotor motor, Force force)`                                      | `Current` | Same conversion, but returns the equivalent motor current instead of voltage. Does not depend on speed, so it's the correct feedforward for torque-current-mode closed-loop control (e.g. TorqueCurrentFOC). |
+| `convertToVoltage(DCMotor motor, Force force)` | `Voltage` | Converts a feedforward `Force` applied at the mechanism into the motor voltage that produces it (the resistive drop of the matching current), using the configured `withGearing`/`withMechanismCircumference`. It does not include the back-EMF of the commanded speed, because it is added on top of a velocity feedforward that already covers that. Used for voltage-mode closed-loop control. |
+| `convertToCurrent(DCMotor motor, Force force)` | `Current` | Same conversion, but returns the equivalent motor current instead of voltage. Used for torque-current-mode closed-loop control (e.g. TorqueCurrentFOC). |
 
-These back `SmartMotorController.setVelocity(velocity, Force feedforwardForce)` (see [SmartMotorController](smart-motor-controller.md#control)) — a `SwerveModule`'s drive motor uses them to turn a PathPlanner set-point generator's per-wheel `Force` into the right feedforward for whichever control mode that motor is using. Both throw `SmartMotorControllerConfigurationException` if `withGearing`/`withMechanismCircumference` were never configured.
+These back `SmartMotorController.setVelocity(velocity, Force feedforwardForce)` (see [SmartMotorController](smart-motor-controller.md#control)). A `SwerveModule`'s drive motor uses them to turn a PathPlanner set-point generator's per-wheel `Force` into the right feedforward for whichever control mode that motor is using.
 
 {% hint style="warning" %}
-Both methods require `withGearing(...)` and `withMechanismCircumference(...)` (or `withWheelRadius(...)`/`withWheelDiameter(...)`) to be configured — including for a `Force` of exactly zero. There's no special case that skips the config requirement for zero; a zero `Force` at a nonzero `mechanismVelocity` still needs a nonzero voltage to overcome back-EMF, so treating "zero force" as "zero output" would be physically wrong.
+Both methods throw `SmartMotorControllerConfigurationException` if no mechanism circumference was configured with `withMechanismCircumference(...)` (or `withWheelRadius(...)`/`withWheelDiameter(...)`), including for a `Force` of exactly zero.
 {% endhint %}
 
 ## See Also
 
 - [SmartMotorController](smart-motor-controller.md)
 - [SparkWrapper](spark-wrapper.md)
+- [NovaWrapper](nova-wrapper.md)
 - [TalonFXWrapper](talonfx-wrapper.md)
