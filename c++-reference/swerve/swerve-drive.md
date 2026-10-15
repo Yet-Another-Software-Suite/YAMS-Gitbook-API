@@ -31,6 +31,7 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 | `SetFieldRelativeChassisSpeeds` | `void SetFieldRelativeChassisSpeeds(wpi::math::ChassisVelocities fieldRelativeSpeeds)`        | Sets field-relative speeds, rotated by gyro heading.                                           |
 | `SetSwerveModuleStates`         | `void SetSwerveModuleStates(wpi::util::array<wpi::math::SwerveModuleVelocity, NumModules> states)` | Commands module states directly.                                                               |
 | `LockPose`                      | `void LockPose()`                                                                   | Commands every module to zero speed with its wheel pointed along its location vector (the X pattern) and clears the desired chassis speeds. Call it every loop (for example from a `Run` command) to hold the lock. |
+| `SetAzimuthAngles`              | `void SetAzimuthAngles(wpi::math::Rotation2d angle)`                                   | Turns every module to `angle` with zero drive speed, skipping the velocity deadband that would hold the wheels where they are, and clears the desired chassis speeds. Used by the azimuth live tuning. |
 | `GetStateFromRobotRelativeChassisSpeeds` | `wpi::util::array<wpi::math::SwerveModuleVelocity, NumModules> GetStateFromRobotRelativeChassisSpeeds(wpi::math::ChassisVelocities robotRelativeSpeeds)` | Converts robot-relative speeds into module states, applying `SwerveDriveConfig::OptimizeRobotRelativeChassisSpeeds(...)` and the configured center of rotation. |
 
 ***
