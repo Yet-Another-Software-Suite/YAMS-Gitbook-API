@@ -6,7 +6,7 @@
 
 See also: [Elevator](../mechanisms/elevator.md)
 
----
+***
 
 ## Constructor
 
@@ -15,39 +15,39 @@ ElevatorConfig()
 ElevatorConfig clone()  // Deep copy
 ```
 
----
+***
 
-## Builder Methods
+## Builder methods
 
-| Method | Parameters | Description |
-|--------|-----------|-------------|
-| `withCarriageWeight(Mass mass)` | `mass`: carriage mass | **Required for simulation.** Used by `ElevatorSim` to model gravity. `Elevator` throws `ElevatorConfigurationException` in simulation without it. |
-| `withHardLimits(Distance min, Distance max)` | `min`: bottom limit, `max`: top limit | **Required for simulation.** Sets the physical height range used by `ElevatorSim` and the Mechanism2d visualization. For limits enforced by the motor controller, use `SmartMotorControllerConfig.withSoftLimits(...)`. |
-| `withAngle(Angle angle)` | `angle`: angle from horizontal | Elevator mounting angle for the visualization. Defaults to 90 degrees (vertical). Optional. |
-| `withHorizontalElevator()` | _(none)_ | Disables gravity simulation. Useful for horizontal linear sliders. Optional. |
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
-| `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional; defaults to orange. |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
+| Method                                                        | Parameters                                             | Description                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `withCarriageWeight(Mass mass)`                               | `mass`: carriage mass                                  | **Required for simulation.** Used by `ElevatorSim` to model gravity. `Elevator` throws `ElevatorConfigurationException` in simulation without it.                                                                       |
+| `withHardLimits(Distance min, Distance max)`                  | `min`: bottom limit, `max`: top limit                  | **Required for simulation.** Sets the physical height range used by `ElevatorSim` and the Mechanism2d visualization. For limits enforced by the motor controller, use `SmartMotorControllerConfig.withSoftLimits(...)`. |
+| `withAngle(Angle angle)`                                      | `angle`: angle from horizontal                         | Elevator mounting angle for the visualization. Defaults to 90 degrees (vertical). Optional.                                                                                                                             |
+| `withHorizontalElevator()`                                    | _(none)_                                               | Disables gravity simulation. Useful for horizontal linear sliders. Optional.                                                                                                                                            |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)`    | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional.                                                                                                                                                           |
+| `withSimColor(Color8Bit color)`                               | `color`: RGB color                                     | Sets the Mechanism2d visualization color. Optional; defaults to orange.                                                                                                                                                 |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config                              | Configures the visualization plane and 3D offset for this mechanism. Optional.                                                                                                                                          |
 
 > **Note:** Drum radius (spool size) is configured on `SmartMotorControllerConfig` via `.withDrumRadius(Distance radius)`, `.withDrumRadius(Distance chainPitch, int teeth)` or `.withMechanismCircumference(Distance)`. Cascading elevator stages are configured via `SmartMotorControllerConfig.withCascadingElevatorStages(int stages)`. The starting height is set with `SmartMotorControllerConfig.withStartingPosition(Distance)` and must lie within the hard limits in simulation.
 
----
+***
 
 ## Getters
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getTelemetryName()` | `Optional<String>` | The configured NT prefix, or empty if telemetry is not set. |
-| `getTelemetryVerbosity()` | `Optional<TelemetryVerbosity>` | The configured verbosity, or empty. |
-| `getCarriageMass()` | `Optional<Mass>` | The carriage mass, or empty if not configured. |
-| `getMinimumHeight()` | `Optional<Distance>` | Lower hard limit, or empty. |
-| `getMaximumHeight()` | `Optional<Distance>` | Upper hard limit, or empty. |
-| `getAngle()` | `Angle` | The elevator angle. Defaults to 90 degrees. |
-| `getIsElevatorHorizontal()` | `boolean` | `true` if `withHorizontalElevator()` was called. |
-| `getSimColor()` | `Color8Bit` | The visualization color. Defaults to orange. |
-| `getMechanismPositionConfig()` | `MechanismPositionConfig` | The position/plane configuration. |
+| Method                         | Returns                        | Description                                                 |
+| ------------------------------ | ------------------------------ | ----------------------------------------------------------- |
+| `getTelemetryName()`           | `Optional<String>`             | The configured NT prefix, or empty if telemetry is not set. |
+| `getTelemetryVerbosity()`      | `Optional<TelemetryVerbosity>` | The configured verbosity, or empty.                         |
+| `getCarriageMass()`            | `Optional<Mass>`               | The carriage mass, or empty if not configured.              |
+| `getMinimumHeight()`           | `Optional<Distance>`           | Lower hard limit, or empty.                                 |
+| `getMaximumHeight()`           | `Optional<Distance>`           | Upper hard limit, or empty.                                 |
+| `getAngle()`                   | `Angle`                        | The elevator angle. Defaults to 90 degrees.                 |
+| `getIsElevatorHorizontal()`    | `boolean`                      | `true` if `withHorizontalElevator()` was called.            |
+| `getSimColor()`                | `Color8Bit`                    | The visualization color. Defaults to orange.                |
+| `getMechanismPositionConfig()` | `MechanismPositionConfig`      | The position/plane configuration.                           |
 
----
+***
 
 ## Example
 

@@ -29,26 +29,26 @@ The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) 
 
 In simulation the constructor throws `ArmConfigurationException` if `ArmConfig.withLength` or `ArmConfig.withHardLimits` is missing, if neither `SmartMotorControllerConfig.withStartingPosition` nor an external encoder zero offset is set, or if the starting position is outside the hard limits. See [ArmConfig](../config/arm-config.md) and [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md).
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.positional.Arm` and work outside of commands.
 
-| Method                              | Returns                | Description                                                                     |
-| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------- |
-| `getAngle()`                        | `Angle`                | Current mechanism angle from the encoder                                        |
-| `isNear(Angle angle, Angle within)` | `boolean`              | `true` when the current angle is within `within` of `angle`                     |
-| `isGte(Angle angle)`                | `boolean`              | `true` when the current angle is greater than or equal to `angle`               |
-| `isLte(Angle angle)`                | `boolean`              | `true` when the current angle is less than or equal to `angle`                  |
-| `isBetween(Angle start, Angle end)` | `boolean`              | `true` when the current angle is in `[start, end]`                              |
+| Method                              | Returns                | Description                                                                    |
+| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| `getAngle()`                        | `Angle`                | Current mechanism angle from the encoder                                       |
+| `isNear(Angle angle, Angle within)` | `boolean`              | `true` when the current angle is within `within` of `angle`                    |
+| `isGte(Angle angle)`                | `boolean`              | `true` when the current angle is greater than or equal to `angle`              |
+| `isLte(Angle angle)`                | `boolean`              | `true` when the current angle is less than or equal to `angle`                 |
+| `isBetween(Angle start, Angle end)` | `boolean`              | `true` when the current angle is in `[start, end]`                             |
 | `isAtMax()`                         | `boolean`              | `true` at or above the upper soft limit if set, otherwise the upper hard limit |
 | `isAtMin()`                         | `boolean`              | `true` at or below the lower soft limit if set, otherwise the lower hard limit |
-| `getArmConfig()`                    | `ArmConfig`            | The `ArmConfig` used to build this arm                                          |
-| `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                 |
-| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                               |
+| `getArmConfig()`                    | `ArmConfig`            | The `ArmConfig` used to build this arm                                         |
+| `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                |
+| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                              |
 
 `isAtMax()` and `isAtMin()` throw `ArmConfigurationException` when neither a soft limit nor a hard limit is configured.
 
-## Command Factories
+## Command factories
 
 Commands that run indefinitely must be interrupted or composed with a terminating condition.
 
@@ -132,7 +132,7 @@ Returns `Command`.
 | `min()`                           | `Trigger` | Active while `isAtMin()` is `true`                                |
 
 {% hint style="info" %}
-The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](#state-queries)).
+The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](arm.md#state-queries)).
 {% endhint %}
 
 ```java
@@ -143,11 +143,11 @@ arm.near(Degrees.of(80), Degrees.of(2)).onTrue(shooter.run(RPM.of(3000)));
 
 Both packages have the same method names and parameters. The difference is the return types and what the commands require:
 
-|                | Commands v2 (`yams.commands2.mechanisms.Arm`)                  | Commands v3 (`yams.commands3.mechanisms.Arm`)                  |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
-| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
-| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+|                | Commands v2 (`yams.commands2.mechanisms.Arm`)                 | Commands v3 (`yams.commands3.mechanisms.Arm`)                 |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                 | `org.wpilib.command3.Command`                                 |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                          | `org.wpilib.command3.Trigger`                                 |
+| Requirement    | The `Subsystem` from `getSubsystem()`                         | The `Mechanism` from `getMechanism()`                         |
 | Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
 
 In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
@@ -163,7 +163,7 @@ public Command pickUp()
 }
 ```
 
-## Visualization & Simulation
+## Visualization and simulation
 
 | Method                           | Returns                | Description                                                                   |
 | -------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
@@ -187,7 +187,7 @@ Commands v3:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/ArmMechanism.java" %}
 
-## See Also
+## See also
 
 * [ArmConfig](../config/arm-config.md)
 * [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md)

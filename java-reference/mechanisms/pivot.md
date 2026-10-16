@@ -20,35 +20,35 @@ import yams.core.mechanisms.config.PivotConfig;
 Pivot(PivotConfig config, SmartMotorController smc)
 ```
 
-| Name     | Type                   | Description                                       |
-| -------- | ---------------------- | ------------------------------------------------- |
-| `config` | `PivotConfig`          | Pivot geometry, limits, and control parameters    |
-| `smc`    | `SmartMotorController` | Configured motor controller driving the pivot     |
+| Name     | Type                   | Description                                    |
+| -------- | ---------------------- | ---------------------------------------------- |
+| `config` | `PivotConfig`          | Pivot geometry, limits, and control parameters |
+| `smc`    | `SmartMotorController` | Configured motor controller driving the pivot  |
 
 The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) passed to the `SmartMotorControllerConfig` constructor, so build the motor controller with `yams.commands2.config.SmartMotorControllerConfig` or `yams.commands3.config.SmartMotorControllerConfig` to match the `Pivot` you import.
 
 In simulation the constructor throws `PivotConfigurationException` if `PivotConfig.withHardLimits` is missing, if `SmartMotorControllerConfig.withStartingPosition` is not set, or if the starting position is outside the hard limits. See [PivotConfig](../config/pivot-config.md) and [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md).
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.positional.Pivot` and work outside of commands.
 
-| Method                              | Returns                | Description                                                                     |
-| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------- |
-| `getAngle()`                        | `Angle`                | Current mechanism angle from the encoder                                        |
-| `isNear(Angle angle, Angle within)` | `boolean`              | `true` when the current angle is within `within` of `angle`                     |
-| `isGte(Angle angle)`                | `boolean`              | `true` when the current angle is greater than or equal to `angle`               |
-| `isLte(Angle angle)`                | `boolean`              | `true` when the current angle is less than or equal to `angle`                  |
-| `isBetween(Angle start, Angle end)` | `boolean`              | `true` when the current angle is in `[start, end]`                              |
+| Method                              | Returns                | Description                                                                    |
+| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| `getAngle()`                        | `Angle`                | Current mechanism angle from the encoder                                       |
+| `isNear(Angle angle, Angle within)` | `boolean`              | `true` when the current angle is within `within` of `angle`                    |
+| `isGte(Angle angle)`                | `boolean`              | `true` when the current angle is greater than or equal to `angle`              |
+| `isLte(Angle angle)`                | `boolean`              | `true` when the current angle is less than or equal to `angle`                 |
+| `isBetween(Angle start, Angle end)` | `boolean`              | `true` when the current angle is in `[start, end]`                             |
 | `isAtMax()`                         | `boolean`              | `true` at or above the upper soft limit if set, otherwise the upper hard limit |
 | `isAtMin()`                         | `boolean`              | `true` at or below the lower soft limit if set, otherwise the lower hard limit |
-| `getPivotConfig()`                  | `PivotConfig`          | The `PivotConfig` used to build this pivot                                      |
-| `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                 |
-| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                               |
+| `getPivotConfig()`                  | `PivotConfig`          | The `PivotConfig` used to build this pivot                                     |
+| `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                |
+| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                              |
 
 `isAtMax()` and `isAtMin()` throw `PivotConfigurationException` when neither a soft limit nor a hard limit is configured.
 
-## Command Factories
+## Command factories
 
 Commands that run indefinitely must be interrupted or composed with a terminating condition.
 
@@ -74,8 +74,8 @@ public Command setAngle(Angle angle)
 public Command setAngle(Supplier<Angle> angle)
 ```
 
-| Name    | Type                        | Description               |
-| ------- | --------------------------- | ------------------------- |
+| Name    | Type                        | Description                 |
+| ------- | --------------------------- | --------------------------- |
 | `angle` | `Angle` / `Supplier<Angle>` | Desired pivot angle to hold |
 
 Returns `Command`.
@@ -89,7 +89,7 @@ public Command runTo(Supplier<Angle> angle, Angle tolerance)
 
 | Name        | Type                        | Description                                        |
 | ----------- | --------------------------- | -------------------------------------------------- |
-| `angle`     | `Angle` / `Supplier<Angle>` | Desired pivot angle                                  |
+| `angle`     | `Angle` / `Supplier<Angle>` | Desired pivot angle                                |
 | `tolerance` | `Angle`                     | Acceptable angular error for the command to finish |
 
 Returns `Command`.
@@ -132,7 +132,7 @@ Returns `Command`.
 | `min()`                           | `Trigger` | Active while `isAtMin()` is `true`                                |
 
 {% hint style="info" %}
-The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](#state-queries)).
+The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](pivot.md#state-queries)).
 {% endhint %}
 
 ```java
@@ -143,11 +143,11 @@ turret.near(Degrees.of(80), Degrees.of(2)).onTrue(shooter.run(RPM.of(3000)));
 
 Both packages have the same method names and parameters. The difference is the return types and what the commands require:
 
-|                | Commands v2 (`yams.commands2.mechanisms.Pivot`)                  | Commands v3 (`yams.commands3.mechanisms.Pivot`)                  |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
-| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
-| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+|                | Commands v2 (`yams.commands2.mechanisms.Pivot`)               | Commands v3 (`yams.commands3.mechanisms.Pivot`)               |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                 | `org.wpilib.command3.Command`                                 |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                          | `org.wpilib.command3.Trigger`                                 |
+| Requirement    | The `Subsystem` from `getSubsystem()`                         | The `Mechanism` from `getMechanism()`                         |
 | Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
 
 In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
@@ -160,19 +160,19 @@ public Command aimAt(Angle angle)
 }
 ```
 
-## Visualization & Simulation
+## Visualization and simulation
 
-| Method                           | Returns                | Description                                                                   |
-| -------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)          |
-| `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                   |
-| `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                      |
+| Method                           | Returns                | Description                                                                     |
+| -------------------------------- | ---------------------- | ------------------------------------------------------------------------------- |
+| `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)            |
+| `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                     |
+| `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                        |
 | `getRelativeMechanismPosition()` | `Translation3d`        | Pivot position relative to the robot, using the `MechanismPositionConfig`       |
-| `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                               |
+| `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                                 |
 | `getName()`                      | `String`               | The pivot telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the pivot physics simulation by one loop and updates the visualization |
-| `updateTelemetry()`              | `void`                 | Publishes current state to NetworkTables                                      |
-| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current angle and setpoint           |
+| `updateTelemetry()`              | `void`                 | Publishes current state to NetworkTables                                        |
+| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current angle and setpoint             |
 
 Call `updateTelemetry()` from `periodic()` and `simIterate()` from `simulationPeriodic()`. `simIterate()` already calls `visualizationUpdate()`.
 
@@ -186,7 +186,7 @@ Commands v3:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/TurretMechanism.java" %}
 
-## See Also
+## See also
 
 * [PivotConfig](../config/pivot-config.md)
 * [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md)

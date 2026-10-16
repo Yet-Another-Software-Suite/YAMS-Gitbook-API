@@ -1,10 +1,10 @@
-# Using YAMS Sensors
+# Using YAMS sensors
 
 **Goal:** Wire real hardware sensors into the YAMS simulation framework so the same subsystem code runs identically in simulation and on a physical robot, with no `#ifdef` guards, no separate simulation paths, and optional automated test-value injection.
 
 ***
 
-## What YAMS Sensors solve
+## What YAMS sensors solve
 
 WPILib's simulation layer lets you override hardware values in the **Glass** GUI. YAMS Sensors expose any arbitrary hardware reading (limit switch, encoder, analog input, color sensor, and so on) to Glass through a `SimDevice`, using the same typed supplier API on robot and in sim.
 

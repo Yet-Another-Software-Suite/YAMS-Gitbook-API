@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Overview](README.md)
-* [Getting Started](getting-started.md)
+* [Getting started](getting-started.md)
 
 ## API
 
@@ -102,13 +102,13 @@
 ## Guides
 
 * [Overview](guides/README.md)
-* [Configuring a Motor Controller](guides/configuring-a-motor.md)
-* [Building an Arm Subsystem](guides/building-an-arm.md)
-* [Building an Elevator Subsystem](guides/building-an-elevator.md)
-* [Building a Flywheel Subsystem](guides/building-a-flywheel.md)
-* [Setting Up Swerve Drive](guides/setting-up-swerve.md)
-* [Building Positional Mechanisms (C++)](guides/building-mechanisms-cpp.md)
-* [Building a Flywheel Subsystem (C++)](guides/building-a-flywheel-cpp.md)
-* [Setting Up Swerve Drive (C++)](guides/setting-up-swerve-cpp.md)
-* [Using YAMS Sensors](guides/using-yams-sensors.md)
+* [Configuring a motor controller](guides/configuring-a-motor.md)
+* [Building an arm subsystem](guides/building-an-arm.md)
+* [Building an elevator subsystem](guides/building-an-elevator.md)
+* [Building a flywheel subsystem](guides/building-a-flywheel.md)
+* [Setting up Swerve Drive](guides/setting-up-swerve.md)
+* [Building positional mechanisms (C++)](guides/building-mechanisms-cpp.md)
+* [Building a flywheel subsystem (C++)](guides/building-a-flywheel-cpp.md)
+* [Setting up Swerve Drive (C++)](guides/setting-up-swerve-cpp.md)
+* [Using YAMS sensors](guides/using-yams-sensors.md)
 * [Simulation](guides/simulation.md)

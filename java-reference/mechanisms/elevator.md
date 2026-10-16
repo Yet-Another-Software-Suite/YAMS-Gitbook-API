@@ -29,26 +29,26 @@ The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) 
 
 In simulation the constructor throws `ElevatorConfigurationException` if `ElevatorConfig.withCarriageWeight` or `ElevatorConfig.withHardLimits` is missing, and `SmartMotorControllerConfigurationException` if `SmartMotorControllerConfig.withStartingPosition` is not set or is outside the hard limits. See [ElevatorConfig](../config/elevator-config.md) and [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md).
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.positional.Elevator` and work outside of commands.
 
-| Method                                     | Returns                | Description                                                                       |
-| ------------------------------------------ | ---------------------- | --------------------------------------------------------------------------------- |
-| `getHeight()`                              | `Distance`             | Current carriage height from the encoder                                          |
-| `getVelocity()`                            | `LinearVelocity`       | Current carriage velocity                                                         |
-| `isNear(Distance height, Distance within)` | `boolean`              | `true` when the current height is within `within` of `height`                     |
-| `isGte(Distance height)`                   | `boolean`              | `true` when the current height is greater than or equal to `height`               |
-| `isLte(Distance height)`                   | `boolean`              | `true` when the current height is less than or equal to `height`                  |
-| `isBetween(Distance start, Distance end)`  | `boolean`              | `true` when the current height is in `[start, end]`                               |
+| Method                                     | Returns                | Description                                                                      |
+| ------------------------------------------ | ---------------------- | -------------------------------------------------------------------------------- |
+| `getHeight()`                              | `Distance`             | Current carriage height from the encoder                                         |
+| `getVelocity()`                            | `LinearVelocity`       | Current carriage velocity                                                        |
+| `isNear(Distance height, Distance within)` | `boolean`              | `true` when the current height is within `within` of `height`                    |
+| `isGte(Distance height)`                   | `boolean`              | `true` when the current height is greater than or equal to `height`              |
+| `isLte(Distance height)`                   | `boolean`              | `true` when the current height is less than or equal to `height`                 |
+| `isBetween(Distance start, Distance end)`  | `boolean`              | `true` when the current height is in `[start, end]`                              |
 | `isAtMax()`                                | `boolean`              | `true` at or above the upper soft limit if set, otherwise the maximum hard limit |
 | `isAtMin()`                                | `boolean`              | `true` at or below the lower soft limit if set, otherwise the minimum hard limit |
-| `getConfig()`                              | `ElevatorConfig`       | The `ElevatorConfig` used to build this elevator                                  |
-| `getMotorController()`                     | `SmartMotorController` | The underlying motor controller                                                   |
+| `getConfig()`                              | `ElevatorConfig`       | The `ElevatorConfig` used to build this elevator                                 |
+| `getMotorController()`                     | `SmartMotorController` | The underlying motor controller                                                  |
 
 `isAtMax()` and `isAtMin()` throw `ElevatorConfigurationException` when neither a soft limit nor a hard limit is configured.
 
-## Command Factories
+## Command factories
 
 Commands that run indefinitely must be interrupted or composed with a terminating condition.
 
@@ -132,7 +132,7 @@ Returns `Command`.
 | `min()`                                  | `Trigger` | Active while `isAtMin()` is `true`                                  |
 
 {% hint style="info" %}
-The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](#state-queries)).
+The `isNear(...)` Trigger factory was renamed to `near(...)`. `isNear(...)` still exists, but returns a `boolean` (see [State Queries](elevator.md#state-queries)).
 {% endhint %}
 
 ```java
@@ -143,11 +143,11 @@ elevator.near(Meters.of(1.2), Inches.of(1)).onTrue(arm.setAngle(Degrees.of(45)))
 
 Both packages have the same method names and parameters. The difference is the return types and what the commands require:
 
-|                | Commands v2 (`yams.commands2.mechanisms.Elevator`)             | Commands v3 (`yams.commands3.mechanisms.Elevator`)             |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
-| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
-| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+|                | Commands v2 (`yams.commands2.mechanisms.Elevator`)            | Commands v3 (`yams.commands3.mechanisms.Elevator`)            |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                 | `org.wpilib.command3.Command`                                 |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                          | `org.wpilib.command3.Trigger`                                 |
+| Requirement    | The `Subsystem` from `getSubsystem()`                         | The `Mechanism` from `getMechanism()`                         |
 | Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
 
 In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
@@ -161,7 +161,7 @@ public Command hold(Distance height)
 }
 ```
 
-## Visualization & Simulation
+## Visualization and simulation
 
 | Method                           | Returns                | Description                                                                        |
 | -------------------------------- | ---------------------- | ---------------------------------------------------------------------------------- |
@@ -189,7 +189,7 @@ Commands v3:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands3/simple_robot-2027/src/main/java/first/robot/mechanisms/ElevatorMechanism.java" %}
 
-## See Also
+## See also
 
 * [ElevatorConfig](../config/elevator-config.md)
 * [SmartMotorControllerConfig](../motor-controllers/smart-motor-controller-config.md)

@@ -4,7 +4,7 @@
 
 Converts raw joystick axis values into field-relative `ChassisVelocities` for swerve drive control. Handles deadbands, cubic input curves, axis scaling, alliance-relative flipping, and multiple drive modes (angular-velocity, heading-snap, translation-only, aim-at-target). Implements `Supplier<ChassisVelocities>` so it can be passed directly wherever a `ChassisVelocities` supplier is expected.
 
-The API is the same in both packages; they differ only in the type of the `Live Tuning` command published by [telemetry](#telemetry-and-live-tuning). Import the one matching your command framework.
+The API is the same in both packages; they differ only in the type of the `Live Tuning` command published by [telemetry](swerve-input-stream.md#telemetry-and-live-tuning). Import the one matching your command framework.
 
 ***
 
@@ -23,101 +23,101 @@ new SwerveInputStream(SwerveDrive drive, DoubleSupplier x, DoubleSupplier y,
                       DoubleSupplier headingX, DoubleSupplier headingY)
 ```
 
-| Parameter  | Type             | Description                                                                       |
-| ---------- | ---------------- | --------------------------------------------------------------------------------- |
+| Parameter  | Type             | Description                                                                                                                                                   |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `drive`    | `SwerveDrive`    | The drivetrain instance (`yams.core.mechanisms.swerve.SwerveDrive`, so a v2 or v3 `SwerveDrive` works). Used for heading reference, rotation PID, and config. |
-| `x`        | `DoubleSupplier` | Forward/back axis in range `[-1, 1]`. Positive is forward.                        |
-| `y`        | `DoubleSupplier` | Left/right axis in range `[-1, 1]`. Positive is left.                             |
-| `rot`      | `DoubleSupplier` | Rotation axis in range `[-1, 1]`, counter-clockwise positive. Used for angular-velocity control. |
-| `headingX` | `DoubleSupplier` | Heading X component in range `[-1, 1]`. Used for heading-angle control.           |
-| `headingY` | `DoubleSupplier` | Heading Y component in range `[-1, 1]`. Used for heading-angle control.           |
+| `x`        | `DoubleSupplier` | Forward/back axis in range `[-1, 1]`. Positive is forward.                                                                                                    |
+| `y`        | `DoubleSupplier` | Left/right axis in range `[-1, 1]`. Positive is left.                                                                                                         |
+| `rot`      | `DoubleSupplier` | Rotation axis in range `[-1, 1]`, counter-clockwise positive. Used for angular-velocity control.                                                              |
+| `headingX` | `DoubleSupplier` | Heading X component in range `[-1, 1]`. Used for heading-angle control.                                                                                       |
+| `headingY` | `DoubleSupplier` | Heading Y component in range `[-1, 1]`. Used for heading-angle control.                                                                                       |
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All builder methods return `SwerveInputStream` for chaining.
 
-### Velocity Limits
+### Velocity limits
 
-| Method                                                 | Parameters | Description                                                |
-| ------------------------------------------------------ | ---------- | ---------------------------------------------------------- |
-| `withMaximumLinearVelocity(LinearVelocity velocity)`   | `velocity` | Chassis speed a full translation axis maps to. Defaults to the drive's maximum chassis linear velocity, or 4 m/s. |
+| Method                                                 | Parameters | Description                                                                                                                    |
+| ------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `withMaximumLinearVelocity(LinearVelocity velocity)`   | `velocity` | Chassis speed a full translation axis maps to. Defaults to the drive's maximum chassis linear velocity, or 4 m/s.              |
 | `withMaximumAngularVelocity(AngularVelocity velocity)` | `velocity` | Chassis rotation rate a full rotation axis maps to. Defaults to the drive's maximum chassis angular velocity, or 1 rotation/s. |
 
 {% hint style="info" %}
 A stream copies `SwerveDriveConfig.withMaximumChassisSpeed(...)`'s value (if set) into its own maximum fields once, at construction time; otherwise it starts from its own defaults (4 m/s, 1 rotation/s). Calling `withMaximumLinearVelocity(...)`/`withMaximumAngularVelocity(...)` afterward overrides that value for this stream and takes effect immediately; the drive's config is not re-checked after construction.
 {% endhint %}
 
-### Axis Configuration
+### Axis configuration
 
-| Method                                                                        | Parameters                               | Description                                                                                                               |
-| ----------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `withControllerRotationAxis(DoubleSupplier rot)`                              | `rot`: range `[-1, 1]`                  | Set or replace the rotation axis supplier after construction. Enables angular-velocity mode.                              |
+| Method                                                                        | Parameters                              | Description                                                                                                                                                                  |
+| ----------------------------------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `withControllerRotationAxis(DoubleSupplier rot)`                              | `rot`: range `[-1, 1]`                  | Set or replace the rotation axis supplier after construction. Enables angular-velocity mode.                                                                                 |
 | `withControllerHeadingAxis(DoubleSupplier headingX, DoubleSupplier headingY)` | `headingX`, `headingY`: range `[-1, 1]` | Face the direction the stick points while `withHeadingControl()` is active. The robot stops turning while the stick is inside the deadband. Replaces any `withHeading(...)`. |
-| `withHeading(Supplier<Angle> heading)`                                        | `heading`                                | Field-relative heading to face while `withHeadingControl()` is active. Replaces any controller heading axis.               |
-| `withDeadband(double deadband)` / `deadband(double deadband)`                 | `deadband`: 0.0 to 1.0                  | Deadband applied to all axes before scaling. `0` disables it.                                                             |
-| `withScaleTranslation(double scale)`                                          | `scale`: range `(0, 1]`                 | Multiplies the translation output magnitude by `scale`. `0` disables scaling.                                             |
-| `withScaleRotation(double scale)`                                             | `scale`: range `(0, 1]`                 | Multiplies the rotation axis value by `scale`. `0` disables scaling.                                                      |
+| `withHeading(Supplier<Angle> heading)`                                        | `heading`                               | Field-relative heading to face while `withHeadingControl()` is active. Replaces any controller heading axis.                                                                 |
+| `withDeadband(double deadband)` / `deadband(double deadband)`                 | `deadband`: 0.0 to 1.0                  | Deadband applied to all axes before scaling. `0` disables it.                                                                                                                |
+| `withScaleTranslation(double scale)`                                          | `scale`: range `(0, 1]`                 | Multiplies the translation output magnitude by `scale`. `0` disables scaling.                                                                                                |
+| `withScaleRotation(double scale)`                                             | `scale`: range `(0, 1]`                 | Multiplies the rotation axis value by `scale`. `0` disables scaling.                                                                                                         |
 
-### Input Curves
+### Input curves
 
 | Method                                                       | Parameters | Description                                                                                 |
 | ------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
-| `withCubeTranslationControllerAxis()`                        | N/A | Applies a cubic curve to translation magnitude for finer low-speed control. Always enabled. |
+| `withCubeTranslationControllerAxis()`                        | N/A        | Applies a cubic curve to translation magnitude for finer low-speed control. Always enabled. |
 | `withCubeTranslationControllerAxis(BooleanSupplier enabled)` | `enabled`  | Applies a cubic curve to translation magnitude when supplier returns `true`.                |
-| `withCubeRotationControllerAxis()`                           | N/A | Applies a cubic curve to the rotation axis. Always enabled.                                 |
+| `withCubeRotationControllerAxis()`                           | N/A        | Applies a cubic curve to the rotation axis. Always enabled.                                 |
 | `withCubeRotationControllerAxis(BooleanSupplier enabled)`    | `enabled`  | Applies a cubic curve to the rotation axis when supplier returns `true`.                    |
 
-### Drive Modes
+### Drive modes
 
 Heading, aim and translation-only control need a rotation controller on the drive (`SwerveDriveConfig.withRotationController(...)`); without one, `get()` throws `SwerveDriveConfigurationException` in those modes.
 
-| Method                                                      | Parameters          | Description                                                                                              |
-| ----------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------- |
-| `withHeadingControl(BooleanSupplier trigger)`               | `trigger`           | Enables heading-angle control mode while trigger returns `true`. Requires `withControllerHeadingAxis()` or `withHeading()`. |
-| `withAim(Supplier<Pose2d> target, BooleanSupplier trigger)` | `target`, `trigger` | Rotates the robot to face the target pose while translating. Enables AIM mode while trigger is `true`.   |
-| `withAimLookahead(Time lookahead)` | `lookahead` | Aims from where the robot will be after the lookahead time, moving the pose along its field relative velocity. |
-| `withAimFeedforward(SimpleMotorFeedforward feedforward)` | `feedforward` | Adds a feedforward to the aim rotation so the robot keeps up with a target whose direction is changing. |
-| `withAimHeadingOffset(Rotation2d offset)` | `offset` | Rotates the aim heading, for a shooter that does not point out of the front of the robot. |
-| `withAimHeadingOffset(Rotation2d offset, BooleanSupplier enabled)` | `offset`, `enabled` | Rotates the aim heading while `enabled` is `true`. |
-| `aimLock(Angle tolerance)` | `tolerance` | Returns a `Trigger` that is true while aiming and within the tolerance of the aim heading. |
-| `isAimLocked(Angle tolerance)` | `tolerance` | Whether the robot is aiming and within the tolerance of the aim heading. |
-| `getTargetVector(Pose2d target)` | `target` | Field relative vector from the robot to the target, from the looked ahead position if a lookahead is set. |
-| `calculateAngularVelocity(Angle target)` | `target` | Angular velocity that turns the robot to a heading, from the rotation controller and the aim feedforward. |
-| `withTranslationOnly(BooleanSupplier trigger)`              | `trigger`           | Suppresses rotation and holds the heading the robot had when enabled while trigger returns `true`.      |
+| Method                                                             | Parameters          | Description                                                                                                                 |
+| ------------------------------------------------------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `withHeadingControl(BooleanSupplier trigger)`                      | `trigger`           | Enables heading-angle control mode while trigger returns `true`. Requires `withControllerHeadingAxis()` or `withHeading()`. |
+| `withAim(Supplier<Pose2d> target, BooleanSupplier trigger)`        | `target`, `trigger` | Rotates the robot to face the target pose while translating. Enables AIM mode while trigger is `true`.                      |
+| `withAimLookahead(Time lookahead)`                                 | `lookahead`         | Aims from where the robot will be after the lookahead time, moving the pose along its field relative velocity.              |
+| `withAimFeedforward(SimpleMotorFeedforward feedforward)`           | `feedforward`       | Adds a feedforward to the aim rotation so the robot keeps up with a target whose direction is changing.                     |
+| `withAimHeadingOffset(Rotation2d offset)`                          | `offset`            | Rotates the aim heading, for a shooter that does not point out of the front of the robot.                                   |
+| `withAimHeadingOffset(Rotation2d offset, BooleanSupplier enabled)` | `offset`, `enabled` | Rotates the aim heading while `enabled` is `true`.                                                                          |
+| `aimLock(Angle tolerance)`                                         | `tolerance`         | Returns a `Trigger` that is true while aiming and within the tolerance of the aim heading.                                  |
+| `isAimLocked(Angle tolerance)`                                     | `tolerance`         | Whether the robot is aiming and within the tolerance of the aim heading.                                                    |
+| `getTargetVector(Pose2d target)`                                   | `target`            | Field relative vector from the robot to the target, from the looked ahead position if a lookahead is set.                   |
+| `calculateAngularVelocity(Angle target)`                           | `target`            | Angular velocity that turns the robot to a heading, from the rotation controller and the aim feedforward.                   |
+| `withTranslationOnly(BooleanSupplier trigger)`                     | `trigger`           | Suppresses rotation and holds the heading the robot had when enabled while trigger returns `true`.                          |
 
-### Field Orientation
+### Field orientation
 
-| Method                                                                    | Parameters         | Description                                                                                                    |
-| ------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `withAllianceRelativeControl()`                                           | N/A | Flips translation 180 degrees on the Red alliance so "forward" always points away from your driver station. Always enabled. |
-| `withAllianceRelativeControl(BooleanSupplier enabled)`                    | `enabled`          | Alliance-relative control when supplier returns `true`.                                                        |
-| `withRobotRelative()`                                                     | N/A | Treats the translation axes as robot relative. The output is still field relative, and alliance flipping is skipped. Always enabled. |
-| `withRobotRelative(BooleanSupplier enabled)`                              | `enabled`          | Robot-relative translation axes when supplier returns `true`.                                                  |
-| `withTranslationHeadingOffset(Rotation2d angle)`                          | `angle`            | Rotates the translation direction by `angle`. Always enabled.                                                  |
-| `withTranslationHeadingOffset(Rotation2d angle, BooleanSupplier enabled)` | `angle`, `enabled` | Rotates the translation direction by `angle` when supplier returns `true`.                                     |
+| Method                                                                    | Parameters         | Description                                                                                                                          |
+| ------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `withAllianceRelativeControl()`                                           | N/A                | Flips translation 180 degrees on the Red alliance so "forward" always points away from your driver station. Always enabled.          |
+| `withAllianceRelativeControl(BooleanSupplier enabled)`                    | `enabled`          | Alliance-relative control when supplier returns `true`.                                                                              |
+| `withRobotRelative()`                                                     | N/A                | Treats the translation axes as robot relative. The output is still field relative, and alliance flipping is skipped. Always enabled. |
+| `withRobotRelative(BooleanSupplier enabled)`                              | `enabled`          | Robot-relative translation axes when supplier returns `true`.                                                                        |
+| `withTranslationHeadingOffset(Rotation2d angle)`                          | `angle`            | Rotates the translation direction by `angle`. Always enabled.                                                                        |
+| `withTranslationHeadingOffset(Rotation2d angle, BooleanSupplier enabled)` | `angle`, `enabled` | Rotates the translation direction by `angle` when supplier returns `true`.                                                           |
 
 ### Utility
 
-| Method    | Parameters | Description                                                                               |
-| --------- | ---------- | ----------------------------------------------------------------------------------------- |
-| `clone()` | N/A | Returns a copy of this stream. Subsequent changes to the copy do not affect the original. The copy has no telemetry. |
+| Method    | Parameters | Description                                                                                                          |
+| --------- | ---------- | -------------------------------------------------------------------------------------------------------------------- |
+| `clone()` | N/A        | Returns a copy of this stream. Subsequent changes to the copy do not affect the original. The copy has no telemetry. |
 
 ***
 
-## Output Methods
+## Output methods
 
-| Method   | Returns         | Description                                                                                            |
-| -------- | --------------- | -------------------------------------------------------------------------------------------------------- |
-| `get()`  | `ChassisVelocities` | Computes and returns the current **field-relative** `ChassisVelocities` based on all configured inputs and the active drive mode. Call once per robot loop, and pass the result to `SwerveDrive.setFieldRelativeChassisSpeeds(...)` (or convert with `toRobotRelative(...)` for `SwerveDrive.drive(...)`). |
-| `getCurrentModeName()` | `String` | Name of the drive mode used by the last `get()` call. |
+| Method                 | Returns             | Description                                                                                                                                                                                                                                                                                                |
+| ---------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `get()`                | `ChassisVelocities` | Computes and returns the current **field-relative** `ChassisVelocities` based on all configured inputs and the active drive mode. Call once per robot loop, and pass the result to `SwerveDrive.setFieldRelativeChassisSpeeds(...)` (or convert with `toRobotRelative(...)` for `SwerveDrive.drive(...)`). |
+| `getCurrentModeName()` | `String`            | Name of the drive mode used by the last `get()` call.                                                                                                                                                                                                                                                      |
 
 The current configuration can also be read and changed at runtime (this is what live tuning uses): `getAxisDeadband()`/`setAxisDeadband(double)`, `getTranslationAxisScale()`/`setTranslationAxisScale(double)`, `getOmegaAxisScale()`/`setOmegaAxisScale(double)`, `getMaximumChassisLinearVelocity()`/`setMaximumChassisLinearVelocity(LinearVelocity)`, `getMaximumChassisAngularVelocity()`/`setMaximumChassisAngularVelocity(AngularVelocity)`, `isTranslationCubeEnabled()`/`setTranslationCubeEnabled(boolean)`, `isOmegaCubeEnabled()`/`setOmegaCubeEnabled(boolean)`, `isAllianceRelativeEnabled()`/`setAllianceRelativeEnabled(boolean)`, and `isRobotRelativeEnabled()`/`setRobotRelativeEnabled(boolean)`.
 
 ***
 
-## Drive Modes
+## Drive modes
 
 `SwerveInputStream` automatically selects the active drive mode each loop based on which suppliers are configured and active.
 
@@ -136,20 +136,20 @@ An earlier `DRIVE_TO_POSE` mode (with a matching `atTargetPose(...)` method) has
 
 ***
 
-## Telemetry and Live Tuning
+## Telemetry and live tuning
 
 Telemetry is off until you call `withTelemetry(name, verbosity)`. It publishes every time the stream is read with `get()`, so there is nothing to call each loop.
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `SwerveInputStream` | Publishes this stream's telemetry under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had. Call it last, after the rest of the configuration, so the dashboard starts with the configured values. |
-| `getTelemetry()` | `Optional<SwerveInputStreamTelemetry>` | The stream's telemetry, or empty if `withTelemetry` was not called. |
+| Method                                                     | Returns                                | Description                                                                                                                                                                                                               |
+| ---------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `withTelemetry(String name, TelemetryVerbosity verbosity)` | `SwerveInputStream`                    | Publishes this stream's telemetry under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had. Call it last, after the rest of the configuration, so the dashboard starts with the configured values. |
+| `getTelemetry()`                                           | `Optional<SwerveInputStreamTelemetry>` | The stream's telemetry, or empty if `withTelemetry` was not called.                                                                                                                                                       |
 
-| Verbosity | Publishes |
-|-----------|-----------|
-| `LOW` | The current drive mode (`mode`). |
-| `MID` | Also the stream's configuration, read-only: `deadband`, `translationScale`, `rotationScale`, `maxLinearVelocity`, `maxAngularVelocity`, `translationCube`, `rotationCube`, `allianceRelative`, `robotRelative`. |
-| `HIGH` | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`. |
+| Verbosity | Publishes                                                                                                                                                                                                       |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOW`     | The current drive mode (`mode`).                                                                                                                                                                                |
+| `MID`     | Also the stream's configuration, read-only: `deadband`, `translationScale`, `rotationScale`, `maxLinearVelocity`, `maxAngularVelocity`, `translationCube`, `rotationCube`, `allianceRelative`, `robotRelative`. |
+| `HIGH`    | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`.                                                |
 
 While the `Live Tuning` command runs, dashboard edits are applied to the stream every loop and changes made in code (for example a slow-mode binding calling `withScaleTranslation`) are published back to the dashboard. Dashboard values outside the allowed range are replaced with the stream's current value. The command requires no subsystem or mechanism, so it does not interrupt the command driving with the stream.
 
@@ -157,12 +157,12 @@ While the `Live Tuning` command runs, dashboard edits are applied to the stream 
 
 **Package:** `yams.commands2.telemetry` (Commands v2) or `yams.commands3.telemetry` (Commands v3). Implements `AutoCloseable`.
 
-| Method | Returns | Description |
-|--------|---------|-------------|
+| Method                   | Returns             | Description                                                                                                                                                                                       |
+| ------------------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `getLiveTuningCommand()` | `Optional<Command>` | The `Live Tuning` command at `HIGH` verbosity, otherwise empty. A `org.wpilib.command2.Command` in v2, a `org.wpilib.command3.Command` in v3. Bind it to a button or start it from the dashboard. |
-| `applyTuningValues()` | `void` | Applies dashboard edits to the stream and publishes code changes. The `Live Tuning` command calls this every loop. Does nothing below `HIGH`. |
-| `updateTelemetry()` | `void` | Publishes the mode and configuration. Called by `SwerveInputStream.get()`. |
-| `close()` | `void` | Stops publishing, canceling and removing the `Live Tuning` command. Use it when replacing a stream with another of the same name. |
+| `applyTuningValues()`    | `void`              | Applies dashboard edits to the stream and publishes code changes. The `Live Tuning` command calls this every loop. Does nothing below `HIGH`.                                                     |
+| `updateTelemetry()`      | `void`              | Publishes the mode and configuration. Called by `SwerveInputStream.get()`.                                                                                                                        |
+| `close()`                | `void`              | Stops publishing, canceling and removing the `Live Tuning` command. Use it when replacing a stream with another of the same name.                                                                 |
 
 {% tabs %}
 {% tab title="Commands v2" %}
@@ -251,7 +251,7 @@ swerveDrive.setFieldRelativeChassisSpeeds(driveInput.get());
 
 ***
 
-## See Also
+## See also
 
 * [SwerveDrive](swerve-drive.md)
 * [C++ SwerveInputStream](../../c++-reference/swerve/swerve-input-stream.md)

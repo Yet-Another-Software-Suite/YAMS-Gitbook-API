@@ -16,7 +16,7 @@ SensorConfig(String name)
 | --------- | -------------------------------------------- |
 | `name`    | Display name shown in the simulation window. |
 
-## Builder Methods: Field Registration
+## Builder methods: Field registration
 
 Register each hardware value you want to expose. Four overloads accept `DoubleSupplier`, `IntSupplier`, `BooleanSupplier`, and `LongSupplier`.
 
@@ -33,7 +33,7 @@ SensorConfig withField(String name, LongSupplier supplier, long defaultVal)
 | `supplier`   | Live hardware value source (called every loop iteration on a real robot).  |
 | `defaultVal` | Value used before any simulation override fires.                           |
 
-## Builder Methods: Simulated Value Injection
+## Builder methods: Simulated value injection
 
 Override a field's value during a match-time window or when a `BooleanSupplier` trigger returns `true`. Overloads exist for `double`, `int`, `long`, and `boolean` values.
 
@@ -46,12 +46,12 @@ SensorConfig withSimulatedValue(String fieldName, Time start, Time end, long val
 SensorConfig withSimulatedValue(String fieldName, Time start, Time end, boolean value)
 ```
 
-| Parameter   | Description                                             |
-| ----------- | ------------------------------------------------------- |
-| `fieldName` | Name of a previously registered field.                  |
+| Parameter   | Description                                                                      |
+| ----------- | -------------------------------------------------------------------------------- |
+| `fieldName` | Name of a previously registered field.                                           |
 | `start`     | Match time (`Timer.getMatchTime()`) at which the simulated value becomes active. |
-| `end`       | Match time at which the simulated value deactivates.    |
-| `value`     | Value to inject while active.                           |
+| `end`       | Match time at which the simulated value deactivates.                             |
+| `value`     | Value to inject while active.                                                    |
 
 ### By arbitrary trigger
 
@@ -107,7 +107,7 @@ Multiple `withSimulatedValue` calls on the same field are all registered. The fi
 `getSensor()` is lazy: the `Sensor` instance is not built until first called. Call it once after configuration is complete and store the result.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SensorConfig (C++)](../../c++-reference/config/sensorconfig.md)
 * [SimSensorConfig (C++)](../../c++-reference/config/sim-sensor-config.md)

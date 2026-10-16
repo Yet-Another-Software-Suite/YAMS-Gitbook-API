@@ -33,25 +33,25 @@ The commands require the `Subsystem` (Commands v2) or `Mechanism` (Commands v3) 
 
 ***
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.velocity.FlyWheel` and work outside of commands.
 
-| Method                                                  | Returns                     | Description                                                                         |
-| ------------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------- |
-| `getSpeed()`                                            | `AngularVelocity`           | Current wheel velocity from the encoder                                             |
-| `getLinearVelocity()`                                   | `LinearVelocity`            | Current surface speed. Throws `FlyWheelConfigurationException` without a diameter   |
-| `getMechanismSetpointVelocity()`                        | `Optional<AngularVelocity>` | The current closed-loop velocity setpoint, if any                                   |
-| `isNear(AngularVelocity speed, AngularVelocity within)` | `boolean`                   | `true` when the current speed is within `within` of `speed`                         |
-| `isGte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is greater than or equal to `speed`                   |
-| `isLte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is less than or equal to `speed`                      |
-| `isBetween(AngularVelocity start, AngularVelocity end)` | `boolean`                   | `true` when the current speed is in `[start, end]`                                  |
-| `getShooterConfig()`                                    | `FlyWheelConfig`            | The `FlyWheelConfig` used to build this flywheel                                    |
-| `getMotorController()`                                  | `SmartMotorController`      | The underlying motor controller                                                     |
+| Method                                                  | Returns                     | Description                                                                       |
+| ------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------- |
+| `getSpeed()`                                            | `AngularVelocity`           | Current wheel velocity from the encoder                                           |
+| `getLinearVelocity()`                                   | `LinearVelocity`            | Current surface speed. Throws `FlyWheelConfigurationException` without a diameter |
+| `getMechanismSetpointVelocity()`                        | `Optional<AngularVelocity>` | The current closed-loop velocity setpoint, if any                                 |
+| `isNear(AngularVelocity speed, AngularVelocity within)` | `boolean`                   | `true` when the current speed is within `within` of `speed`                       |
+| `isGte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is greater than or equal to `speed`                 |
+| `isLte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is less than or equal to `speed`                    |
+| `isBetween(AngularVelocity start, AngularVelocity end)` | `boolean`                   | `true` when the current speed is in `[start, end]`                                |
+| `getShooterConfig()`                                    | `FlyWheelConfig`            | The `FlyWheelConfig` used to build this flywheel                                  |
+| `getMotorController()`                                  | `SmartMotorController`      | The underlying motor controller                                                   |
 
 ***
 
-## Command Factories
+## Command factories
 
 ### `run(AngularVelocity velocity)`
 
@@ -93,9 +93,9 @@ public <T> Command run(Supplier<T> velocity)
 
 Spins the wheel at the supplied velocity, re-evaluated each loop. `T` must be `AngularVelocity` or `LinearVelocity`; the type is checked once, when the command is created.
 
-| Name       | Type          | Description                                                |
-| ---------- | ------------- | ---------------------------------------------------------- |
-| `velocity` | `Supplier<T>` | Supplier of an `AngularVelocity` or a `LinearVelocity`     |
+| Name       | Type          | Description                                            |
+| ---------- | ------------- | ------------------------------------------------------ |
+| `velocity` | `Supplier<T>` | Supplier of an `AngularVelocity` or a `LinearVelocity` |
 
 **Returns:** `Command`: runs until interrupted. Throws `IllegalArgumentException` if the supplied value is neither type, and `FlyWheelConfigurationException` for a `LinearVelocity` without a configured diameter.
 
@@ -112,10 +112,10 @@ public Command runTo(Supplier<LinearVelocity> velocity, LinearVelocity tolerance
 
 Sets the velocity setpoint and ends once the wheel is within `tolerance` (debounced 0.1 s). The setpoint stays active after the command ends, unless a default command replaces it. Supplier overloads read the supplier once when the command starts. `LinearVelocity` overloads need the `FlyWheelConfig` diameter.
 
-| Name        | Type                                    | Description                                      |
-| ----------- | --------------------------------------- | ------------------------------------------------ |
-| `velocity`  | `AngularVelocity` / `LinearVelocity`    | Desired wheel velocity                           |
-| `tolerance` | `AngularVelocity` / `LinearVelocity`    | Acceptable speed error for the command to finish |
+| Name        | Type                                 | Description                                      |
+| ----------- | ------------------------------------ | ------------------------------------------------ |
+| `velocity`  | `AngularVelocity` / `LinearVelocity` | Desired wheel velocity                           |
+| `tolerance` | `AngularVelocity` / `LinearVelocity` | Acceptable speed error for the command to finish |
 
 **Returns:** `Command`: ends when the wheel reaches the target speed.
 
@@ -130,9 +130,9 @@ public Command set(Supplier<Double> dutycycle)
 
 Open-loop duty cycle, runs until interrupted. The closed-loop controller is stopped while it runs and restarted when it ends. This is the usual command for open-loop rollers and intakes.
 
-| Name        | Type                          | Description                             |
-| ----------- | ----------------------------- | --------------------------------------- |
-| `dutycycle` | `double` / `Supplier<Double>` | Motor output in the range \[-1.0, 1.0]  |
+| Name        | Type                          | Description                            |
+| ----------- | ----------------------------- | -------------------------------------- |
+| `dutycycle` | `double` / `Supplier<Double>` | Motor output in the range \[-1.0, 1.0] |
 
 **Returns:** `Command`
 
@@ -227,11 +227,11 @@ Active when the current wheel speed is in the inclusive range `[start, end]`.
 
 Both packages have the same method names and parameters. The difference is the return types and what the commands require:
 
-|                | Commands v2 (`yams.commands2.mechanisms.FlyWheel`)             | Commands v3 (`yams.commands3.mechanisms.FlyWheel`)             |
-| -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| `Command` type | `org.wpilib.command2.Command`                                  | `org.wpilib.command3.Command`                                  |
-| `Trigger` type | `org.wpilib.command2.button.Trigger`                           | `org.wpilib.command3.Trigger`                                  |
-| Requirement    | The `Subsystem` from `getSubsystem()`                          | The `Mechanism` from `getMechanism()`                          |
+|                | Commands v2 (`yams.commands2.mechanisms.FlyWheel`)            | Commands v3 (`yams.commands3.mechanisms.FlyWheel`)            |
+| -------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| `Command` type | `org.wpilib.command2.Command`                                 | `org.wpilib.command3.Command`                                 |
+| `Trigger` type | `org.wpilib.command2.button.Trigger`                          | `org.wpilib.command3.Trigger`                                 |
+| Requirement    | The `Subsystem` from `getSubsystem()`                         | The `Mechanism` from `getMechanism()`                         |
 | Motor config   | `yams.commands2.config.SmartMotorControllerConfig(Subsystem)` | `yams.commands3.config.SmartMotorControllerConfig(Mechanism)` |
 
 In Commands v3 the commands are coroutines, so your own commands can `await` or `fork` them:
@@ -247,7 +247,7 @@ public Command hold(AngularVelocity speed)
 
 ***
 
-## Visualization & Simulation
+## Visualization and simulation
 
 | Method                           | Returns                | Description                                                                        |
 | -------------------------------- | ---------------------- | ---------------------------------------------------------------------------------- |
