@@ -29,6 +29,7 @@ All methods return `ArmConfig&` for chaining.
 | `WithMaxAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Maximum allowable mechanism angle; also applied as the motor controller upper limit                                                                 |
 | `WithTelemetryName(const std::string& name)` | Optional                    | Name used for SmartDashboard and log entries                                                      |
 | `WithSimColor(const wpi::util::Color8Bit& color)`  | Optional                    | Color of the simulated arm ligament                                                               |
+| `WithMechanismPositionConfig(const MechanismPositionConfig& config)` | Optional | Where the mechanism is on the robot, for `GetPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md) |
 
 ***
 
@@ -40,6 +41,7 @@ std::optional<wpi::units::degree_t> GetMinAngle() const;
 std::optional<wpi::units::degree_t> GetMaxAngle() const;
 std::optional<wpi::units::meter_t> GetArmLength() const;
 wpi::util::Color8Bit GetSimColor() const;
+const MechanismPositionConfig& GetMechanismPositionConfig() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.

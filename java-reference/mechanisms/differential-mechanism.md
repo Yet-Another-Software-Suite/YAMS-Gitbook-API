@@ -124,6 +124,7 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 | `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
 | `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
 | `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
+| `getPose3d()` | `Pose3d` | The mechanism's axis, tilted, then twisted about its own length, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `getName()` | `String` | The mechanism telemetry name |
 
 ---

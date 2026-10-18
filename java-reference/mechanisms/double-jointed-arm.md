@@ -167,7 +167,9 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 | `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
 | `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
 | `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
-| `getRelativeMechanismPosition()` | `Translation3d` | End-effector position relative to the robot |
+| `getPose3d()` | `Pose3d` | The lower arm's axis, turned to its angle, relative to the robot, from the lower arm's [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
+| `getUpperPose3d()` | `Pose3d` | The upper arm at the end of the lower arm, turned to its angle |
+| `getPosition()` | `Translation2d` | The end of the upper arm, from the lower arm's axis |
 | `getName()` | `String` | The mechanism telemetry name |
 
 ---

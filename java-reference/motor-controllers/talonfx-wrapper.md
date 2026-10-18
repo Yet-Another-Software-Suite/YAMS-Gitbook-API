@@ -18,7 +18,13 @@ TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig<?> 
 | -------------------- | ----------------- | ------------------------- |
 | TalonFX (Kraken X60) | `TalonFXWrapper`  | `DCMotor.getKrakenX60(1)` |
 | TalonFX (Falcon 500) | `TalonFXWrapper`  | `DCMotor.getFalcon500(1)` |
-| TalonFXS             | `TalonFXSWrapper` | Appropriate CTRE model    |
+| TalonFXS (Minion)    | `TalonFXSWrapper` | `DCMotor.getMinion(1)`, driven as `Minion_JST` |
+| TalonFXS (NEO)       | `TalonFXSWrapper` | `DCMotor.getNEO(1)`, driven as `NEO_JST` |
+| TalonFXS (NEO 550)   | `TalonFXSWrapper` | `DCMotor.getNeo550(1)`, driven as `NEO550_JST` |
+| TalonFXS (NEO Vortex) | `TalonFXSWrapper` | `DCMotor.getNeoVortex(1)`, driven as `VORTEX_JST` |
+| TalonFXS (Thrifty Pulsar 775) | `TalonFXSWrapper` | `YMotors.getThriftyPulsar(1)`, driven as `NEO_JST` |
+
+`TalonFXSWrapper` picks the TalonFXS's motor arrangement from the `DCMotor`, and throws `IllegalArgumentException` for one it does not know. WPILib has no `DCMotor` of the Thrifty Pulsar, so YAMS has one in `yams.core.motorcontrollers.YMotors`, from Thrifty's specs. It will be removed once WPILib has one.
 
 ## Example
 

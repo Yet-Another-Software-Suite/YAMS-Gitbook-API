@@ -28,7 +28,8 @@ All methods return `ElevatorConfig&` for chaining.
 | `WithCarriageMass(wpi::units::kilogram_t mass)`   | **Required for simulation.** Mass of the carriage, used in simulation          |
 | `WithIsHorizontal(bool horizontal)`          | When `true`, disables gravity simulation. Useful for horizontal linear sliders |
 | `WithSimColor(const wpi::util::Color8Bit& color)`  | Color of the simulated elevator (default: orange)                              |
-| `WithAngle(wpi::units::degree_t angle)`           | Angle of the elevator ligament in Mechanism2d (default: `90_deg`, vertical)    |
+| `WithAngle(wpi::units::degree_t angle)`           | Angle of the elevator in its movement plane, for Mechanism2d and `GetPose3d()` (default: `90_deg`, vertical) |
+| `WithMechanismPositionConfig(const MechanismPositionConfig& config)` | Where the mechanism is on the robot, for `GetPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md) |
 
 > **Note:** Drum or sprocket size is configured on `SmartMotorControllerConfig` via `.WithMechanismCircumference(circumference)` or `.WithMechanismCircumference(gearPitch, teeth)`, and the starting height via `.WithStartingPosition(wpi::units::meter_t)`. In simulation the `Elevator` constructor throws an `ElevatorConfigurationException` if the carriage mass, minimum height, maximum height, starting position or mechanism circumference is missing. Cascading elevator stages are configured via `SmartMotorControllerConfig::WithCascadingElevatorStages(int stages)`.
 
@@ -44,6 +45,7 @@ std::optional<wpi::units::kilogram_t> GetCarriageMass() const;
 bool IsHorizontal() const;
 wpi::util::Color8Bit GetSimColor() const;
 wpi::units::degree_t GetAngle() const;
+const MechanismPositionConfig& GetMechanismPositionConfig() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.

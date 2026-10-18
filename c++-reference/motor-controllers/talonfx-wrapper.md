@@ -142,6 +142,8 @@ enum class MotorArrangement {
 };
 ```
 
+A Thrifty Pulsar 775 is driven as `MotorArrangement::NEO`.
+
 ### Constructors
 
 ```cpp

@@ -32,7 +32,7 @@ FlyWheelConfig clone()  // Deep copy
 | `withSpeedometerSimulation()`                                 | _(none)_                                               | Enables the speedometer with the previously configured max velocity. Throws a `FlyWheelConfigurationException` if max velocity was not set first. |
 | `disableSpeedometerSimulation()`                              | _(none)_                                               | Disables the speedometer simulation.                                                                                                              |
 | `withSimColor(Color8Bit color)`                               | `color`: RGB color                                     | Sets the Mechanism2d visualization color. Optional; defaults to orange.                                                                           |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config                              | Configures the visualization plane and 3D offset for this mechanism. Optional.                                                                    |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config                              | Where the mechanism is on the robot, for `getPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md). Optional.                                                                    |
 | `withTelemetry(String name, TelemetryVerbosity verbosity)`    | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional.                                                                                     |
 
 ***

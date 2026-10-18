@@ -42,7 +42,7 @@ Both motor controllers, a starting tilt and twist, and a length are **required**
 | `withMOI(MomentOfInertia MOI)` | `MOI`: moment of inertia | Sets the moment of inertia for simulation directly. An MOI is required in simulation. |
 | `withTelemetry(String name, TelemetryVerbosity verbosity)` | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional. |
 | `withSimColor(Color8Bit color)` | `color`: RGB color | Sets the Mechanism2d visualization color. Optional. |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Configures the visualization plane and 3D offset for this mechanism. Optional. |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config | Where the mechanism is on the robot, for `getPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md). Optional. |
 
 Other methods: `applyConfig()` reapplies both motor controller configs, and the getters `getLeftMotorController()`, `getRightMotorController()`, `getMOI()`, `getLength()`, `getTwistGearing()`, `getStartingTiltAngle()`, `getStartingTwistAngle()`, `getTiltAngleSupplier()`, `getTwistAngleSupplier()`, `getTelemetryName()`, `getTelemetryVerbosity()`, `getSimColor()` and `getMechanismPositionConfig()`. `getTiltAngle(Angle left, Angle right)`, `getTwistAngle(Angle left, Angle right)`, `getLeftMechanismPosition(Angle tilt, Angle twist)` and `getRightMechanismPosition(Angle tilt, Angle twist)` convert between motor and tilt/twist positions.
 

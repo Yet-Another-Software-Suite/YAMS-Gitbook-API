@@ -37,6 +37,7 @@ These come from `yams.core.mechanisms.positional.Elevator` and work outside of c
 | ------------------------------------------ | ---------------------- | -------------------------------------------------------------------------------- |
 | `getHeight()`                              | `Distance`             | Current carriage height from the encoder                                         |
 | `getVelocity()`                            | `LinearVelocity`       | Current carriage velocity                                                        |
+| `getMeasurementSetpoint()`                 | `Optional<Distance>`   | The closed-loop position setpoint as a height, if there is one                   |
 | `isNear(Distance height, Distance within)` | `boolean`              | `true` when the current height is within `within` of `height`                    |
 | `isGte(Distance height)`                   | `boolean`              | `true` when the current height is greater than or equal to `height`              |
 | `isLte(Distance height)`                   | `boolean`              | `true` when the current height is less than or equal to `height`                 |
@@ -168,7 +169,7 @@ public Command hold(Distance height)
 | `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)               |
 | `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                        |
 | `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                           |
-| `getRelativeMechanismPosition()` | `Translation3d`        | Carriage position relative to the robot, using the `MechanismPositionConfig`       |
+| `getPose3d()`                    | `Pose3d`               | The carriage, moved by its height along the elevator's angle, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md). Works on the robot and in simulation |
 | `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                                    |
 | `getName()`                      | `String`               | The elevator telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the elevator physics simulation by one loop and updates the visualization |

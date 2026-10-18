@@ -28,6 +28,7 @@ All methods return `PivotConfig&` for chaining.
 | `WithMinAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Minimum allowable mechanism angle; also applied as the motor controller lower limit                                    |
 | `WithMaxAngle(wpi::units::degree_t angle)`        | **Required for simulation** | Maximum allowable mechanism angle; also applied as the motor controller upper limit                                    |
 | `WithSimColor(const wpi::util::Color8Bit& color)`  | Optional | Color of the simulated pivot ligament. Defaults to green if not set. |
+| `WithMechanismPositionConfig(const MechanismPositionConfig& config)` | Optional | Where the mechanism is on the robot, for `GetPose3d()`, and the plane it moves in, XY unless set. See [MechanismPositionConfig](mechanism-position-config.md) |
 
 ***
 
@@ -38,6 +39,7 @@ std::string GetTelemetryName() const;
 std::optional<wpi::units::degree_t> GetMinAngle() const;
 std::optional<wpi::units::degree_t> GetMaxAngle() const;
 wpi::util::Color8Bit GetSimColor() const;
+const MechanismPositionConfig& GetMechanismPositionConfig() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called. `GetSimColor()` always returns a value (defaults to green).

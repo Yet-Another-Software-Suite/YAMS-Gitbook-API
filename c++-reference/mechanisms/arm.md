@@ -65,7 +65,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 | Method                         | Signature                                                 | Description                                              |
 | ------------------------------ | --------------------------------------------------------- | -------------------------------------------------------- |
 | `SetAngle`                     | `void SetAngle(wpi::units::degree_t angle)`                    | Directly commands the setpoint without a command wrapper |
-| `GetRelativeMechanismPosition` | `wpi::math::Translation3d GetRelativeMechanismPosition() const` | 3D end-effector position relative to the mechanism root  |
+| `GetPose3d` | `wpi::math::Pose3d GetPose3d() const` | The arm's axis, turned to its angle, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `GetConfig`                    | `const config::ArmConfig& GetConfig() const`              | Returns the configuration this arm was constructed with  |
 | `GetMotor`                     | `motorcontrollers::SmartMotorController* GetMotor()`      | Returns the underlying motor controller pointer          |
 | `GetMechanismLigament`         | `wpi::MechanismLigament2d* GetMechanismLigament()`        | The Mechanism2d visualization ligament                   |

@@ -29,7 +29,7 @@ PivotConfig clone()           // Deep copy
 | `withHardLimits(Angle min, Angle max)`                        | `min`: lower bound, `max`: upper bound                 | Sets the physical rotation limits. The motor controller will not command positions outside these angles. Optional. |
 | `withTelemetry(String name, TelemetryVerbosity verbosity)`    | `name`: NT key prefix, `verbosity`: `LOW`/`MID`/`HIGH` | Enables NetworkTables telemetry for this mechanism. Optional.                                                      |
 | `withSimColor(Color8Bit color)`                               | `color`: RGB color                                     | Sets the Mechanism2d visualization color. Defaults to orange if not set. Optional.                                 |
-| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config                              | Configures the visualization plane and 3D offset for this mechanism. Defaults to the XY plane. Optional.           |
+| `withMechanismPositionConfig(MechanismPositionConfig config)` | `config`: position config                              | Where the mechanism is on the robot, for `getPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md). Defaults to the XY plane. Optional.           |
 
 ***
 

@@ -29,6 +29,7 @@ All methods return `FlyWheelConfig&` for chaining.
 | `WithTelemetryName(const std::string& name)`  | Name used for SmartDashboard and log entries                        |
 | `WithRollerDiameter(wpi::units::meter_t diameter)` | Roller/flywheel outer diameter, used for surface speed calculations |
 | `WithSimColor(const wpi::util::Color8Bit& color)`   | Color of the simulated flywheel (default: orange)                   |
+| `WithMechanismPositionConfig(const MechanismPositionConfig& config)` | Where the mechanism is on the robot, for `GetPose3d()`, and the plane it moves in. See [MechanismPositionConfig](mechanism-position-config.md) |
 
 ***
 
@@ -38,6 +39,7 @@ All methods return `FlyWheelConfig&` for chaining.
 std::string GetTelemetryName() const;
 std::optional<wpi::units::meter_t> GetRollerDiameter() const;
 wpi::util::Color8Bit GetSimColor() const;
+const MechanismPositionConfig& GetMechanismPositionConfig() const;
 ```
 
 Getters for optional fields return `std::nullopt` if the corresponding setter was not called.

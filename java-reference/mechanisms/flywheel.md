@@ -255,7 +255,7 @@ public Command hold(AngularVelocity speed)
 | `getMechanismLigament()`         | `MechanismLigament2d`  | The ligament used in the Mechanism2d visualization (simulation only)               |
 | `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                        |
 | `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                           |
-| `getRelativeMechanismPosition()` | `Translation3d`        | Flywheel position relative to the robot, using the `MechanismPositionConfig`       |
+| `getPose3d()`                    | `Pose3d`               | The flywheel's axle, turned by the wheel's position, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md). Works on the robot and in simulation |
 | `getName()`                      | `String`               | The flywheel telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the flywheel physics simulation by one loop and updates the visualization |
 | `updateTelemetry()`              | `void`                 | Publishes the current flywheel state to NetworkTables                              |

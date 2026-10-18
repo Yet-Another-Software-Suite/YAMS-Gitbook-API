@@ -78,7 +78,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 | ------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------ |
 | `SetVelocity`                  | `void SetVelocity(wpi::units::degrees_per_second_t velocity)`  | Direct setpoint without command wrapper                      |
 | `SetSurfaceSpeed`              | `void SetSurfaceSpeed(wpi::units::meters_per_second_t speed)`  | Surface speed setpoint; requires `WithRollerDiameter()` in config  |
-| `GetRelativeMechanismPosition` | `wpi::math::Translation3d GetRelativeMechanismPosition() const` | 3D position of the mechanism                                 |
+| `GetPose3d` | `wpi::math::Pose3d GetPose3d() const` | The flywheel's axle, turned by the wheel's position, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `GetConfig`                    | `const config::FlyWheelConfig& GetConfig() const`         | Returns the configuration this flywheel was constructed with |
 | `GetMotor`                     | `motorcontrollers::SmartMotorController* GetMotor()`      | Returns the underlying motor controller pointer              |
 | `SimIterate`                   | `void SimIterate() override`                              | Advances flywheel physics simulation one loop iteration      |

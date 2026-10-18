@@ -25,6 +25,7 @@ Both parameters are non-owning pointers. The `ElevatorConfig` and `SmartMotorCon
 | Method      | Signature                          | Description             |
 | ----------- | ---------------------------------- | ----------------------- |
 | `GetHeight` | `wpi::units::meter_t GetHeight() const` | Current carriage height |
+| `GetMeasurementSetpoint` | `std::optional<wpi::units::meter_t> GetMeasurementSetpoint()` | The closed-loop position setpoint as a height, if there is one |
 
 ***
 
@@ -65,7 +66,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 | Method                         | Signature                                                 | Description                                                  |
 | ------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------ |
 | `SetHeight`                    | `void SetHeight(wpi::units::meter_t height)`                   | Directly commands the setpoint without a command wrapper     |
-| `GetRelativeMechanismPosition` | `wpi::math::Translation3d GetRelativeMechanismPosition() const` | 3D carriage position relative to the mechanism root          |
+| `GetPose3d` | `wpi::math::Pose3d GetPose3d() const` | The carriage, moved by its height along the elevator's angle, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `GetConfig`                    | `const config::ElevatorConfig& GetConfig() const`         | Returns the configuration this elevator was constructed with |
 | `GetMotor`                     | `motorcontrollers::SmartMotorController* GetMotor()`      | Returns the underlying motor controller pointer              |
 | `GetMechanismLigament`         | `wpi::MechanismLigament2d* GetMechanismLigament()`        | The Mechanism2d visualization ligament                       |
