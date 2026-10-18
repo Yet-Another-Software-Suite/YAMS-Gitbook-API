@@ -170,6 +170,8 @@ public Command hold(Distance height)
 | `getMechanismRoot()`             | `MechanismRoot2d`      | The root of the Mechanism2d visualization (simulation only)                        |
 | `getMechanismWindow()`           | `Mechanism2d`          | The Mechanism2d window (simulation only)                                           |
 | `getPose3d()`                    | `Pose3d`               | The carriage, moved by its height along the elevator's angle, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md). Works on the robot and in simulation |
+| `getCascadePose3d()`             | `List<Pose3d>`         | Each moving stage's pose for a cascade elevator, whose stages all move at once, each by its share of the carriage's height. From the stage nearest the fixed stage to the carriage, which is `getPose3d()`. Needs 2 or more stages from `ElevatorConfig.withStages(...)`, or throws `ElevatorConfigurationException` |
+| `getContinuousPose3d()`          | `List<Pose3d>`         | Each moving stage's pose for a continuous elevator, whose carriage moves the whole of its travel first, then the stage below it, and so on. In the same order and with the same requirement as `getCascadePose3d()` |
 | `getMotor()`                     | `SmartMotorController` | The underlying motor controller                                                    |
 | `getName()`                      | `String`               | The elevator telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the elevator physics simulation by one loop and updates the visualization |

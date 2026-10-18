@@ -41,6 +41,8 @@ All methods return `ElevatorConfig&` for chaining.
 std::string GetTelemetryName() const;
 std::optional<wpi::units::meter_t> GetMinHeight() const;
 std::optional<wpi::units::meter_t> GetMaxHeight() const;
+std::optional<int> GetStages() const;
+const std::vector<wpi::units::meter_t>& GetStageHeights() const;
 std::optional<wpi::units::kilogram_t> GetCarriageMass() const;
 bool IsHorizontal() const;
 wpi::util::Color8Bit GetSimColor() const;
