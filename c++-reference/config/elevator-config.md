@@ -23,8 +23,8 @@ All methods return `ElevatorConfig&` for chaining.
 | Method                                       | Description                                                                    |
 | -------------------------------------------- | ------------------------------------------------------------------------------ |
 | `WithTelemetryName(const std::string& name)` | Name used for SmartDashboard and log entries                                   |
-| `WithMinimumHeight(wpi::units::meter_t height)`   | **Required for simulation.** Minimum allowable carriage height                                              |
-| `WithMaximumHeight(wpi::units::meter_t height)`   | **Required for simulation.** Maximum allowable carriage height                                              |
+| `WithMinimumHeight(wpi::units::meter_t height)`   | **Required for simulation**, unless the stages are set with `WithStages(...)`. Minimum allowable carriage height                                              |
+| `WithMaximumHeight(wpi::units::meter_t height)`   | **Required for simulation**, unless the stages are set with `WithStages(...)`. Maximum allowable carriage height                                              |
 | `WithCarriageMass(wpi::units::kilogram_t mass)`   | **Required for simulation.** Mass of the carriage, used in simulation          |
 | `WithIsHorizontal(bool horizontal)`          | When `true`, disables gravity simulation. Useful for horizontal linear sliders |
 | `WithSimColor(const wpi::util::Color8Bit& color)`  | Color of the simulated elevator (default: orange)                              |
@@ -39,10 +39,11 @@ All methods return `ElevatorConfig&` for chaining.
 
 ```cpp
 std::string GetTelemetryName() const;
-std::optional<wpi::units::meter_t> GetMinHeight() const;
-std::optional<wpi::units::meter_t> GetMaxHeight() const;
+std::optional<wpi::units::meter_t> GetMinHeight() const;  // or 0 when the stages are set without one
+std::optional<wpi::units::meter_t> GetMaxHeight() const;  // or the stage heights' total without one
 std::optional<int> GetStages() const;
 const std::vector<wpi::units::meter_t>& GetStageHeights() const;
+std::optional<wpi::units::meter_t> GetStageHeightTotal() const;
 std::optional<wpi::units::kilogram_t> GetCarriageMass() const;
 bool IsHorizontal() const;
 wpi::util::Color8Bit GetSimColor() const;
