@@ -68,6 +68,7 @@ Each method enables a single boolean status flag. Flags are automatically suppre
 | `WithSetpointPosition()`    | Current position setpoint in mechanism units.                                           |
 | `WithSetpointVelocity()`    | Current velocity setpoint in mechanism units.                                           |
 | `WithSetpointForce()`       | Feedforward force applied with the velocity setpoint (N).                               |
+| `WithClosedLoopPeriod()`    | How often the closed loop runs, `closedloop/period`, in seconds: 1 ms on the motor controller, or the closed loop control period on the SystemCore. Included at `HIGH`. |
 | `WithOutputVoltage()`       | Motor output voltage (V).                                                               |
 | `WithStatorCurrent()`       | Stator (output) current (A).                                                            |
 | `WithTemperature()`         | Motor temperature.                                                                      |

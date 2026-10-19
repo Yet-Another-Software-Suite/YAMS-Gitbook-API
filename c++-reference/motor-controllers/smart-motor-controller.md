@@ -172,7 +172,10 @@ Used when the closed loop runs on the SystemCore instead of inside the motor con
 void StartClosedLoopController();
 void StopClosedLoopController();
 void IterateClosedLoopController();
+wpi::units::second_t GetClosedLoopControllerPeriod() const;
 ```
+
+`GetClosedLoopControllerPeriod()` is how often the closed loop runs: `WithClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. It is published as `closedloop/period`.
 
 ### Telemetry and Live Tuning
 

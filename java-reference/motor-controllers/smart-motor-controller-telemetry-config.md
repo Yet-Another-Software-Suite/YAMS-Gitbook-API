@@ -55,6 +55,7 @@ Each method enables a single numeric (double) field.
 | `withSetpointPosition()`    | Current position setpoint in mechanism units (read-only; non-tunable).                                                |
 | `withSetpointVelocity()`    | Current velocity setpoint in mechanism units.                                                                         |
 | `withSetpointForce()`       | Feedforward force last supplied to `setVelocity(velocity, Force)`, in newtons (read-only; non-tunable; `0` when unset). |
+| `withClosedLoopPeriod()`    | How often the closed loop runs, `closedloop/period`, in seconds: 1 ms on the motor controller, or the closed loop control period on the SystemCore. Included at `HIGH`. |
 | `withOutputVoltage()`       | Motor output voltage (V).                                                                                             |
 | `withStatorCurrent()`       | Stator (output) current (A).                                                                                          |
 | `withTemperature()`         | Motor winding temperature (°C).                                                                                       |

@@ -34,6 +34,7 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 | ---------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `SetSwerveModuleState` | `void SetSwerveModuleState(wpi::math::SwerveModuleVelocity state)` | Commands drive speed and azimuth angle.                                          |
 | `SetAzimuthAngle`      | `wpi::math::SwerveModuleVelocity SetAzimuthAngle(wpi::math::Rotation2d angle)` | Turns the wheel to `angle` with zero drive speed, skipping the velocity deadband, and returns the commanded state. Used by `LockPose()` and `SetAzimuthAngles(...)`. |
+| `GetCouplingVelocity` | `wpi::units::meters_per_second_t GetCouplingVelocity() const` | The wheel velocity the drive encoder reads because the azimuth is turning, which a drive held still must be commanded to. |
 | `SetupTelemetry`       | `void SetupTelemetry(const std::string& mechName)`        | Wires up telemetry under `Mechanisms/<mechName>/modules/<moduleName>`. Called by `SwerveDrive<N>`; see below. |
 | `SeedAzimuthEncoder`   | `void SeedAzimuthEncoder()`                               | Reads the absolute encoder and seeds the azimuth motor's relative encoder (skipped in simulation and when the azimuth uses an external feedback encoder). The constructor already calls it once. |
 

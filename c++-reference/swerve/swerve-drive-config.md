@@ -55,7 +55,7 @@ All methods return `SwerveDriveConfig&` for chaining.
 | `WithTelemetry` | `const std::string& name, telemetry::SwerveDriveTelemetryConfig telemetryConfig` | Sets the telemetry name and configures telemetry with an explicit `SwerveDriveTelemetryConfig`, taking precedence over the verbosity-based overload. |
 
 {% hint style="info" %}
-`WithTranslationController` and `WithRotationController` are optional, but `SwerveDrive::DriveToPose(...)` and `DriveToPoseSetpoint(...)` throw a `SwerveDriveConfigurationException` if either is missing, and the `tuning/driveToPose` live-tuning command is only published when both are configured.
+`WithTranslationController` and `WithRotationController` are optional, but `SwerveDrive::DriveToPose(...)` and `DriveToPoseSetpoint(...)` throw a `SwerveDriveConfigurationException` if either is missing, and the `tuning` live-tuning command is only published when both are configured.
 {% endhint %}
 
 {% hint style="info" %}

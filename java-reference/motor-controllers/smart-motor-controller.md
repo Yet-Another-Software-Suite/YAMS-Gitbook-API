@@ -97,6 +97,7 @@ SmartMotorController motor = new TalonFXWrapper(
 | -------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
 | `startClosedLoopController()`                      | `void`                     | Starts the background closed-loop control thread.                                  |
 | `stopClosedLoopController()`                       | `void`                     | Stops the closed-loop control thread.                                              |
+| `getClosedLoopControllerPeriod()`                  | `Time`                     | How often the closed loop runs: `withClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. Published as `closedloop/period`. |
 | `iterateClosedLoopController()`                    | `void`                     | Executes one closed-loop iteration. Called automatically by the background thread. |
 | `setClosedLoopSlot(ClosedLoopControllerSlot slot)` | `void`                     | Selects the active PID slot.                                                       |
 | `setKp(double kP)` / `setKi(double kI)` / `setKd(double kD)` | `void`           | Sets one PID gain at runtime.                                                      |
