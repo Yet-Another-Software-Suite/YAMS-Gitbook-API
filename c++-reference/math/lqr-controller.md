@@ -23,6 +23,7 @@ explicit LQRController(LQRConfig config)
 | Method         | Signature                                           | Description                                                         |
 | -------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
 | `UpdateConfig` | `void UpdateConfig(LQRConfig config)`               | Replace the internal system loop at runtime                         |
+| `Retune`       | `void Retune(LQRConfig config)`                     | Rebuild the loop from a config whose values changed, keeping the state estimate, so the output does not jump. Safe to call while the closed loop controller's thread runs `Calculate`. Throws `std::invalid_argument` for a config of a different `LQRType` |
 | `GetType`      | `LQRConfig::LQRType GetType() const`                | Returns the configured mechanism type                               |
 | `GetConfig`    | `const std::optional<LQRConfig>& GetConfig() const` | Returns the config if constructed from `LQRConfig`, otherwise empty |
 
@@ -71,3 +72,9 @@ motor.SetVoltage(output);
 {% hint style="info" %}
 Call `Reset` whenever the mechanism is re-enabled or its state is known (e.g., at initialization) to prevent the Kalman filter from tracking stale state.
 {% endhint %}
+
+***
+
+## Live tuning
+
+A [SmartMotorController](../motor-controllers/smart-motor-controller.md) with an LQR publishes its values at `TelemetryVerbosity::HIGH` in place of kP, kI and kD, see [LQR fields](../motor-controllers/smart-motor-controller-telemetry-config.md#lqr-fields). While the `Live Tuning` command runs, a changed value is set on a copy of `GetConfig()` and passed to `Retune`. `SmartMotorController::GetLQRController()` returns the controller, or `nullptr` without one.
