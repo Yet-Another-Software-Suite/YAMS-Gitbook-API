@@ -336,7 +336,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 **Gain slots.** Both wrappers support three closed loop gain slots (`SLOT_0` through `SLOT_2`). Attempting to activate `SLOT_3` throws `std::invalid_argument`.
 
-**Simulation.** Both wrappers use `wpi::sim::DCMotorSim` with the configured moment of inertia (`SmartMotorControllerConfig::WithMOI(...)`) and report their current draw to [`BatterySim`](../sensor/battery-sim.md). The constructor calls `SetupSimulation()` for you, and the YAMS mechanisms call `SimIterate()` from their simulation loop. Call `SimIterate()` yourself only when using the wrapper without a mechanism. The simulated TalonFX models the motor of the `DCMotor` you pass: a Kraken X44 when its free speed is above 7,000 RPM (`wpi::math::DCMotor::KrakenX44(1)`), and a Kraken X60 otherwise.
+**Simulation.** Both wrappers use `wpi::sim::DCMotorSim` with the configured moment of inertia (`SmartMotorControllerConfig::WithMOI(...)`) and report their current draw to [`BatterySim`](../sensor/battery-sim.md). The constructor calls `SetupSimulation()` for you, and the YAMS mechanisms call `SimIterate()` from their simulation loop. Call `SimIterate()` yourself only when using the wrapper without a mechanism. The simulated TalonFX models a Kraken X44 when the `DCMotor` you pass is `wpi::math::DCMotor::KrakenX44(n)` or `wpi::math::DCMotor::KrakenX44FOC(n)`, for one to four motors, and a Kraken X60 otherwise.
 
 **Telemetry and live tuning.** Both wrappers support every telemetry field. `TelemetryVerbosity::HIGH` together with `WithSubsystem(this)` registers the `Live Tuning` command automatically; see [SmartMotorController](smart-motor-controller.md#telemetry-and-live-tuning).
 
