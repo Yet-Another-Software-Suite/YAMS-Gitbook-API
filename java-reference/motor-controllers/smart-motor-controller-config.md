@@ -73,7 +73,7 @@ SmartMotorControllerConfig(Mechanism mechanism)
 {% endtab %}
 {% endtabs %}
 
-## Builder Methods: Motor Settings
+## Builder methods: Motor settings
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -87,12 +87,12 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withInputCurrentLimit(Current supplyCurrent)` | `supplyCurrent` | Alias for `withSupplyCurrentLimit`. Use when thinking in terms of input current rather than supply current. |
 | `withVoltageCompensation(Voltage voltage)` | `voltage` | Enables voltage compensation; normalizes output to this battery voltage. |
 | `withTemperatureCutoff(Temperature temp)` | `temp` | Disables motor output when temperature exceeds this value. |
-| `withOpenLoopRampRate(Time rate)` | `rate` | Time to ramp from 0 to full output in open-loop mode. |
-| `withClosedLoopRampRate(Time rate)` | `rate` | Time to ramp from 0 to full output in closed-loop mode. |
+| `withOpenLoopRampRate(Time rate)` | `rate` | Time to ramp from 0 to full output in open loop mode. |
+| `withClosedLoopRampRate(Time rate)` | `rate` | Time to ramp from 0 to full output in closed loop mode. |
 | `withControlMode(ControlMode mode)` | `mode` | Selects `OPEN_LOOP` or `CLOSED_LOOP`. |
 | `withResetPreviousConfig(boolean reset)` | `reset` | When `true` (default), clears any previously burned configuration before applying this one. |
 
-## Builder Methods: Gearing & Measurement
+## Builder methods: Gearing & measurement
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -108,12 +108,12 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withSoftLimits(Distance low, Distance high)` | `low`, `high` | Sets soft limits in distance units. Requires `withMechanismCircumference`. |
 | `withExternalEncoderZeroOffset(Angle offset)` | `offset` | Applies a zero offset to the external encoder reading. Negative values are automatically wrapped. Read it back with `getExternalEncoderZeroOffset()` (formerly `getZeroOffset()`). |
 | `withExternalEncoderZeroOffset(Distance distance)` | `distance` | Zero offset in distance units. Requires `withMechanismCircumference`. |
-| `withContinuousWrapping(Angle min, Angle max)` | `min`, `max` | Enables continuous input for the closed-loop controller. Incompatible with soft limits and distance-based mechanisms. Requires `withClosedLoopController` to be called first. |
+| `withContinuousWrapping(Angle min, Angle max)` | `min`, `max` | Enables continuous input for the closed loop controller. Incompatible with soft limits and distance-based mechanisms. Requires `withClosedLoopController` to be called first. |
 | `withClosedLoopTolerance(Angle tolerance)` | `tolerance` | Sets the position tolerance for the PID controller. |
 | `withClosedLoopTolerance(Distance tolerance)` | `tolerance` | Sets position tolerance in distance units. Requires `withLinearClosedLoopController(true)`. |
 | `withFeedbackSynchronizationThreshold(Angle angle)` | `angle` | Relative encoder is re-seeded from absolute encoder when drift exceeds this angle. Incompatible with distance-based mechanisms. |
 
-## Builder Methods: Closed-Loop Control
+## Builder methods: Closed loop control
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -122,15 +122,15 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withClosedLoopController(PIDController controller)` | `controller` | Attaches an existing `PIDController` to SLOT_0. |
 | `withClosedLoopController(PIDController controller, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withClosedLoopController(LQRController controller)` | `controller` | Replaces the PID with an [LQR controller](../math/lqr-controller.md). Clears all PID slots. |
-| `withClosedLoopControlPeriod(Time time)` | `time` | Period of the software closed-loop thread. Default: 20 ms. |
+| `withClosedLoopControlPeriod(Time time)` | `time` | Period of the software closed loop thread. Default: 20 ms. |
 | `withClosedLoopControlPeriod(Frequency freq)` | `freq` | Sets the period from a frequency. |
-| `withClosedLoopControllerMaximumVoltage(Voltage volts)` | `volts` | Clamps the closed-loop voltage output to ±`volts`. |
+| `withClosedLoopControllerMaximumVoltage(Voltage volts)` | `volts` | Clamps the closed loop voltage output to ±`volts`. |
 | `withLinearClosedLoopController(boolean linear)` | `linear` | When `true`, the controller operates in meters instead of rotations. |
 | `withFeedforward(SimpleMotorFeedforward ff)` | `ff` | Attaches a `SimpleMotorFeedforward` (kS, kV, kA) to SLOT_0. |
 | `withFeedforward(SimpleMotorFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withFeedforward(ArmFeedforward ff)` | `ff` | Attaches an `ArmFeedforward` (kS, kG, kV, kA) to SLOT_0. Feedforward is gravity-compensated as a function of angle. |
 | `withFeedforward(ArmFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
-| `withFeedforward(ElevatorFeedforward ff)` | `ff` | Attaches an `ElevatorFeedforward` (kS, kG, kV, kA) to SLOT_0. Enables linear closed-loop mode. |
+| `withFeedforward(ElevatorFeedforward ff)` | `ff` | Attaches an `ElevatorFeedforward` (kS, kG, kV, kA) to SLOT_0. Enables linear closed loop mode. |
 | `withFeedforward(ElevatorFeedforward ff, ClosedLoopControllerSlot slot)` | N/A | Same, for a specific slot. |
 | `withExponentialProfile(ExponentialProfile.Constraints constraints)` | `constraints` | Enables an exponential motion profile. |
 | `withExponentialProfile(Voltage maxVolts, DCMotor motor, MomentOfInertia moi)` | N/A | Derives exponential profile constraints from motor and MOI (single-jointed arm). |
@@ -149,7 +149,7 @@ SmartMotorControllerConfig(Mechanism mechanism)
 `withClosedLoopController` must be called before `withContinuousWrapping` or `withClosedLoopTolerance`. The PID controller must exist to configure those options.
 {% endhint %}
 
-## Builder Methods: Simulation Overrides
+## Builder methods: Simulation overrides
 
 These methods set values used only when running in simulation. If no sim-specific value is set, the real-hardware value is used in simulation as well.
 
@@ -168,7 +168,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withSimStartingPosition(Angle angle)` | `angle` | Seeds the simulated encoder to this angle at startup (simulation only). |
 | `withSimStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance (simulation only). |
 
-## Builder Methods: External Encoder
+## Builder methods: External encoder
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -178,7 +178,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withExternalEncoderDiscontinuityPoint(Angle discontinuity)` | `discontinuity` | Sets the absolute encoder wraparound point. Must be `Rotations.of(0.5)` or `Rotations.of(1.0)`. Required for `SparkAbsoluteEncoder`. Optional for `CANcoder`. |
 | `withUseExternalFeedbackEncoder(boolean use)` | `use` | When `true` (default), the external encoder is used as the PID feedback source. |
 
-## Builder Methods: Simulation Model
+## Builder methods: Simulation model
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -187,7 +187,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withStartingPosition(Angle angle)` | `angle` | Seeds the encoder to this angle at startup (real hardware and simulation). |
 | `withStartingPosition(Distance distance)` | `distance` | Seeds from a linear distance. |
 
-## Builder Methods: Subsystem/Mechanism & Telemetry
+## Builder methods: Subsystem/Mechanism & telemetry
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
@@ -202,20 +202,20 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withVendorConfig(Object vendorConfig)` | `vendorConfig` | Provides a vendor-specific base configuration. YAMS options applied via this class always take precedence and overwrite it. |
 | `withVendorControlRequest(Object vendorControlRequest)` | `vendorControlRequest` | Provides a vendor-specific control request object that overrides YAMS default control requests for velocity and position. |
 
-## Feedforward Conversion
+## Feedforward conversion
 
 | Method                                                                              | Returns   | Description                                                                                                                                                                                     |
 | ------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `convertToVoltage(DCMotor motor, Force force)` | `Voltage` | Converts a feedforward `Force` applied at the mechanism into the motor voltage that produces it (the resistive drop of the matching current), using the configured `withGearing`/`withMechanismCircumference`. It does not include the back-EMF of the commanded speed, because it is added on top of a velocity feedforward that already covers that. Used for voltage-mode closed-loop control. |
-| `convertToCurrent(DCMotor motor, Force force)` | `Current` | Same conversion, but returns the equivalent motor current instead of voltage. Used for torque-current-mode closed-loop control (e.g. TorqueCurrentFOC). |
+| `convertToVoltage(DCMotor motor, Force force)` | `Voltage` | Converts a feedforward `Force` applied at the mechanism into the motor voltage that produces it (the resistive drop of the matching current), using the configured `withGearing`/`withMechanismCircumference`. It does not include the back-EMF of the commanded speed, because it is added on top of a velocity feedforward that already covers that. Used for voltage-mode closed loop control. |
+| `convertToCurrent(DCMotor motor, Force force)` | `Current` | Same conversion, but returns the equivalent motor current instead of voltage. Used for torque-current-mode closed loop control (e.g. TorqueCurrentFOC). |
 
-These back `SmartMotorController.setVelocity(velocity, Force feedforwardForce)` (see [SmartMotorController](smart-motor-controller.md#control)). A `SwerveModule`'s drive motor uses them to turn a PathPlanner set-point generator's per-wheel `Force` into the right feedforward for whichever control mode that motor is using.
+These back `SmartMotorController.setVelocity(velocity, Force feedforwardForce)` (see [SmartMotorController](smart-motor-controller.md#control)). A `SwerveModule`'s drive motor uses them to turn a PathPlanner setpoint generator's per-wheel `Force` into the right feedforward for whichever control mode that motor is using.
 
 {% hint style="warning" %}
 Both methods throw `SmartMotorControllerConfigurationException` if no mechanism circumference was configured with `withMechanismCircumference(...)` (or `withWheelRadius(...)`/`withWheelDiameter(...)`), including for a `Force` of exactly zero.
 {% endhint %}
 
-## See Also
+## See also
 
 - [SmartMotorController](smart-motor-controller.md)
 - [SparkWrapper](spark-wrapper.md)

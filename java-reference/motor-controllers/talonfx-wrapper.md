@@ -1,4 +1,4 @@
-# Talon Wrapper
+# TalonFXWrapper / TalonFXSWrapper
 
 **Package:** `yams.core.motorcontrollers.remote`\
 **Extends:** `SmartMotorController`
@@ -12,7 +12,7 @@ TalonFXWrapper(TalonFX talonFX, DCMotor motor, SmartMotorControllerConfig<?> con
 TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig<?> config)
 ```
 
-## Supported Hardware
+## Supported hardware
 
 | Hardware             | Class             | `DCMotor` Model           |
 | -------------------- | ----------------- | ------------------------- |
@@ -42,7 +42,7 @@ SmartMotorController motor = new TalonFXWrapper(
 );
 ```
 
-## CTRE-Specific Notes
+## CTRE-specific notes
 
 **Phoenix 6 required.** YAMS only supports Phoenix 6 (26.70 alpha for WPILib 2027) for TalonFX and TalonFXS. Phoenix 5 is not supported. Phoenix 6 devices take a `CANBus`, e.g. `new CANBus(CANPort.CAN_S0)` for a SystemCore CAN port.
 
@@ -107,7 +107,7 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 
 **Simulation.** Uses `DCMotorSim` with the configured moment of inertia.
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

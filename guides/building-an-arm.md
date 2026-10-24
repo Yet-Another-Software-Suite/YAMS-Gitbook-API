@@ -1,4 +1,4 @@
-# Building an Arm Subsystem
+# Building an arm subsystem
 
 **Goal:** Create an `Arm` subsystem with position control and physics simulation.
 

@@ -1,4 +1,4 @@
-# Setting Up Swerve Drive
+# Setting up swerve drive
 
 **Goal:** Create a fully functional `SwerveDrive` subsystem with field-relative driving, odometry, and simulation.
 

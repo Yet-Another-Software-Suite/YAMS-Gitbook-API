@@ -16,7 +16,7 @@ PivotConfig() = default;
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `PivotConfig&` for chaining.
 

@@ -8,7 +8,7 @@ There is no config class. The whole API is one constructor and three methods.
 
 ***
 
-## When to Use
+## When to use
 
 Use `EasyCRT` when:
 

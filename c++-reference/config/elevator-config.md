@@ -16,7 +16,7 @@ ElevatorConfig() = default;
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `ElevatorConfig&` for chaining.
 

@@ -16,7 +16,7 @@ ArmConfig() = default;
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `ArmConfig&` for chaining.
 

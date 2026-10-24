@@ -19,7 +19,7 @@ LQRController(LQRType type, LinearSystemLoop<?, ?, ?> loop, Time period)
 | `reset(Distance distance, LinearVelocity velocity)` | `void`  | Resets the observer for elevator systems.                        |
 | `updateConfig(LQRConfig config)`                    | `void`  | Replaces the underlying system loop at runtime.                  |
 
-## Calculate Overloads
+## Calculate overloads
 
 | Method                                                                     | For Mechanism                   | Returns   |
 | -------------------------------------------------------------------------- | ------------------------------- | --------- |
@@ -49,7 +49,7 @@ SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
     .withClosedLoopController(new LQRController(lqrCfg));
 ```
 
-## See Also
+## See also
 
 * [LQRConfig](lqr-config.md)
 * [C++ LQRController](../../c++-reference/math/lqr-controller.md)

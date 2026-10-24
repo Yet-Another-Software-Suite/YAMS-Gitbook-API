@@ -26,11 +26,11 @@ TalonFXWrapper(ctre::phoenix6::hardware::TalonFX* talon,
 | `dcMotor` | `wpi::math::DCMotor`                       | DC motor model used for simulation (e.g. `wpi::math::DCMotor::KrakenX60(1)`). |
 | `config`  | `SmartMotorControllerConfig*`        | Initial configuration to apply. Must outlive this wrapper.              |
 
-### Key Methods
+### Key methods
 
 The `TalonFXWrapper` implements the full [`SmartMotorController`](smart-motor-controller.md) interface. The table below lists the methods most commonly used directly.
 
-#### Open-Loop Outputs
+#### Open loop outputs
 
 | Method         | Signature                                | Description                              |
 | -------------- | ---------------------------------------- | ---------------------------------------- |
@@ -39,16 +39,16 @@ The `TalonFXWrapper` implements the full [`SmartMotorController`](smart-motor-co
 | `SetVoltage`   | `void SetVoltage(wpi::units::volt_t voltage)` | Command a voltage output.                |
 | `GetVoltage`   | `wpi::units::volt_t GetVoltage()`             | Returns the last commanded voltage.      |
 
-#### Closed-Loop Setpoints
+#### Closed loop setpoints
 
 | Method        | Signature                                               | Description                                                                                                    |
 | ------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `SetPosition` | `void SetPosition(wpi::units::turn_t angle)`                 | Command an angular position setpoint (closed-loop).                                                            |
+| `SetPosition` | `void SetPosition(wpi::units::turn_t angle)`                 | Command an angular position setpoint (closed loop).                                                            |
 | `SetPosition` | `void SetPosition(wpi::units::meter_t distance)`             | Command a linear position setpoint. Converts to turns using the configured mechanism circumference.            |
-| `SetVelocity` | `void SetVelocity(wpi::units::turns_per_second_t velocity)`  | Command an angular velocity setpoint (closed-loop).                                                            |
+| `SetVelocity` | `void SetVelocity(wpi::units::turns_per_second_t velocity)`  | Command an angular velocity setpoint (closed loop).                                                            |
 | `SetVelocity` | `void SetVelocity(wpi::units::meters_per_second_t velocity)` | Command a linear velocity setpoint. Converts to turns per second using the configured mechanism circumference. |
 
-#### Encoder Reads
+#### Encoder reads
 
 | Method                       | Signature                                                                 | Description                                      |
 | ---------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -69,7 +69,7 @@ The `TalonFXWrapper` implements the full [`SmartMotorController`](smart-motor-co
 `GetExternalEncoderPosition()` / `GetExternalEncoderVelocity()` no longer exist. Use `GetExternalEncoderMechanismPosition()` / `GetExternalEncoderMechanismVelocity()`.
 {% endhint %}
 
-#### Motor Status
+#### Motor status
 
 | Method             | Signature                                           | Description                    |
 | ------------------ | --------------------------------------------------- | ------------------------------ |
@@ -77,7 +77,7 @@ The `TalonFXWrapper` implements the full [`SmartMotorController`](smart-motor-co
 | `GetStatorCurrent` | `wpi::units::ampere_t GetStatorCurrent()`                | Stator (motor-side) current.   |
 | `GetTemperature`   | `wpi::units::celsius_t GetTemperature()`                 | Motor temperature.             |
 
-#### Live Configuration Setters
+#### Live configuration setters
 
 These methods apply changes immediately without requiring a full `ApplyConfig` call.
 
@@ -96,7 +96,7 @@ These methods apply changes immediately without requiring a full `ApplyConfig` c
 | `SetMotionProfileMaxAcceleration` | Two overloads: `turns_per_second_squared_t` and `meters_per_second_squared_t` | Cap motion profile acceleration.                                                                       |
 | `SetClosedLoopSlot`               | `void SetClosedLoopSlot(ClosedLoopControllerSlot slot)`                       | Select active PID/FF gain slot. TalonFX supports SLOT\_0 through SLOT\_2; SLOT\_3 throws `std::invalid_argument`. |
 
-#### CTRE-Specific Methods
+#### CTRE-specific methods
 
 | Method               | Signature                                                  | Description                                                                                                                                    |
 | -------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -109,7 +109,7 @@ These methods apply changes immediately without requiring a full `ApplyConfig` c
 
 `TalonFXSWrapper` has the same methods (returning `TalonFXSWrapper&` where applicable).
 
-#### Advanced Accessors
+#### Advanced accessors
 
 ```cpp
 SmartMotorControllerConfig& GetConfig();
@@ -127,7 +127,7 @@ void* GetMotorControllerConfig();
 
 **Header:** `#include <yams/motorcontrollers/remote/TalonFXSWrapper.hpp>`
 
-### Motor Arrangement Enum
+### Motor arrangement enum
 
 The TalonFXS drives third-party motors through an external motor port. You must specify which motor type is connected.
 
@@ -164,13 +164,13 @@ TalonFXSWrapper(ctre::phoenix6::hardware::TalonFXS* talon,
 | `arrangement` | `TalonFXSWrapper::MotorArrangement`   | The motor type connected to the TalonFXS. The three-argument overload picks it from the `dcMotor` model. |
 | `config`      | `SmartMotorControllerConfig*`         | Initial configuration to apply. Must outlive this wrapper.                                          |
 
-### Key Methods
+### Key methods
 
-`TalonFXSWrapper` exposes the same [`SmartMotorController`](smart-motor-controller.md) interface as `TalonFXWrapper`. The sections above (Open-Loop Outputs, Closed-Loop Setpoints, Encoder Reads, Motor Status, Live Configuration Setters) apply equally.
+`TalonFXSWrapper` exposes the same [`SmartMotorController`](smart-motor-controller.md) interface as `TalonFXWrapper`. The sections above (open loop outputs, closed loop setpoints, encoder reads, motor status and live configuration setters) apply equally.
 
 > **Note:** On TalonFXS, `SetEncoderInverted` sets the external feedback `SensorPhase` (opposed when inverted). On TalonFX it has no effect.
 
-#### Advanced Accessors
+#### Advanced accessors
 
 ```cpp
 SmartMotorControllerConfig& GetConfig();
@@ -184,7 +184,7 @@ void* GetMotorControllerConfig();
 
 ***
 
-## Supported Hardware
+## Supported hardware
 
 | Hardware             | Wrapper Class     | Recommended `wpi::math::DCMotor` Model |
 | -------------------- | ----------------- | -------------------------------- |
@@ -198,7 +198,7 @@ void* GetMotorControllerConfig();
 
 ***
 
-## External Encoder Support
+## External encoder support
 
 ### CANcoder
 
@@ -230,7 +230,7 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 
 ***
 
-## Code Examples
+## Code examples
 
 ### TalonFX with CANcoder
 
@@ -334,7 +334,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 **Configuration retries.** `TalonFXConfiguration` and `TalonFXSConfiguration` are built from `SmartMotorControllerConfig` and applied via the Phoenix 6 configurator. YAMS retries configuration on failure (every 10 ms, up to 10 times); `ForceConfigApply()` re-applies the whole configuration and returns the last status.
 
-**Gain slots.** Both wrappers support three closed-loop gain slots (`SLOT_0` through `SLOT_2`). Attempting to activate `SLOT_3` throws `std::invalid_argument`.
+**Gain slots.** Both wrappers support three closed loop gain slots (`SLOT_0` through `SLOT_2`). Attempting to activate `SLOT_3` throws `std::invalid_argument`.
 
 **Simulation.** Both wrappers use `wpi::sim::DCMotorSim` with the configured moment of inertia (`SmartMotorControllerConfig::WithMOI(...)`) and report their current draw to [`BatterySim`](../sensor/battery-sim.md). The constructor calls `SetupSimulation()` for you, and the YAMS mechanisms call `SimIterate()` from their simulation loop. Call `SimIterate()` yourself only when using the wrapper without a mechanism.
 
@@ -348,7 +348,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 ***
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

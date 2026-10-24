@@ -28,17 +28,17 @@ A vendor config passed with `WithVendorConfig` must be a `thrifty::NovaConfigBat
 
 ***
 
-## Key Methods
+## Key methods
 
-`NovaWrapper` implements the full [`SmartMotorController`](smart-motor-controller.md) interface (open-loop outputs, closed-loop setpoints, encoder reads and writes, live configuration setters, telemetry and live tuning). See that page for the complete method list. The notes below cover Nova-specific behavior.
+`NovaWrapper` implements the full [`SmartMotorController`](smart-motor-controller.md) interface (open loop outputs, closed loop setpoints, encoder reads and writes, live configuration setters, telemetry and live tuning). See that page for the complete method list. The notes below cover Nova-specific behavior.
 
-### Closed-Loop Control
+### Closed loop control
 
-The closed-loop controller always runs on the SystemCore and commands the Nova with voltage, the same way the profiled controllers of the other wrappers do. ThriftyLib's simulation ignores the Nova's onboard PID gains, so running the loop on the SystemCore keeps simulation and the real robot the same. PID, feedforward, trapezoidal and exponential profiles, and [LQR](../math/lqr-controller.md) are all evaluated by YAMS.
+The closed loop controller always runs on the SystemCore and commands the Nova with voltage, the same way the profiled controllers of the other wrappers do. ThriftyLib's simulation ignores the Nova's onboard PID gains, so running the loop on the SystemCore keeps simulation and the real robot the same. PID, feedforward, trapezoidal and exponential profiles, and [LQR](../math/lqr-controller.md) are all evaluated by YAMS.
 
-In closed-loop mode the wrapper starts the closed-loop notifier and raises an alert (see [Alerts](#alerts)). Set the loop period with `WithClosedLoopControlPeriod(...)` (default 20 ms); it is only valid in closed-loop mode.
+In closed loop mode the wrapper starts the closed loop notifier and raises an alert (see [Alerts](#alerts)). Set the loop period with `WithClosedLoopControlPeriod(...)` (default 20 ms); it is only valid in closed loop mode.
 
-### Encoder Reads
+### Encoder reads
 
 | Method                                                                            | Nova behavior                                                                                                  |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -59,7 +59,7 @@ In closed-loop mode the wrapper starts the closed-loop notifier and raises an al
 
 ***
 
-## External Encoders
+## External encoders
 
 Pass one of the following to `WithExternalEncoder(...)`:
 
@@ -97,7 +97,7 @@ Alerts are published in the `YAMS` alert group and cleared when the wrapper is d
 
 | Alert                                                          | When                                                                 |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `<name> closed loop controller is running on the SystemCore.`  | The config uses closed-loop mode, which on a Nova always runs on the SystemCore. |
+| `<name> closed loop controller is running on the SystemCore.`  | The config uses closed loop mode, which on a Nova always runs on the SystemCore. |
 
 ***
 
@@ -139,7 +139,7 @@ class ArmSubsystem : public wpi::cmd::SubsystemBase {
 
 ***
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

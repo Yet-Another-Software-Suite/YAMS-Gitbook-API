@@ -8,7 +8,7 @@ Package: `yams.core.units`
 
 ---
 
-## Distance Units
+## Distance units
 
 | Constant | Symbol | Metric Equivalent |
 |----------|--------|------------------|
@@ -22,7 +22,7 @@ Package: `yams.core.units`
 | `Leagues` | N/A | 4828.032 m |
 | `FootlongSandwich` | N/A | 0.3048 m |
 
-## Time Units
+## Time units
 
 | Constant | Equivalent |
 |----------|-----------|
@@ -32,7 +32,7 @@ Package: `yams.core.units`
 | `Fortnight` | 1209600 s |
 | `Years` | 31536000 s (365 days) |
 
-## Velocity Units
+## Velocity units
 
 | Constant | Description |
 |----------|-------------|
@@ -40,14 +40,14 @@ Package: `yams.core.units`
 | `FurlongsPerFortnight` (FPF) | A classic unit of slow speed |
 | `SandwichPerSecond` | One FootlongSandwich per second |
 
-## Angular Rate Units
+## Angular rate units
 
 | Constant | Description |
 |----------|-------------|
 | `RotationsPerYear` (RPY) | For very slow mechanisms |
 | `RPMPerSecond` | Angular acceleration in rotations-per-minute per second |
 
-## Momentum Units
+## Momentum units
 
 | Constant | Description |
 |----------|-------------|
@@ -56,7 +56,7 @@ Package: `yams.core.units`
 | `PoundFeetSquaredPerSecond` | Angular momentum, imperial |
 | `PoundInchesSquaredPerSecond` | Angular momentum, smaller scale |
 
-## Moment of Inertia Units
+## Moment of inertia units
 
 | Constant | Description |
 |----------|-------------|

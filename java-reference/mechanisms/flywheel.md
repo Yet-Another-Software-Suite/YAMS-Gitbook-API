@@ -41,7 +41,7 @@ These come from `yams.core.mechanisms.velocity.FlyWheel` and work outside of com
 | ------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------- |
 | `getSpeed()`                                            | `AngularVelocity`           | Current wheel velocity from the encoder                                           |
 | `getLinearVelocity()`                                   | `LinearVelocity`            | Current surface speed. Throws `FlyWheelConfigurationException` without a diameter |
-| `getMechanismSetpointVelocity()`                        | `Optional<AngularVelocity>` | The current closed-loop velocity setpoint, if any                                 |
+| `getMechanismSetpointVelocity()`                        | `Optional<AngularVelocity>` | The current closed loop velocity setpoint, if any                                 |
 | `isNear(AngularVelocity speed, AngularVelocity within)` | `boolean`                   | `true` when the current speed is within `within` of `speed`                       |
 | `isGte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is greater than or equal to `speed`                 |
 | `isLte(AngularVelocity speed)`                          | `boolean`                   | `true` when the current speed is less than or equal to `speed`                    |
@@ -59,7 +59,7 @@ These come from `yams.core.mechanisms.velocity.FlyWheel` and work outside of com
 public Command run(AngularVelocity velocity)
 ```
 
-Spins the wheel at `velocity` indefinitely using closed-loop velocity control.
+Spins the wheel at `velocity` indefinitely using closed loop velocity control.
 
 | Name       | Type              | Description            |
 | ---------- | ----------------- | ---------------------- |
@@ -128,7 +128,7 @@ public Command set(double dutycycle)
 public Command set(Supplier<Double> dutycycle)
 ```
 
-Open-loop duty cycle, runs until interrupted. The closed-loop controller is stopped while it runs and restarted when it ends. This is the usual command for open-loop rollers and intakes.
+Open loop duty cycle, runs until interrupted. The closed loop controller is stopped while it runs and restarted when it ends. This is the usual command for open loop rollers and intakes.
 
 | Name        | Type                          | Description                            |
 | ----------- | ----------------------------- | -------------------------------------- |
@@ -145,7 +145,7 @@ public Command setVoltage(Voltage volts)
 public Command setVoltage(Supplier<Voltage> volts)
 ```
 
-Open-loop voltage, runs until interrupted. The closed-loop controller is stopped while it runs and restarted when it ends.
+Open loop voltage, runs until interrupted. The closed loop controller is stopped while it runs and restarted when it ends.
 
 | Name    | Type                            | Description           |
 | ------- | ------------------------------- | --------------------- |

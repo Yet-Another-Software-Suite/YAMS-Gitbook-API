@@ -1,4 +1,4 @@
-# Configuring a Motor Controller
+# Configuring a motor controller
 
 **Goal:** Build and instantiate a `SmartMotorController` ready for use in a mechanism or standalone.
 
@@ -20,7 +20,7 @@ Add the appropriate vendordep to your project before proceeding.
 {% step %}
 #### Create a `SmartMotorControllerConfig` and chain builder methods
 
-`SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed-loop controller (PID), and zero power mode.
+`SmartMotorControllerConfig` follows the builder pattern. Call the methods you need and chain them together. At minimum, set gearing, a closed loop controller (PID), and zero power mode.
 
 In Java, import `SmartMotorControllerConfig` from the command framework package you installed and pass the owning `Subsystem` (Commands v2) or `Mechanism` (Commands v3) to the constructor. Everything else comes from `yams.core`.
 
@@ -172,7 +172,7 @@ Arm arm = new Arm(armConfig, motor);
 ## Notes
 
 {% hint style="info" %}
-If you are using a SPARK MAX with an **absolute encoder**, you should call `.withExternalEncoderDiscontinuityPoint(angle)` on the config to set the wrap point (`Rotations.of(0.5)` for a [-0.5, 0.5] rotation range, `Rotations.of(1)` for [0, 1]). Without it, the encoder will report a discontinuity at 0/360 degrees and the closed-loop controller will behave erratically near that boundary.
+If you are using a SPARK MAX with an **absolute encoder**, you should call `.withExternalEncoderDiscontinuityPoint(angle)` on the config to set the wrap point (`Rotations.of(0.5)` for a [-0.5, 0.5] rotation range, `Rotations.of(1)` for [0, 1]). Without it, the encoder will report a discontinuity at 0/360 degrees and the closed loop controller will behave erratically near that boundary.
 {% endhint %}
 
 {% hint style="info" %}

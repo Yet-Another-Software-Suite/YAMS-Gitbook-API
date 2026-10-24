@@ -12,17 +12,17 @@ For most use-cases, passing a name and verbosity to `SmartMotorControllerConfig.
 SmartMotorControllerTelemetryConfig()
 ```
 
-## Verbosity Presets
+## Verbosity presets
 
 `withTelemetryVerbosity(TelemetryVerbosity)` enables a cumulative set of fields. Each higher level includes everything from the levels below it.
 
 | Level  | Fields enabled                                                                                                                                                                                         |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `LOW`  | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed-loop slot |
+| `LOW`  | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed loop slot |
 | `MID`  | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                |
 | `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), setpoint feedforward force, current limits, ramp rates, limit values, motor temperature |
 
-## Builder Methods: Output Channels
+## Builder methods: Output channels
 
 | Method                                                 | Description                                                                                         |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -31,7 +31,7 @@ SmartMotorControllerTelemetryConfig()
 | `withoutNetworkTables()`                               | Disables NT4 publishing. Useful during competition matches to reduce CAN/network load.              |
 | `withTelemetryVerbosity(TelemetryVerbosity verbosity)` | Enables a preset bundle of fields (`LOW`, `MID`, or `HIGH`).                                        |
 
-## Builder Methods: Boolean Fields
+## Builder methods: Boolean fields
 
 Each method enables a single boolean status flag. The flag is automatically suppressed if the motor controller or configuration does not support it.
 
@@ -40,13 +40,13 @@ Each method enables a single boolean status flag. The flag is automatically supp
 | `withMechanismLowerLimit()` | Whether the mechanism is at or past its lower soft limit.      |
 | `withMechanismUpperLimit()` | Whether the mechanism is at or past its upper soft limit.      |
 | `withTemperatureLimit()`    | Whether the motor is in an over-temperature condition.         |
-| `withVelocityControl()`     | Whether velocity closed-loop mode is currently active.         |
+| `withVelocityControl()`     | Whether velocity closed loop mode is currently active.         |
 | `withElevatorFeedforward()` | Whether an `ElevatorFeedforward` is in use.                    |
 | `withArmFeedforward()`      | Whether an `ArmFeedforward` is in use.                         |
 | `withSimpleFeedforward()`   | Whether a `SimpleMotorFeedforward` is in use.                  |
 | `withMotionProfile()`       | Whether a trapezoidal or exponential motion profile is active. |
 
-## Builder Methods: Numeric Fields
+## Builder methods: Numeric fields
 
 Each method enables a single numeric (double) field.
 
@@ -66,7 +66,7 @@ Each method enables a single numeric (double) field.
 | `withRotorPosition()`       | Raw rotor position (rotations).                                                                                       |
 | `withRotorVelocity()`       | Raw rotor velocity (rotations/s).                                                                                     |
 
-## Builder Methods: Custom / Escape Hatch
+## Builder methods: Custom / escape hatch
 
 `withCustom(...)` is an escape hatch for enabling or disabling any `BooleanTelemetryField` or `DoubleTelemetryField` by value, without a dedicated `with*()` method. It's useful for fields that don't have a named builder method, or for bulk enabling/disabling several fields at once with an array. Both enums live on `SmartMotorControllerTelemetry` (`SmartMotorControllerTelemetry.BooleanTelemetryField`, `SmartMotorControllerTelemetry.DoubleTelemetryField`).
 
@@ -127,7 +127,7 @@ Fields that are not applicable to the current motor controller or configuration 
 `withCustom(...)` is currently Java-only; the C++ port does not yet expose a `WithCustom(...)` escape hatch.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

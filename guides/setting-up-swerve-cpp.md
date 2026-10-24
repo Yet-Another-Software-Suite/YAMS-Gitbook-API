@@ -1,4 +1,4 @@
-# Setting Up Swerve Drive (C++)
+# Setting up swerve drive (C++)
 
 **Goal:** Create a fully functional `SwerveDrive` subsystem in C++ with field-relative driving, odometry, and simulation.
 

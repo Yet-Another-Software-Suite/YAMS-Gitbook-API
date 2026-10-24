@@ -1,4 +1,4 @@
-# Building an Elevator Subsystem
+# Building an elevator subsystem
 
 **Goal:** Create an `Elevator` subsystem with height-based position control and physics simulation.
 

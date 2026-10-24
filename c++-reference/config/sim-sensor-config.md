@@ -17,7 +17,7 @@ explicit SimSensorConfig(std::string name)
 | --------- | -------------------------------------------- |
 | `name`    | Display name shown in the simulation window. |
 
-## Builder Methods: Field Registration
+## Builder methods: Field registration
 
 Register each hardware value you want to expose. Four overloads accept `double`, `int`, `bool`, and `int64_t` suppliers.
 
@@ -34,7 +34,7 @@ SimSensorConfig& WithField(const std::string& name, std::function<int64_t()> sup
 | `supplier`   | Live hardware value source, called every loop iteration on a real robot.   |
 | `defaultVal` | Value used before any simulation override fires.                           |
 
-## Builder Methods: Match-Time Simulated Value Injection
+## Builder methods: Match-time simulated value injection
 
 Override a field's value during a match-time window. Overloads exist for `double`, `int`, `int64_t`, and `bool`.
 
@@ -52,7 +52,7 @@ SimSensorConfig& WithSimulatedValue(const std::string& fieldName,
 | `end`       | Match time at which the simulated value deactivates.    |
 | `value`     | Value to inject while active.                           |
 
-## Builder Methods: Trigger-Based Simulated Value Injection
+## Builder methods: Trigger-based simulated value injection
 
 ```cpp
 SimSensorConfig& WithSimulatedValue(const std::string& fieldName,
@@ -110,7 +110,7 @@ Multiple `WithSimulatedValue` calls on the same field are all registered. The fi
 `GetSensor()` is lazy: the `Sensor` instance is not constructed until the first call. Call it once after configuration is complete and store the returned reference.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SensorConfig (C++)](sensorconfig.md): why there is no separate C++ `SensorConfig`
 * [SensorConfig (Java)](../../java-reference/config/sensor-config.md)

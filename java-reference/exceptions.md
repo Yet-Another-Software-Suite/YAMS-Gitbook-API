@@ -65,5 +65,5 @@ try {
 ```
 
 {% hint style="info" %}
-During development, leave these exceptions uncaught. The stack trace will identify exactly which config method you need to call. In competition code, wrap mechanism construction in try/catch to log errors gracefully rather than crashing the robot.
+Leave these exceptions uncaught: the stack trace names the config method you need to call. Catching one doesn't keep the robot working. It means the motor controller or mechanism was never built, so the code fails the first time it uses it instead. Fix the config before an event, and catch the exception only to log its message.
 {% endhint %}

@@ -42,7 +42,7 @@ Throws `DoubleJointedArmConfigurationException` if:
 
 ---
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.positional.DoubleJointedArm` and work outside of commands.
 
@@ -62,7 +62,7 @@ These come from `yams.core.mechanisms.positional.DoubleJointedArm` and work outs
 
 ---
 
-## Command Factories
+## Command factories
 
 ### `setAngle(Angle lowerAngle, Angle upperAngle)`
 
@@ -136,7 +136,7 @@ Moves to the target with inverse kinematics, ending when the end-effector is wit
 public Command set(Double lowerDutycycle, Double upperDutycycle)
 ```
 
-Open-loop duty cycle for each joint. Pass `null` to leave a joint alone. The closed-loop controller of each driven joint is stopped while it runs and restarted when it ends.
+Open loop duty cycle for each joint. Pass `null` to leave a joint alone. The closed loop controller of each driven joint is stopped while it runs and restarted when it ends.
 
 **Returns:** `Command`: runs until interrupted.
 
@@ -159,7 +159,7 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 
 ---
 
-## Visualization & Simulation
+## Visualization & simulation
 
 | Method | Returns | Description |
 |--------|---------|-------------|

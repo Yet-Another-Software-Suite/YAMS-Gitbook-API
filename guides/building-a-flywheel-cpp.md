@@ -1,4 +1,4 @@
-# Building a Flywheel Subsystem (C++)
+# Building a flywheel subsystem (C++)
 
 **Goal:** Create a `FlyWheel` subsystem in C++ with velocity control and physics simulation.
 

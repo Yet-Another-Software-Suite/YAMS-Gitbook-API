@@ -37,7 +37,7 @@ These come from `yams.core.mechanisms.positional.Elevator` and work outside of c
 | ------------------------------------------ | ---------------------- | -------------------------------------------------------------------------------- |
 | `getHeight()`                              | `Distance`             | Current carriage height from the encoder                                         |
 | `getVelocity()`                            | `LinearVelocity`       | Current carriage velocity                                                        |
-| `getMeasurementSetpoint()`                 | `Optional<Distance>`   | The closed-loop position setpoint as a height, if there is one                   |
+| `getMeasurementSetpoint()`                 | `Optional<Distance>`   | The closed loop position setpoint as a height, if there is one                   |
 | `isNear(Distance height, Distance within)` | `boolean`              | `true` when the current height is within `within` of `height`                    |
 | `isGte(Distance height)`                   | `boolean`              | `true` when the current height is greater than or equal to `height`              |
 | `isLte(Distance height)`                   | `boolean`              | `true` when the current height is less than or equal to `height`                 |
@@ -55,18 +55,18 @@ Commands that run indefinitely must be interrupted or composed with a terminatin
 
 | Method                                                 | Returns   | Description                                                                     |
 | ------------------------------------------------------ | --------- | ------------------------------------------------------------------------------- |
-| `setHeight(Distance height)`                           | `Command` | Holds `height` using closed-loop control; runs indefinitely                     |
+| `setHeight(Distance height)`                           | `Command` | Holds `height` using closed loop control; runs indefinitely                     |
 | `setHeight(Supplier<Distance> height)`                 | `Command` | Holds the supplied height, re-evaluated each loop; runs indefinitely            |
 | `run(Distance height)`                                 | `Command` | Same as `setHeight(Distance)`                                                   |
 | `run(Supplier<Distance> height)`                       | `Command` | Same as `setHeight(Supplier<Distance>)`                                         |
 | `runTo(Distance height, Distance tolerance)`           | `Command` | Sets the target and ends once within `tolerance` (debounced 0.1 s)              |
 | `runTo(Supplier<Distance> height, Distance tolerance)` | `Command` | Reads the supplier once at start, then behaves like `runTo(Distance, Distance)` |
-| `set(double dutycycle)`                                | `Command` | Open-loop duty cycle; runs indefinitely                                         |
-| `set(Supplier<Double> dutycycle)`                      | `Command` | Open-loop duty cycle from a supplier; re-evaluated each loop                    |
-| `setVoltage(Voltage volts)`                            | `Command` | Open-loop fixed voltage; runs indefinitely                                      |
-| `setVoltage(Supplier<Voltage> volts)`                  | `Command` | Open-loop voltage from a supplier; re-evaluated each loop                       |
+| `set(double dutycycle)`                                | `Command` | Open loop duty cycle; runs indefinitely                                         |
+| `set(Supplier<Double> dutycycle)`                      | `Command` | Open loop duty cycle from a supplier; re-evaluated each loop                    |
+| `setVoltage(Voltage volts)`                            | `Command` | Open loop fixed voltage; runs indefinitely                                      |
+| `setVoltage(Supplier<Voltage> volts)`                  | `Command` | Open loop voltage from a supplier; re-evaluated each loop                       |
 
-`set` and `setVoltage` come from the `CommandMechanism` interface. They stop the closed-loop controller while running and restart it when the command ends.
+`set` and `setVoltage` come from the `CommandMechanism` interface. They stop the closed loop controller while running and restart it when the command ends.
 
 ### `setHeight`
 

@@ -18,7 +18,7 @@ Build the config with `WithSubsystem()` and `WithModules()`, then pass a pointer
 
 ***
 
-## Type Alias
+## Type alias
 
 ```cpp
 using TelemetryVerbosity = motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity;
@@ -26,7 +26,7 @@ using TelemetryVerbosity = motorcontrollers::SmartMotorControllerConfig::Telemet
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `SwerveDriveConfig&` for chaining.
 
@@ -66,7 +66,7 @@ Both `WithTelemetry` overloads require a name; there is no name-less `WithTeleme
 
 ***
 
-## DataLog Telemetry
+## DataLog telemetry
 
 `SwerveDriveConfig` has no `WithDataLogName(...)` method: DataLog output is configured on a [`SwerveDriveTelemetryConfig`](../../c++-reference/swerve/swerve-drive.md#telemetry--datalog) and wired in via `WithTelemetry(name, SwerveDriveTelemetryConfig)`:
 
@@ -110,7 +110,7 @@ driveConfig.WithSubsystem(this)
 | `GetRotationPID` | `std::optional<std::reference_wrapper<wpi::math::PIDController>> GetRotationPID()` | Active rotation controller (sim variant if simulating and configured), or `std::nullopt` if none was configured. |
 | `OptimizeRobotRelativeChassisSpeeds` | `wpi::math::ChassisVelocities OptimizeRobotRelativeChassisSpeeds(wpi::math::ChassisVelocities speeds) const` | Applies angular-velocity skew correction (when a scale factor and `WithGyroVelocity` are both set) and discretization (when `WithDiscretizationTime` is set). `SwerveDrive` calls this before converting speeds into module states. |
 
-## Static Helpers
+## Static helpers
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
@@ -142,7 +142,7 @@ yams::mechanisms::swerve::SwerveDrive<4> m_drive{&config};
 
 ***
 
-## See Also
+## See also
 
 * [Java SwerveDriveConfig](../../java-reference/swerve/swerve-drive-config.md)
 * [SwerveDrive](swerve-drive.md)

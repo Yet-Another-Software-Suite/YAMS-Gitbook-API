@@ -44,7 +44,7 @@ These come from `yams.core.mechanisms.positional.Pivot` and work outside of comm
 | `isAtMin()`                         | `boolean`              | `true` at or below the lower soft limit if set, otherwise the lower hard limit |
 | `getPivotConfig()`                  | `PivotConfig`          | The `PivotConfig` used to build this pivot                                     |
 | `getMotorController()`              | `SmartMotorController` | The underlying motor controller                                                |
-| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed-loop position setpoint, if any                              |
+| `getMechanismSetpoint()`            | `Optional<Angle>`      | The current closed loop position setpoint, if any                              |
 
 `isAtMax()` and `isAtMin()` throw `PivotConfigurationException` when neither a soft limit nor a hard limit is configured.
 
@@ -54,18 +54,18 @@ Commands that run indefinitely must be interrupted or composed with a terminatin
 
 | Method                                          | Returns   | Description                                                               |
 | ----------------------------------------------- | --------- | ------------------------------------------------------------------------- |
-| `setAngle(Angle angle)`                         | `Command` | Holds `angle` using closed-loop control; runs indefinitely                |
+| `setAngle(Angle angle)`                         | `Command` | Holds `angle` using closed loop control; runs indefinitely                |
 | `setAngle(Supplier<Angle> angle)`               | `Command` | Holds the supplied angle, re-evaluated each loop; runs indefinitely       |
 | `run(Angle angle)`                              | `Command` | Same as `setAngle(Angle)`                                                 |
 | `run(Supplier<Angle> angle)`                    | `Command` | Same as `setAngle(Supplier<Angle>)`                                       |
 | `runTo(Angle angle, Angle tolerance)`           | `Command` | Sets the target and ends once within `tolerance` (debounced 0.1 s)        |
 | `runTo(Supplier<Angle> angle, Angle tolerance)` | `Command` | Reads the supplier once at start, then behaves like `runTo(Angle, Angle)` |
-| `set(double dutycycle)`                         | `Command` | Open-loop duty cycle; runs indefinitely                                   |
-| `set(Supplier<Double> dutycycle)`               | `Command` | Open-loop duty cycle from a supplier; re-evaluated each loop              |
-| `setVoltage(Voltage volts)`                     | `Command` | Open-loop fixed voltage; runs indefinitely                                |
-| `setVoltage(Supplier<Voltage> volts)`           | `Command` | Open-loop voltage from a supplier; re-evaluated each loop                 |
+| `set(double dutycycle)`                         | `Command` | Open loop duty cycle; runs indefinitely                                   |
+| `set(Supplier<Double> dutycycle)`               | `Command` | Open loop duty cycle from a supplier; re-evaluated each loop              |
+| `setVoltage(Voltage volts)`                     | `Command` | Open loop fixed voltage; runs indefinitely                                |
+| `setVoltage(Supplier<Voltage> volts)`           | `Command` | Open loop voltage from a supplier; re-evaluated each loop                 |
 
-`set` and `setVoltage` come from the `CommandMechanism` interface. They stop the closed-loop controller while running and restart it when the command ends.
+`set` and `setVoltage` come from the `CommandMechanism` interface. They stop the closed loop controller while running and restart it when the command ends.
 
 ### `setAngle`
 

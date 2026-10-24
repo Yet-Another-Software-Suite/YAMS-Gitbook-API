@@ -26,7 +26,7 @@ Use the default constructor plus `WithSmartMotorController()` when the motors ar
 
 ***
 
-## Type Alias
+## Type alias
 
 ```cpp
 using TelemetryVerbosity = motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity;
@@ -34,7 +34,7 @@ using TelemetryVerbosity = motorcontrollers::SmartMotorControllerConfig::Telemet
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `SwerveModuleConfig&` for chaining.
 
@@ -61,7 +61,7 @@ All methods return `SwerveModuleConfig&` for chaining.
 
 ***
 
-## DataLog Telemetry
+## DataLog telemetry
 
 `SwerveModuleConfig` has no `WithDataLogName(...)` method: DataLog output is configured on a [`telemetry::SwerveModuleTelemetryConfig`](../../c++-reference/swerve/swerve-module.md#telemetry--datalog) and wired in via `WithTelemetry(name, SwerveModuleTelemetryConfig)`:
 
@@ -117,7 +117,7 @@ frontLeftConfig
 
 ***
 
-## See Also
+## See also
 
 * [Java SwerveModuleConfig](../../java-reference/swerve/swerve-module-config.md)
 * [SwerveModule](swerve-module.md)

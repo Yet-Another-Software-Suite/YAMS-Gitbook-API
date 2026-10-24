@@ -15,7 +15,7 @@ Sprocket(String[] reductionStage)   // "IN:OUT" format
 
 ---
 
-## Factory Methods
+## Factory methods
 
 | Method | Description |
 |--------|-------------|
@@ -43,7 +43,7 @@ Sprocket s = Sprocket.fromStages("18:36");
 
 ---
 
-## See Also
+## See also
 
 - [GearBox](gearbox.md)
 - [MechanismGearing](mechanism-gearing.md)

@@ -20,7 +20,7 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 ***
 
-## State Queries
+## State queries
 
 | Method     | Signature                          | Description                              |
 | ---------- | ---------------------------------- | ---------------------------------------- |
@@ -28,7 +28,7 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 
 ***
 
-## Command Factories
+## Command factories
 
 | Method                  | Signature                                                                                             | Description                                                             |
 | ----------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -36,10 +36,10 @@ Both parameters are non-owning pointers. The `ArmConfig` and `SmartMotorControll
 | `Run` (supplier)        | `wpi::cmd::CommandPtr Run(std::function<wpi::units::degree_t()> angle)`                                        | Drives to a supplier-provided angle, re-evaluated each iteration        |
 | `RunTo` (target)        | `wpi::cmd::CommandPtr RunTo(wpi::units::degree_t angle, wpi::units::degree_t tolerance = 1.0_deg)`                  | Drives to `angle`, ends when within `tolerance`. Default tolerance: 1°. |
 | `RunTo` (supplier)      | `wpi::cmd::CommandPtr RunTo(std::function<wpi::units::degree_t()> angle, wpi::units::degree_t tolerance = 1.0_deg)` | `RunTo` with a supplier target                                          |
-| `Set` (duty cycle)      | `wpi::cmd::CommandPtr Set(double dutycycle)`                                                              | Open-loop duty cycle                                                    |
-| `Set` (supplier)        | `wpi::cmd::CommandPtr Set(std::function<double()> dutycycle)`                                             | Open-loop duty cycle with supplier                                      |
-| `SetVoltage`            | `wpi::cmd::CommandPtr SetVoltage(wpi::units::volt_t volts)`                                                    | Open-loop voltage                                                       |
-| `SetVoltage` (supplier) | `wpi::cmd::CommandPtr SetVoltage(std::function<wpi::units::volt_t()> volts)`                                   | Open-loop voltage with supplier                                         |
+| `Set` (duty cycle)      | `wpi::cmd::CommandPtr Set(double dutycycle)`                                                              | Open loop duty cycle                                                    |
+| `Set` (supplier)        | `wpi::cmd::CommandPtr Set(std::function<double()> dutycycle)`                                             | Open loop duty cycle with supplier                                      |
+| `SetVoltage`            | `wpi::cmd::CommandPtr SetVoltage(wpi::units::volt_t volts)`                                                    | Open loop voltage                                                       |
+| `SetVoltage` (supplier) | `wpi::cmd::CommandPtr SetVoltage(std::function<wpi::units::volt_t()> volts)`                                   | Open loop voltage with supplier                                         |
 
 ***
 
@@ -60,7 +60,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 
 ***
 
-## Other Public Methods
+## Other public methods
 
 | Method                         | Signature                                                 | Description                                              |
 | ------------------------------ | --------------------------------------------------------- | -------------------------------------------------------- |
@@ -83,12 +83,12 @@ Every mechanism also exposes the helpers declared in `yams::mechanisms::SmartMec
 
 | Method                           | Signature                                                                 | Description                                                         |
 | -------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `SetMechanismPositionSetpoint`   | `void SetMechanismPositionSetpoint(wpi::units::turn_t angle)`             | Starts closed-loop control and sets a mechanism angle setpoint      |
-| `SetMeasurementPositionSetpoint` | `void SetMeasurementPositionSetpoint(wpi::units::meter_t distance)`       | Starts closed-loop control and sets a linear position setpoint      |
-| `SetMechanismVelocitySetpoint`   | `void SetMechanismVelocitySetpoint(wpi::units::turns_per_second_t velocity)` | Starts closed-loop control and sets a mechanism velocity setpoint |
-| `SetMeasurementVelocitySetpoint` | `void SetMeasurementVelocitySetpoint(wpi::units::meters_per_second_t velocity)` | Starts closed-loop control and sets a linear velocity setpoint |
-| `SetVoltageSetpoint`             | `void SetVoltageSetpoint(wpi::units::volt_t voltage)`                     | Stops the closed-loop controller and applies a voltage immediately  |
-| `SetDutyCycleSetpoint`           | `void SetDutyCycleSetpoint(double dutycycle)`                             | Stops the closed-loop controller and applies a duty cycle           |
+| `SetMechanismPositionSetpoint`   | `void SetMechanismPositionSetpoint(wpi::units::turn_t angle)`             | Starts closed loop control and sets a mechanism angle setpoint      |
+| `SetMeasurementPositionSetpoint` | `void SetMeasurementPositionSetpoint(wpi::units::meter_t distance)`       | Starts closed loop control and sets a linear position setpoint      |
+| `SetMechanismVelocitySetpoint`   | `void SetMechanismVelocitySetpoint(wpi::units::turns_per_second_t velocity)` | Starts closed loop control and sets a mechanism velocity setpoint |
+| `SetMeasurementVelocitySetpoint` | `void SetMeasurementVelocitySetpoint(wpi::units::meters_per_second_t velocity)` | Starts closed loop control and sets a linear velocity setpoint |
+| `SetVoltageSetpoint`             | `void SetVoltageSetpoint(wpi::units::volt_t voltage)`                     | Stops the closed loop controller and applies a voltage immediately  |
+| `SetDutyCycleSetpoint`           | `void SetDutyCycleSetpoint(double dutycycle)`                             | Stops the closed loop controller and applies a duty cycle           |
 | `GetMotorController`             | `motorcontrollers::SmartMotorController* GetMotorController()`            | Returns the underlying motor controller                             |
 | `GetMechanismSetpoint`           | `std::optional<wpi::units::turn_t> GetMechanismSetpoint()`                | Current mechanism setpoint, if one has been set                     |
 | `GetMechanismWindow`             | `wpi::Mechanism2d* GetMechanismWindow()`                                  | The Mechanism2d window, or `nullptr` if not initialized             |
@@ -130,7 +130,7 @@ In simulation the `Arm` constructor throws `exceptions::ArmConfigurationExceptio
 
 ***
 
-## See Also
+## See also
 
 * [Java Arm](../../java-reference/mechanisms/arm.md)
 * [C++ ArmConfig](../config/arm-config.md)

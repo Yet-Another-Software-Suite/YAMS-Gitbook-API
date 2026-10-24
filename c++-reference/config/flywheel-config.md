@@ -20,7 +20,7 @@ FlyWheelConfig() = default;
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All methods return `FlyWheelConfig&` for chaining.
 

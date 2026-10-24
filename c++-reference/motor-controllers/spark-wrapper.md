@@ -31,15 +31,15 @@ A vendor config passed with `WithVendorConfig` must be a `rev::spark::SparkMaxCo
 
 ***
 
-## Key Methods
+## Key methods
 
-`SparkWrapper` implements the full [`SmartMotorController`](smart-motor-controller.md) interface (open-loop outputs, closed-loop setpoints, encoder reads and writes, live configuration setters, telemetry and live tuning). See that page for the complete method list. The notes below cover SPARK-specific behavior.
+`SparkWrapper` implements the full [`SmartMotorController`](smart-motor-controller.md) interface (open loop outputs, closed loop setpoints, encoder reads and writes, live configuration setters, telemetry and live tuning). See that page for the complete method list. The notes below cover SPARK-specific behavior.
 
 ### Units on the SPARK
 
 The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the motor's encoder, or of the external encoder when it is used for feedback). YAMS does not configure conversion factors on the SPARK. Gains, setpoints, MAXMotion constraints, tolerances and soft limits are scaled from YAMS mechanism units by the mechanism-to-feedback-sensor ratio, so you always work in mechanism units.
 
-### Closed-Loop Control
+### Closed loop control
 
 | Configuration                          | Where the loop runs                                                                                                        |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -49,7 +49,7 @@ The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the
 
 `WithClosedLoopControlPeriod`, `WithClosedLoopMaxVoltage` and `WithFeedbackSynchronizationThreshold` are only valid when the loop runs on the SystemCore (exponential profile or [LQR](../math/lqr-controller.md)); otherwise `ApplyConfig` throws `SmartMotorControllerConfigurationException`.
 
-### Encoder Reads
+### Encoder reads
 
 | Method                                                                        | SPARK behavior                                                                                                   |
 | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
@@ -58,7 +58,7 @@ The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the
 | `GetExternalEncoderMechanismPosition()` / `GetExternalEncoderMechanismVelocity()` | The external encoder with the external encoder gearing applied. Empty when no external encoder is attached.   |
 | `GetRotorPosition()` / `GetRotorVelocity()`                                   | Raw rotor position and velocity (before gearing).                                                                |
 
-### Unsupported Options
+### Unsupported options
 
 | Option                                              | Behavior                                                                                         |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -70,7 +70,7 @@ The SPARK runs in the raw units of its feedback sensor (rotations and RPM of the
 
 ***
 
-## External Encoders
+## External encoders
 
 Pass a pointer to the encoder with `WithExternalEncoder(...)`:
 
@@ -162,7 +162,7 @@ m_motor.emplace(&m_sparkFlex, wpi::math::DCMotor::NeoVortex(1), &m_motorConfig);
 
 ***
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

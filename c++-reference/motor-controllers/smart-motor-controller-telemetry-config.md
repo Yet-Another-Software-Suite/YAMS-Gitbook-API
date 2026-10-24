@@ -7,7 +7,7 @@ Fine-grained telemetry configuration for a `SmartMotorController`. Every field i
 
 For most use-cases, passing a name and verbosity to `SmartMotorControllerConfig::WithTelemetry(const std::string&, TelemetryVerbosity)` is sufficient. Use this class only when you need to override which specific fields are published or to route telemetry to DataLog instead of NetworkTables.
 
-## Type Alias
+## Type alias
 
 ```cpp
 using TelemetryVerbosity =
@@ -20,22 +20,22 @@ using TelemetryVerbosity =
 SmartMotorControllerTelemetryConfig()
 ```
 
-## Verbosity Presets
+## Verbosity presets
 
 `WithTelemetryVerbosity(TelemetryVerbosity)` enables a cumulative set of fields. Each higher level includes everything from the levels below it.
 
 | Level    | Fields enabled                                                                                                                                                                                                                                                                              |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `NONE`   | Nothing                                                                                                                                                                                                                                                                                     |
-| `LOW`    | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed-loop slot                                                                                      |
+| `LOW`    | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed loop slot                                                                                      |
 | `MEDIUM` | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                                                                                                     |
-| `HIGH`   | Everything in MEDIUM, plus: all boolean status flags (including motor and encoder inversion), tunable setpoints and closed-loop slot, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), current limits, ramp rates, soft limit values, motor temperature, setpoint feedforward force |
+| `HIGH`   | Everything in MEDIUM, plus: all boolean status flags (including motor and encoder inversion), tunable setpoints and closed loop slot, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), current limits, ramp rates, soft limit values, motor temperature, setpoint feedforward force |
 
 {% hint style="info" %}
 `HIGH` also publishes the tunable values that drive live tuning. When the motor controller's config has a subsystem (`WithSubsystem(this)`), a `Live Tuning` command is registered automatically at `HIGH`; see [SmartMotorController](smart-motor-controller.md#telemetry-and-live-tuning).
 {% endhint %}
 
-## Builder Methods: Output Channels
+## Builder methods: Output channels
 
 All methods return `SmartMotorControllerTelemetryConfig&` for chaining.
 
@@ -46,7 +46,7 @@ All methods return `SmartMotorControllerTelemetryConfig&` for chaining.
 | `WithoutNetworkTables()`                               | Disables NT4 publishing. Useful during competition matches.               |
 | `WithTelemetryVerbosity(TelemetryVerbosity verbosity)` | Enables a preset bundle (`LOW`, `MEDIUM`, or `HIGH`).                     |
 
-## Builder Methods: Boolean Fields
+## Builder methods: Boolean fields
 
 Each method enables a single boolean status flag. Flags are automatically suppressed if the motor controller or configuration does not support them.
 
@@ -55,13 +55,13 @@ Each method enables a single boolean status flag. Flags are automatically suppre
 | `WithMechanismLowerLimit()` | Whether the mechanism is at or past its lower soft limit.      |
 | `WithMechanismUpperLimit()` | Whether the mechanism is at or past its upper soft limit.      |
 | `WithTemperatureLimit()`    | Whether the motor is in an over-temperature condition.         |
-| `WithVelocityControl()`     | Whether velocity closed-loop mode is currently active.         |
+| `WithVelocityControl()`     | Whether velocity closed loop mode is currently active.         |
 | `WithElevatorFeedforward()` | Whether an elevator feedforward is in use.                     |
 | `WithArmFeedforward()`      | Whether an arm feedforward is in use.                          |
 | `WithSimpleFeedforward()`   | Whether a simple motor feedforward is in use.                  |
 | `WithMotionProfile()`       | Whether a trapezoidal or exponential motion profile is active. |
 
-## Builder Methods: Numeric Fields
+## Builder methods: Numeric fields
 
 | Method                      | What it logs                                                                            |
 | --------------------------- | --------------------------------------------------------------------------------------- |
@@ -79,7 +79,7 @@ Each method enables a single boolean status flag. Flags are automatically suppre
 | `WithRotorPosition()`       | Raw rotor position (rotations).                                                         |
 | `WithRotorVelocity()`       | Raw rotor velocity (rotations/s).                                                       |
 
-## Builder Methods: Custom Fields
+## Builder methods: Custom fields
 
 `WithCustom` enables or disables any field from the `yams::telemetry::DoubleTelemetryField` and `yams::telemetry::BooleanTelemetryField` enums (declared in `yams/telemetry/SmartMotorControllerTelemetry.hpp`), including fields that have no dedicated `With*()` method such as `SupplyCurrent`, `kP` or `TrapezoidalProfileMaxVelocity`.
 
@@ -134,7 +134,7 @@ Fields that are not applicable to the current motor controller or configuration 
 `WithTelemetryVerbosity()` is cumulative: combining it with individual `With*()` methods produces the union of all requested fields.
 {% endhint %}
 
-## Related Pages
+## Related pages
 
 * [SmartMotorController (C++)](smart-motor-controller.md)
 * [SmartMotorControllerConfig (C++)](smart-motor-controller-config.md)

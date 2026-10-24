@@ -1,4 +1,4 @@
-# Swerve Drive
+# Swerve drive
 
 Complete swerve drive implementation with kinematics and pose estimation.
 

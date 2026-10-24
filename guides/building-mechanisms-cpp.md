@@ -1,4 +1,4 @@
-# Building Positional Mechanisms (C++)
+# Building positional mechanisms (C++)
 
 **Goal:** Create `Arm`, `Elevator`, and `Pivot` subsystems in C++ with position control and physics simulation.
 

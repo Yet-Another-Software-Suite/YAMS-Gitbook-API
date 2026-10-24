@@ -17,7 +17,7 @@ GearBox(String[] reductionStage)   // "IN:OUT" format per stage
 
 ***
 
-## Factory Methods
+## Factory methods
 
 | Method                                                          | Description                                                                                                               |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -38,7 +38,7 @@ GearBox(String[] reductionStage)   // "IN:OUT" format per stage
 
 ***
 
-## Expressing the Same Reduction Three Ways
+## Expressing the same reduction three ways
 
 All three of the following produce an equivalent 5.14:1 reduction:
 
@@ -62,7 +62,7 @@ GearBox twoStage = GearBox.fromTeeth(12, 48, 16, 64);
 
 ***
 
-## See Also
+## See also
 
 * [MechanismGearing](mechanism-gearing.md)
 * [Sprocket](sprocket.md)

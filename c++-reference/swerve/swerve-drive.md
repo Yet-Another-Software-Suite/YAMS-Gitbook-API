@@ -36,7 +36,7 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 
 ***
 
-## Odometry & Pose
+## Odometry & pose
 
 | Method                                | Signature                                                                               | Description                                           |
 | ------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------- |
@@ -49,7 +49,7 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 
 ***
 
-## State Queries
+## State queries
 
 | Method                       | Signature                                                                | Description                                               |
 | ---------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------- |
@@ -81,7 +81,7 @@ There is no direct accessor for the underlying `wpi::math::SwerveDrivePoseEstima
 
 ***
 
-## Auto-Align (Drive to Pose) & PID Control
+## Auto-align (drive to pose) & PID control
 
 | Method                | Signature                    | Description                                  |
 | --------------------- | ---------------------------- | -------------------------------------------- |
@@ -146,7 +146,7 @@ wpi::cmd::CommandPtr DriveCommand(std::function<wpi::math::ChassisVelocities()> 
 
 ***
 
-## See Also
+## See also
 
 * [Java SwerveDrive](../../java-reference/swerve/swerve-drive.md)
 * [SwerveDriveConfig](swerve-drive-config.md)

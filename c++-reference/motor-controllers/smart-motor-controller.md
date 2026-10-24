@@ -11,7 +11,7 @@ All quantities use the WPILib 2027 C++ units library in the `wpi::units` namespa
 
 ***
 
-## Type Aliases
+## Type aliases
 
 ```cpp
 using ClosedLoopControllerSlot = SmartMotorControllerConfig::ClosedLoopControllerSlot;
@@ -21,7 +21,7 @@ using ControlMode = SmartMotorControllerConfig::ControlMode;
 
 ***
 
-## Pure Virtual Methods
+## Pure virtual methods
 
 Subclasses must implement all of the following methods.
 
@@ -40,14 +40,14 @@ virtual void SimIterate() = 0;
 
 The bundled wrappers call `SetupSimulation()` from their constructors (it does nothing outside simulation), and the YAMS mechanisms call `SimIterate()` from their simulation loop.
 
-### Encoder Sync
+### Encoder sync
 
 ```cpp
 virtual void SeedRelativeEncoder() = 0;
 virtual void SynchronizeRelativeEncoder() = 0;
 ```
 
-### Open-Loop Outputs
+### Open loop outputs
 
 ```cpp
 virtual void SetDutyCycle(double dutyCycle) = 0;
@@ -56,7 +56,7 @@ virtual void SetVoltage(wpi::units::volt_t voltage) = 0;
 virtual wpi::units::volt_t GetVoltage() = 0;
 ```
 
-### Closed-Loop Setpoints
+### Closed loop setpoints
 
 ```cpp
 virtual void SetPosition(wpi::units::turn_t angle) = 0;
@@ -72,7 +72,7 @@ virtual void SetVelocity(wpi::units::turns_per_second_t velocity,
 void SetVelocity(wpi::units::meters_per_second_t velocity, wpi::units::newton_t feedforwardForce);
 ```
 
-### Encoder Writes
+### Encoder writes
 
 ```cpp
 virtual void SetEncoderPosition(wpi::units::turn_t angle) = 0;
@@ -81,7 +81,7 @@ virtual void SetEncoderVelocity(wpi::units::turns_per_second_t velocity) = 0;
 virtual void SetEncoderVelocity(wpi::units::meters_per_second_t velocity) = 0;
 ```
 
-### Encoder Reads
+### Encoder reads
 
 ```cpp
 virtual wpi::units::turn_t GetMechanismPosition() = 0;
@@ -108,7 +108,7 @@ virtual std::optional<wpi::units::turns_per_second_t> GetExternalEncoderMechanis
 `GetExternalEncoderPosition()` / `GetExternalEncoderVelocity()` (which returned `degree_t` / `degrees_per_second_t`) no longer exist. Use `GetExternalEncoderMechanismPosition()` / `GetExternalEncoderMechanismVelocity()`, which return mechanism turns and turns per second.
 {% endhint %}
 
-### Motor Status
+### Motor status
 
 ```cpp
 virtual std::optional<wpi::units::ampere_t> GetSupplyCurrent() = 0;
@@ -117,7 +117,7 @@ virtual wpi::units::celsius_t GetTemperature() = 0;
 virtual wpi::math::DCMotor GetDCMotor() = 0;
 ```
 
-### Live Configuration Setters
+### Live configuration setters
 
 These apply a change immediately without a full `ApplyConfig` call. They are also what live tuning calls.
 
@@ -137,8 +137,8 @@ These apply a change immediately without a full `ApplyConfig` call. They are als
 | `SetFeedforward`                  | `virtual void SetFeedforward(double kS, double kV, double kA, double kG) = 0`                                                             | Set all feedforward gains at once                            |
 | `SetStatorCurrentLimit`           | `virtual void SetStatorCurrentLimit(wpi::units::ampere_t currentLimit) = 0`                                                               | Cap motor output current                                     |
 | `SetSupplyCurrentLimit`           | `virtual void SetSupplyCurrentLimit(wpi::units::ampere_t currentLimit) = 0`                                                               | Cap battery draw current                                     |
-| `SetClosedLoopRampRate`           | `virtual void SetClosedLoopRampRate(wpi::units::second_t rampRate) = 0`                                                                   | Ramp time for closed-loop output                             |
-| `SetOpenLoopRampRate`             | `virtual void SetOpenLoopRampRate(wpi::units::second_t rampRate) = 0`                                                                     | Ramp time for open-loop output                               |
+| `SetClosedLoopRampRate`           | `virtual void SetClosedLoopRampRate(wpi::units::second_t rampRate) = 0`                                                                   | Ramp time for closed loop output                             |
+| `SetOpenLoopRampRate`             | `virtual void SetOpenLoopRampRate(wpi::units::second_t rampRate) = 0`                                                                     | Ramp time for open loop output                               |
 | `SetMechanismUpperLimit`          | `virtual void SetMechanismUpperLimit(wpi::units::turn_t upperLimit) = 0`                                                                  | Update the upper angular soft limit                          |
 | `SetMechanismLowerLimit`          | `virtual void SetMechanismLowerLimit(wpi::units::turn_t lowerLimit) = 0`                                                                  | Update the lower angular soft limit                          |
 | `SetMechanismLimits`              | `virtual void SetMechanismLimits(wpi::units::turn_t lower, wpi::units::turn_t upper) = 0`                                                 | Update both angular soft limits                              |
@@ -155,7 +155,7 @@ These apply a change immediately without a full `ApplyConfig` call. They are als
 
 ***
 
-## Non-Virtual Public Methods
+## Non-virtual public methods
 
 ### Simulation
 
@@ -164,7 +164,7 @@ void SetSimSupplier(std::shared_ptr<SimSupplier> supplier);
 SimSupplier* GetSimSupplier() const;
 ```
 
-### Closed-Loop Controller Thread
+### Closed loop controller thread
 
 Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), an exponential profile on a SPARK, or any closed loop on a Thrifty Nova).
 
@@ -177,7 +177,7 @@ wpi::units::second_t GetClosedLoopControllerPeriod() const;
 
 `GetClosedLoopControllerPeriod()` is how often the closed loop runs: `WithClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. It is published as `closedloop/period`.
 
-### Telemetry and Live Tuning
+### Telemetry and live tuning
 
 ```cpp
 void SetupTelemetry(std::shared_ptr<wpi::nt::NetworkTable> dataTable,
@@ -233,7 +233,7 @@ The wrappers raise WPILib alerts (`wpi::util::Alert`, group `YAMS`) for configur
 
 ***
 
-## SimSupplier Interface
+## SimSupplier interface
 
 `SimSupplier` (`#include <yams/motorcontrollers/SimSupplier.hpp>`) is a pure virtual interface for physics simulation backends. Implement this interface to provide custom physics, or use one of the three built-in implementations in `yams::motorcontrollers::simulation`:
 
@@ -247,9 +247,9 @@ Each wrapper (`SparkWrapper`, `NovaWrapper`, `TalonFXWrapper`, `TalonFXSWrapper`
 
 ***
 
-## CTRE-Specific Notes
+## CTRE-specific notes
 
-### CANdi as External Encoder (TalonFXWrapper / TalonFXSWrapper)
+### CANdi as external encoder (TalonFXWrapper / TalonFXSWrapper)
 
 A `CANdi` can be passed via `WithExternalEncoder(&candi)` for both `TalonFXWrapper` and `TalonFXSWrapper` (external encoders are passed as pointers). Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the sensor source to one of `SyncCANdiPWM1`, `RemoteCANdiPWM1`, `SyncCANdiPWM2` or `RemoteCANdiPWM2`; otherwise offset, inversion and discontinuity settings are not applied to either channel.
 
@@ -298,7 +298,7 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 
 ***
 
-## See Also
+## See also
 
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-config.md)

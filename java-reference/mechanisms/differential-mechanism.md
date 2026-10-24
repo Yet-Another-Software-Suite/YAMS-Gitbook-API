@@ -33,7 +33,7 @@ Throws `DifferentialMechanismConfigurationException` if the starting tilt or twi
 
 ---
 
-## State Queries
+## State queries
 
 These come from `yams.core.mechanisms.positional.DifferentialMechanism` and work outside of commands.
 
@@ -49,7 +49,7 @@ These come from `yams.core.mechanisms.positional.DifferentialMechanism` and work
 
 ---
 
-## Command Factories
+## Command factories
 
 ### `setPosition(Angle tilt, Angle twist)`
 
@@ -88,7 +88,7 @@ Same as `setPosition` with the same arguments.
 public Command set(double twist, double tilt)
 ```
 
-Open-loop duty cycle. Note the argument order: twist first, then tilt. The left motor gets `tilt - twist` and the right motor `tilt + twist`. The closed-loop controllers are stopped while it runs and restarted when it ends.
+Open loop duty cycle. Note the argument order: twist first, then tilt. The left motor gets `tilt - twist` and the right motor `tilt + twist`. The closed loop controllers are stopped while it runs and restarted when it ends.
 
 | Name | Type | Description |
 |------|------|-------------|
@@ -116,7 +116,7 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 
 ---
 
-## Visualization & Simulation
+## Visualization & simulation
 
 | Method | Returns | Description |
 |--------|---------|-------------|

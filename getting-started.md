@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 {% hint style="info" %}
 YAMS requires WPILib 2027 (`2027_alpha7`) and Java 25. Robot code runs on the SystemCore. Ensure your project is up to date before installing.

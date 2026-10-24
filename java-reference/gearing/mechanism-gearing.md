@@ -57,7 +57,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig()
 
 ***
 
-## See Also
+## See also
 
 * [GearBox](gearbox.md)
 * [Sprocket](sprocket.md)

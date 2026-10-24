@@ -1,4 +1,4 @@
-# Building a Flywheel Subsystem
+# Building a flywheel subsystem
 
 **Goal:** Create a `FlyWheel` subsystem with velocity control and physics simulation.
 
@@ -8,7 +8,7 @@
 {% step %}
 #### Configure the motor for velocity control
 
-Use `withClosedLoopController` for the closed-loop PID and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
+Use `withClosedLoopController` for the closed loop PID and `withFeedforward(SimpleMotorFeedforward)` to reduce steady-state error. Optionally add an exponential profile for smooth spin-up.
 
 ```java
 // "this" is the Subsystem (Commands v2) or Mechanism (Commands v3) that owns the motor.

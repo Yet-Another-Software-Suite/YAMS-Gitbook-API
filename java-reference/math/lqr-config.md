@@ -20,7 +20,7 @@ LQRConfig(DCMotor motor, MechanismGearing gearing, MomentOfInertia moi)
 
 All builder methods return the `LQRConfig` object for chaining.
 
-## Builder Methods
+## Builder methods
 
 | Method                                                                                                                                                                                              | Parameters                  | Description                                                                      |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------- |
@@ -49,7 +49,7 @@ The qelms parameters ("Q elements") define how much you care about state error. 
 | `getLoop()`                                                     | `LinearSystemLoop<?, ?, ?>`         | Constructs and returns the full system loop (convenience method). |
 | `getLoop(LinearSystem, LinearQuadraticRegulator, KalmanFilter)` | `LinearSystemLoop<?, ?, ?>`         | Constructs the loop from individually-provided components.        |
 
-## See Also
+## See also
 
 * [LQRController](lqr-controller.md)
 * [C++ LQRConfig](../../c++-reference/math/lqr-config.md)

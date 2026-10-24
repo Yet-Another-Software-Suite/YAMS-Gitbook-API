@@ -27,7 +27,7 @@ Both motor controllers, a starting tilt and twist, and a length are **required**
 
 ---
 
-## Builder Methods
+## Builder methods
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|

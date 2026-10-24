@@ -15,7 +15,7 @@ NovaWrapper(Nova nova, DCMotor motor, SmartMotorControllerConfig<?> config)
 
 A vendor config passed with `withVendorConfig` must be a `NovaConfig.Config`, such as a `NovaConfigBatch`. It is applied before the YAMS config, so YAMS options overwrite it. Any other vendor config type throws `SmartMotorControllerConfigurationException`.
 
-## Supported Hardware
+## Supported hardware
 
 | Hardware              | `Motor.MotorType` | `DCMotor` Model     |
 | --------------------- | ----------------- | ------------------- |
@@ -48,7 +48,7 @@ SmartMotorController motor = new NovaWrapper(
 );
 ```
 
-## Nova-Specific Notes
+## Nova-specific notes
 
 **Closed loop runs on the SystemCore.** In `ControlMode.CLOSED_LOOP` the PID, feedforward and motion profiles run in YAMS on the SystemCore, and the Nova is commanded with voltage. ThriftyLib's simulation ignores the Nova's onboard PID gains, so this keeps simulation and the real robot the same. YAMS raises a `closed loop controller is running on the SystemCore` alert while it does this.
 
@@ -74,7 +74,7 @@ Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOff
 
 **Telemetry.** Every `SmartMotorControllerTelemetry` field is supported.
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)

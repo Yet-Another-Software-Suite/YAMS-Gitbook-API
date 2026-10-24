@@ -13,7 +13,7 @@ The stream keeps a pointer to the `SwerveDrive<N>` it was built from, so the dri
 
 ***
 
-## Factory Method
+## Factory method
 
 ```cpp
 static SwerveInputStream Of(SwerveDrive<NumModules>& drive,
@@ -46,11 +46,11 @@ The second constructor pre-configures heading axes; pair it with `WithHeadingCon
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All builder methods return `SwerveInputStream&` for chaining.
 
-### Velocity Limits
+### Velocity limits
 
 | Method                       | Signature                                                          | Description                                                           |
 | ---------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
@@ -61,7 +61,7 @@ All builder methods return `SwerveInputStream&` for chaining.
 A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if set) into its own maximum fields once, at construction time; otherwise it starts from its own defaults (4 m/s, 2 pi rad/s). Calling `WithMaximumLinearVelocity(...)`/`WithMaximumAngularVelocity(...)` afterward overrides that value for this stream and takes effect immediately; the drive's config is not re-checked after construction.
 {% endhint %}
 
-### Axis Configuration
+### Axis configuration
 
 | Method                       | Signature                                                                                       | Description                                                                                                               |
 | ---------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -72,14 +72,14 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 | `WithScaleTranslation`       | `WithScaleTranslation(double scale)`                                                            | Multiplies translation output magnitude by `scale`. Range `(0, 1]`.                                                       |
 | `WithScaleRotation`          | `WithScaleRotation(double scale)`                                                               | Multiplies rotation axis value by `scale`. Range `(0, 1]`.                                                                |
 
-### Input Curves
+### Input curves
 
 | Method                              | Signature                                                                                           | Description                                                                       |
 | ----------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `WithCubeTranslationControllerAxis` | `WithCubeTranslationControllerAxis()` or `WithCubeTranslationControllerAxis(std::function<bool()>)` | Applies a cubic input curve to translation magnitude for finer low-speed control. |
 | `WithCubeRotationControllerAxis`    | `WithCubeRotationControllerAxis()` or `WithCubeRotationControllerAxis(std::function<bool()>)`       | Applies a cubic curve to the rotation axis.                                       |
 
-### Drive Modes
+### Drive modes
 
 | Method                | Signature                                                                        | Description                                                                                             |
 | --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -98,7 +98,7 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 `HEADING`, `AIM` and `TRANSLATION_ONLY` modes use the drive's rotation PID controller. If `SwerveDriveConfig::WithRotationController(...)` was not called, `Get()` throws a `SwerveDriveConfigurationException` when one of those modes becomes active.
 {% endhint %}
 
-### Field Orientation
+### Field orientation
 
 | Method                         | Signature                                                                                     | Description                                                                    |
 | ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -127,7 +127,7 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 
 ***
 
-## Drive Modes
+## Drive modes
 
 `SwerveInputStream` automatically selects the active drive mode each loop based on which suppliers are configured and active.
 
@@ -142,7 +142,7 @@ Mode priority (highest to lowest): `TRANSLATION_ONLY` > `AIM` > `HEADING` > `ANG
 
 ***
 
-## Telemetry & Live Tuning
+## Telemetry & live tuning
 
 Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It then publishes every time the stream is read with `Get()`, so there is nothing to call each loop.
 
@@ -225,7 +225,7 @@ wpi::cmd::CommandPtr DriveCommand() {
 
 ***
 
-## See Also
+## See also
 
 * [Java SwerveInputStream](../../java-reference/swerve/swerve-input-stream.md)
 * [C++ SwerveDrive\<N>](swerve-drive.md)

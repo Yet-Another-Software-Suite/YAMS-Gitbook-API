@@ -40,7 +40,7 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 
 ***
 
-## Motor Access
+## Motor access
 
 | Method                      | Signature                                                                   | Description                   |
 | --------------------------- | --------------------------------------------------------------------------- | ----------------------------- |
@@ -68,7 +68,7 @@ explicit SwerveModule(config::SwerveModuleConfig* config)
 
 ***
 
-## See Also
+## See also
 
 * [Java SwerveModule](../../java-reference/swerve/swerve-module.md)
 * [SwerveModuleConfig](swerve-module-config.md)

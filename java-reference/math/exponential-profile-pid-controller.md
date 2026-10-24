@@ -11,7 +11,7 @@ ExponentialProfilePIDController(PIDController controller, ExponentialProfile.Con
 ExponentialProfilePIDController(double kP, double kI, double kD, ExponentialProfile.Constraints constraints)
 ```
 
-## Constraints Factory Methods
+## Constraints factory methods
 
 These static methods produce `ExponentialProfile.Constraints` suited to specific mechanism types:
 
@@ -24,7 +24,7 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 | `static Constraints createFlywheelConstraints(Voltage maxVolts, DCMotor motor, Mass mass, Distance radius, MechanismGearing gearing)` | Constraints for a flywheel; computes MOI from mass and radius. |
 | `static Constraints createConstraints(Voltage maxVolts, AngularVelocity maxVelocity, AngularAcceleration maxAcceleration)` | Generic constraints from physical limits. |
 
-## Control Methods
+## Control methods
 
 | Method | Returns | Description |
 | ------ | ------- | ----------- |
@@ -33,7 +33,7 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 | `reset(State measurement)` | `void` | Resets the profile and PID to the given state. Call on enable. |
 | `reset(double position, double velocity)` | `void` | Resets with position and velocity scalars. |
 
-## State Query Methods
+## State query methods
 
 | Method | Returns | Description |
 | ------ | ------- | ----------- |
@@ -49,7 +49,7 @@ These static methods produce `ExponentialProfile.Constraints` suited to specific
 | `getKv()` | `AngularVelocity` | Velocity gain derived from the constraints (`-A/B`). Throws `IllegalStateException` if no constraints are set. |
 | `getKa()` | `AngularAcceleration` | Acceleration gain derived from the constraints (`1/B`). Throws `IllegalStateException` if no constraints are set. |
 
-## PID Tuning Methods
+## PID tuning methods
 
 | Method | Description |
 | ------ | ----------- |

@@ -13,14 +13,14 @@ This class is entirely static and requires no setup for basic voltage sag under 
 The current draw registered here comes directly out of each mechanism's physics simulation, which derives current from the torque needed to produce a given acceleration. An unrealistic moment of inertia understates that current, and therefore the voltage sag `BatterySim` computes. Set a real MOI via [`SmartMotorControllerConfig::WithMOI(...)`](../motor-controllers/smart-motor-controller-config.md) for more realistic results.
 {% endhint %}
 
-## Static Fields
+## Static fields
 
 | Field                | Type              | Description                                                                              |
 | -------------------- | ----------------- | ------------------------------------------------------------------------------------------- |
 | `BatteryVoltage`     | `wpi::units::volt_t`   | Nominal open-circuit battery voltage used when discharge simulation is disabled. Default `12V`. |
 | `BatteryResistance`  | `wpi::units::ohm_t`    | Nominal internal resistance used when discharge simulation is disabled. Default `0.020` ohm.    |
 
-## Voltage Calculation
+## Voltage calculation
 
 ```cpp
 static wpi::units::volt_t CalculateVoltage(const void* id, wpi::units::ampere_t current);
@@ -28,7 +28,7 @@ static wpi::units::volt_t CalculateVoltage(const void* id, wpi::units::ampere_t 
 
 Registers `current` under `id` and returns the resulting loaded battery voltage across every registered id. `id` should be a stable identity for the calling mechanism; YAMS's built-in sim suppliers and hardware wrappers pass the address of the owning `SmartMotorController`, so each motor controller counts once.
 
-## Managing Registered Draws
+## Managing registered draws
 
 ```cpp
 static void RemoveCurrent(const void* id);
@@ -42,7 +42,7 @@ static bool HasCurrent(const void* id);
 | `Reset`         | Clears every tracked draw and resets discharge simulation to a fresh, fully charged, disabled state.           |
 | `HasCurrent`    | Whether a draw is currently tracked for `id`.                                                                  |
 
-## Discharge Simulation
+## Discharge simulation
 
 By default, `BatterySim` holds a constant nominal voltage and resistance, enough to model sag under instantaneous combined load, but not a battery weakening over a match. Enable discharge modeling to layer state-of-charge tracking on top: current draw is integrated into amp-hours consumed over time (using `wpi::Timer::GetTimestamp()`, derated by discharge rate; see [Capacity Derating](#capacity-derating) below), and the open-circuit voltage droops along a fixed discharge curve (flat through most of the charge, sagging quickly near depletion) while internal resistance rises as the battery empties.
 
@@ -65,7 +65,7 @@ static double GetStateOfCharge();
 Discharge simulation only affects `CalculateVoltage(...)`. It has no effect on a real robot, where the SystemCore's measured battery voltage reflects actual hardware.
 {% endhint %}
 
-## Custom Discharge Curves
+## Custom discharge curves
 
 `EnableDischarge(...)` sags voltage along a built-in curve that models a typical FRC sealed lead-acid battery: roughly flat through most of the charge, then dropping off quickly near depletion. Not every battery behaves that way. Call `ReplaceSOCInterpolation(...)` **before** `EnableDischarge(...)` to swap in a curve that matches the battery you're actually trying to model.
 
@@ -98,7 +98,7 @@ yams::motorcontrollers::simulation::BatterySim::EnableDischarge(
 Keys and values should span the full `[0, 1]` state-of-charge range. Querying outside the range you defined returns the nearest endpoint's voltage instead of extrapolating, so a table missing the low or high end will not sag realistically there.
 {% endhint %}
 
-## Capacity Derating
+## Capacity derating
 
 Sealed lead-acid batteries deliver noticeably fewer amp-hours the faster they're discharged (the Peukert effect), unlike lithium chemistries, which stay close to their rated capacity across a wide range of discharge currents. A battery rated for 18 Ah at a light 0.9 A draw might only deliver ~11 Ah at a sustained 54 A draw, which is well within normal FRC match currents. `EnableDischarge(...)` derates the amp-hours consumed by a discharge-current &rarr; capacity-fraction table so the modeled state of charge drops faster under heavy sustained load, matching this behavior instead of assuming the full rated capacity is available at any current.
 
@@ -157,7 +157,7 @@ void Robot::UtilityInit() {
 }
 ```
 
-## Related Pages
+## Related pages
 
 * [SmartMotorController](../motor-controllers/smart-motor-controller.md)
 * [BatterySim (Java)](../../java-reference/sensor/battery-sim.md)

@@ -1,4 +1,4 @@
-# Simulation
+# Sensor
 
 **Namespace:** `yams::motorcontrollers::simulation`\
 **Header:** `#include <yams/motorcontrollers/simulation/Sensor.hpp>`
@@ -86,7 +86,7 @@ SensorData(std::string name, std::function<HAL_Value()> supplier, HAL_Value defa
 | `Set(int64_t val)`   |                                        |
 | `Set(HAL_Value val)` | Raw HAL write.                         |
 
-### Trigger Injection
+### Trigger injection
 
 ```cpp
 void AddSimTrigger(HAL_Value value, std::function<bool()> trigger)

@@ -1,4 +1,4 @@
-# Simulation
+# Sensor
 
 **Package:** `yams.core.motorcontrollers.simulation`
 
@@ -86,7 +86,7 @@ SensorData(String name, Supplier<HALValue> supplier, HALValue defaultValue, HALV
 | `set(long val)`     |                                        |
 | `set(HALValue val)` | Raw HAL write.                         |
 
-### Trigger Injection
+### Trigger injection
 
 ```java
 void addSimTrigger(HALValue value, BooleanSupplier trigger)

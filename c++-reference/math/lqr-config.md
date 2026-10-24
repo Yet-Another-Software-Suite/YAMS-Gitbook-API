@@ -20,7 +20,7 @@ Defined inside `LQRConfig`.
 
 ***
 
-## Type Aliases
+## Type aliases
 
 ```cpp
 using Loop1 = wpi::math::LinearSystemLoop<1, 1, 1>;  // Used for FLYWHEEL
@@ -29,7 +29,7 @@ using Loop2 = wpi::math::LinearSystemLoop<2, 1, 1>;  // Used for ARM and ELEVATO
 
 ***
 
-## Builder Methods
+## Builder methods
 
 All builder methods return `LQRConfig&` for chaining.
 

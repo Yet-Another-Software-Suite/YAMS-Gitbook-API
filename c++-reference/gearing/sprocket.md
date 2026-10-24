@@ -19,7 +19,7 @@ explicit Sprocket(const std::vector<std::string>& stages)  // "IN:OUT" format
 
 ***
 
-## Factory Methods
+## Factory methods
 
 ```cpp
 static Sprocket FromStages(std::initializer_list<std::string_view> stages)  // "IN:OUT"

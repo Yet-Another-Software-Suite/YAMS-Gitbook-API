@@ -15,7 +15,7 @@
 
 | Value         | Description                         |
 | ------------- | ----------------------------------- |
-| `CLOSED_LOOP` | Closed-loop PID/[LQR](../math/lqr-controller.md) control         |
+| `CLOSED_LOOP` | Closed loop PID/[LQR](../math/lqr-controller.md) control         |
 | `OPEN_LOOP`   | Direct duty cycle or voltage output |
 
 ### `MotorMode`
@@ -44,7 +44,7 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 
 ***
 
-## PID & Feedforward Methods
+## PID & feedforward methods
 
 | Method                                                                                                                       | Description                                      |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -59,7 +59,7 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 
 ***
 
-## Motion Profile Methods
+## Motion profile methods
 
 | Method                                                                                                                                                       | Description                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
@@ -78,7 +78,7 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 
 ***
 
-## Gearing & Measurement Methods
+## Gearing & measurement methods
 
 | Method                                                                 | Description                                         |
 | ---------------------------------------------------------------------- | --------------------------------------------------- |
@@ -92,7 +92,7 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 
 ***
 
-## Limits & Safety Methods
+## Limits & safety methods
 
 | Method                                                                         | Description                                          |
 | ------------------------------------------------------------------------------ | ---------------------------------------------------- |
@@ -101,35 +101,35 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 | `WithStatorCurrentLimit(wpi::units::ampere_t limit)`                           | Cap motor output current                             |
 | `WithSupplyCurrentLimit(wpi::units::ampere_t limit)`                           | Cap battery draw current                             |
 | `WithTemperatureCutoff(wpi::units::celsius_t temperature)`                     | Disable motor above this temperature                 |
-| `WithClosedLoopMaxVoltage(wpi::units::volt_t maxVoltage)`                      | Cap closed-loop voltage output                       |
+| `WithClosedLoopMaxVoltage(wpi::units::volt_t maxVoltage)`                      | Cap closed loop voltage output                       |
 | `WithVoltageCompensation(wpi::units::volt_t voltage)`                          | Nominal voltage the output is compensated for        |
 | `WithFeedbackSynchronizationThreshold(wpi::units::turn_t threshold)`           | Resync the relative encoder to the absolute encoder beyond this error |
 
 ***
 
-## Control Behavior Methods
+## Control behavior methods
 
 | Method                                                                   | Description                                                          |
 | ------------------------------------------------------------------------ | -------------------------------------------------------------------- |
 | `WithZeroPower(MotorMode mode)`                                          | Coast or Brake                                                       |
-| `WithClosedLoopMode()`                                                   | Select closed-loop control                                           |
-| `WithOpenLoopMode()`                                                     | Select open-loop control                                             |
-| `WithClosedLoopControlPeriod(wpi::units::second_t period)`               | Period of the SystemCore closed-loop thread                          |
+| `WithClosedLoopMode()`                                                   | Select closed loop control                                           |
+| `WithOpenLoopMode()`                                                     | Select open loop control                                             |
+| `WithClosedLoopControlPeriod(wpi::units::second_t period)`               | Period of the SystemCore closed loop thread                          |
 | `WithResetPreviousConfig(bool reset)`                                    | Reset the controller's previous configuration first (default true)  |
-| `WithOpenLoopRampRate(wpi::units::second_t rampRate)`                    | Output ramp time for open-loop                                       |
-| `WithClosedLoopRampRate(wpi::units::second_t rampRate)`                  | Output ramp time for closed-loop                                     |
+| `WithOpenLoopRampRate(wpi::units::second_t rampRate)`                    | Output ramp time for open loop                                       |
+| `WithClosedLoopRampRate(wpi::units::second_t rampRate)`                  | Output ramp time for closed loop                                     |
 | `WithMotorInverted(bool inverted)`                                       | Invert motor direction                                               |
 | `WithEncoderInverted(bool inverted)`                                     | Invert encoder direction                                             |
 | `WithContinuousWrapping(wpi::units::turn_t min, wpi::units::turn_t max)` | Enable continuous input for wrapping mechanisms                      |
 
 ***
 
-## External Encoder Methods
+## External encoder methods
 
 | Method                                                                         | Description                                                    |
 | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
 | `WithExternalEncoder(std::any encoder)`                                        | Attach an external encoder, passed as a pointer (see below)    |
-| `WithUseExternalFeedbackEncoder(bool use)`                                     | Use the external encoder as the closed-loop feedback source    |
+| `WithUseExternalFeedbackEncoder(bool use)`                                     | Use the external encoder as the closed loop feedback source    |
 | `WithExternalEncoderInverted(bool inverted)`                                   | Invert the external encoder reading                            |
 | `WithExternalEncoderConversionFactor(double factor)`                           | Override the conversion factor (prefer the gearing methods)    |
 | `WithExternalEncoderZeroOffset(wpi::units::turn_t zeroOffset)`                 | Zero offset for the external encoder                           |
@@ -150,7 +150,7 @@ Accepted external encoder types per wrapper:
 
 ***
 
-## Simulation Methods
+## Simulation methods
 
 | Method                                                                                                                       | Description                                       |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
@@ -173,7 +173,7 @@ Accepted external encoder types per wrapper:
 
 ***
 
-## Telemetry Methods
+## Telemetry methods
 
 | Method                                                                                                  | Description                                                     |
 | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -185,7 +185,7 @@ Live tuning is registered automatically at `TelemetryVerbosity::HIGH` when a sub
 
 ***
 
-## Other Methods
+## Other methods
 
 | Method                                                                      | Description                                                  |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -238,7 +238,7 @@ m_motorConfig.WithSubsystem(this)
 
 ***
 
-## See Also
+## See also
 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-config.md)

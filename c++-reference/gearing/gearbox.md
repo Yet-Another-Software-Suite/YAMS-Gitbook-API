@@ -21,7 +21,7 @@ Each element of `reductionStages` is the reduction for one stage (for example `3
 
 ***
 
-## Factory Methods
+## Factory methods
 
 ```cpp
 static GearBox FromReductionStages(std::initializer_list<double> stages)

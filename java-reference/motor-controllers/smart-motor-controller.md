@@ -43,7 +43,7 @@ SmartMotorController motor = new TalonFXWrapper(
 | Method                          | Returns   | Description                                                                                        |
 | ------------------------------- | --------- | -------------------------------------------------------------------------------------------------- |
 | `isMotor(DCMotor a, DCMotor b)` | `boolean` | Compares two `DCMotor` instances by all physical parameters. Useful for runtime motor type checks. |
-| `close()` | `void` | Stops the closed-loop thread, removes this controller from `BatterySim`, closes its telemetry and alerts, and runs any registered close hooks (such as the live tuning registration). Use in unit tests. |
+| `close()` | `void` | Stops the closed loop thread, removes this controller from `BatterySim`, closes its telemetry and alerts, and runs any registered close hooks (such as the live tuning registration). Use in unit tests. |
 
 ## Control
 
@@ -57,11 +57,11 @@ SmartMotorController motor = new TalonFXWrapper(
 | `setPosition(Distance distance)`        | `void`    | Commands the mechanism to the given linear position. Requires `withMechanismCircumference` to be set. |
 | `setVelocity(AngularVelocity velocity)` | `void`    | Commands the mechanism to the given angular velocity.                                                 |
 | `setVelocity(LinearVelocity velocity)`  | `void`    | Commands the mechanism to the given linear velocity.                                                  |
-| `setVelocity(AngularVelocity velocity, Force feedforwardForce)` | `void` | Commands the mechanism to the given angular velocity, with an additional feedforward `Force` applied on top (e.g. from a PathPlanner set-point generator). Requires `withGearing`/`withMechanismCircumference` to be set. Pass `null` to fall back to plain velocity control. |
+| `setVelocity(AngularVelocity velocity, Force feedforwardForce)` | `void` | Commands the mechanism to the given angular velocity, with an additional feedforward `Force` applied on top (e.g. from a PathPlanner setpoint generator). Requires `withGearing`/`withMechanismCircumference` to be set. Pass `null` to fall back to plain velocity control. |
 | `setVelocity(LinearVelocity velocity, Force feedforwardForce)` | `void` | Linear-velocity counterpart of the above. |
 
 {% hint style="info" %}
-`Force` here means the drive-wheel feedforward force from a set-point generator such as PathPlanner's `DriveFeedforwards.linearForces()`, not a torque or a raw voltage. `SmartMotorControllerConfig.convertToVoltage(...)`/`convertToCurrent(...)` convert it into the correct motor-level feedforward using the configured gearing and mechanism circumference (wheel radius); see [SmartMotorControllerConfig](smart-motor-controller-config.md#feedforward-conversion). A `null` force is treated identically to calling the no-force overload: no feedforward is applied, and `getSetpointFeedforwardForce()` reads back empty.
+`Force` here means the drive-wheel feedforward force from a setpoint generator such as PathPlanner's `DriveFeedforwards.linearForces()`, not a torque or a raw voltage. `SmartMotorControllerConfig.convertToVoltage(...)`/`convertToCurrent(...)` convert it into the correct motor-level feedforward using the configured gearing and mechanism circumference (wheel radius); see [SmartMotorControllerConfig](smart-motor-controller-config.md#feedforward-conversion). A `null` force is treated identically to calling the no-force overload: no feedforward is applied, and `getSetpointFeedforwardForce()` reads back empty.
 {% endhint %}
 
 ## Measurement
@@ -91,14 +91,14 @@ SmartMotorController motor = new TalonFXWrapper(
 | `seedRelativeEncoder()`                        | `void`  | Seeds the relative encoder from the absolute/external encoder.                                         |
 | `synchronizeRelativeEncoder()`                 | `void`  | Checks whether the relative encoder has drifted beyond the configured threshold and re-seeds it if so. |
 
-## Closed-Loop Controller
+## Closed loop controller
 
 | Method                                             | Returns                    | Description                                                                        |
 | -------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
-| `startClosedLoopController()`                      | `void`                     | Starts the background closed-loop control thread.                                  |
-| `stopClosedLoopController()`                       | `void`                     | Stops the closed-loop control thread.                                              |
+| `startClosedLoopController()`                      | `void`                     | Starts the background closed loop control thread.                                  |
+| `stopClosedLoopController()`                       | `void`                     | Stops the closed loop control thread.                                              |
 | `getClosedLoopControllerPeriod()`                  | `Time`                     | How often the closed loop runs: `withClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. Published as `closedloop/period`. |
-| `iterateClosedLoopController()`                    | `void`                     | Executes one closed-loop iteration. Called automatically by the background thread. |
+| `iterateClosedLoopController()`                    | `void`                     | Executes one closed loop iteration. Called automatically by the background thread. |
 | `setClosedLoopSlot(ClosedLoopControllerSlot slot)` | `void`                     | Selects the active PID slot.                                                       |
 | `setKp(double kP)` / `setKi(double kI)` / `setKd(double kD)` | `void`           | Sets one PID gain at runtime.                                                      |
 | `setFeedback(double kP, double kI, double kD)`     | `void`                     | Sets all PID gains at runtime.                                                     |
@@ -131,8 +131,8 @@ SmartMotorController motor = new TalonFXWrapper(
 | `setEncoderInverted(boolean inverted)`              | `void`                       | Sets encoder phase inversion at runtime.                                                                                                                    |
 | `setStatorCurrentLimit(Current limit)`              | `void`                       | Sets stator current limit at runtime.                                                                                                                       |
 | `setSupplyCurrentLimit(Current limit)`              | `void`                       | Sets supply current limit at runtime.                                                                                                                       |
-| `setOpenLoopRampRate(Time rampRate)`                | `void`                       | Sets the open-loop ramp rate at runtime.                                                                                                                    |
-| `setClosedLoopRampRate(Time rampRate)`              | `void`                       | Sets the closed-loop ramp rate at runtime.                                                                                                                  |
+| `setOpenLoopRampRate(Time rampRate)`                | `void`                       | Sets the open loop ramp rate at runtime.                                                                                                                    |
+| `setClosedLoopRampRate(Time rampRate)`              | `void`                       | Sets the closed loop ramp rate at runtime.                                                                                                                  |
 | `setMeasurementUpperLimit(Distance upper)`          | `void`                       | Sets the upper soft limit in distance units at runtime.                                                                                                     |
 | `setMeasurementLowerLimit(Distance lower)`          | `void`                       | Sets the lower soft limit in distance units at runtime.                                                                                                     |
 | `setMechanismUpperLimit(Angle upper)`               | `void`                       | Sets upper soft limit at runtime.                                                                                                                           |
@@ -181,7 +181,7 @@ At `TelemetryVerbosity.HIGH`, `setupTelemetry()` registers a `Live Tuning` comma
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/advantage_kit/java/first/robot/subsystems/ArmSubsystem.java#L114-L147" %}
 
-## See Also
+## See also
 
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
