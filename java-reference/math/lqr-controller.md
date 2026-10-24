@@ -18,6 +18,7 @@ LQRController(LQRType type, LinearSystemLoop<?, ?, ?> loop, Time period)
 | `reset(Angle angle, AngularVelocity velocity)`      | `void`  | Resets the observer for arm or flywheel systems. Call on enable. |
 | `reset(Distance distance, LinearVelocity velocity)` | `void`  | Resets the observer for elevator systems.                        |
 | `updateConfig(LQRConfig config)`                    | `void`  | Replaces the underlying system loop at runtime.                  |
+| `retune(LQRConfig config)`                          | `void`  | Rebuilds the loop from a config whose values changed, keeping the state estimate, so the output does not jump. Safe to call while the closed loop runs. Throws `IllegalArgumentException` if the config is for a different `LQRType`. |
 
 ## Calculate overloads
 
@@ -48,6 +49,10 @@ LQRConfig lqrCfg = new LQRConfig(DCMotor.getNEO(1), gearing, moi)
 SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
     .withClosedLoopController(new LQRController(lqrCfg));
 ```
+
+## Live tuning
+
+A [SmartMotorController](../motor-controllers/smart-motor-controller.md) with an LQR publishes its values at `TelemetryVerbosity.HIGH` in place of kP, kI and kD, see [LQR fields](../motor-controllers/smart-motor-controller-telemetry-config.md#lqr-fields). While the `Live Tuning` command runs, a changed value is set on the controller's `LQRConfig` and passed to `retune`.
 
 ## See also
 

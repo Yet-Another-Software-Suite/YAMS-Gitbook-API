@@ -29,6 +29,22 @@ using Loop2 = wpi::math::LinearSystemLoop<2, 1, 1>;  // Used for ARM and ELEVATO
 
 ***
 
+## `LoopBundle<States>`
+
+A `LinearSystemLoop` together with everything it points to. WPILib's `LinearSystemLoop` keeps raw pointers to its LQR and Kalman filter, and `KalmanFilter` keeps a raw pointer to its plant, so `GetLoop()` builds all four together on the heap. A `LoopBundle` can be neither copied nor moved, so those pointers never dangle.
+
+```cpp
+template <int States>  // 1 for a flywheel, 2 for an arm or elevator
+struct LoopBundle {
+  wpi::math::LinearSystem<States, 1, 1> plant;
+  wpi::math::LinearQuadraticRegulator<States, 1> controller;
+  wpi::math::KalmanFilter<States, 1, 1> observer;
+  wpi::math::LinearSystemLoop<States, 1, 1> loop;  // The loop to run
+};
+```
+
+***
+
 ## Builder methods
 
 All builder methods return `LQRConfig&` for chaining.
@@ -43,8 +59,11 @@ All builder methods return `LQRConfig&` for chaining.
 | `WithRElems(std::initializer_list<double> rElems)`                                              | Control effort cost weights (R matrix diagonal) |
 | `WithStateStdDevs(std::initializer_list<double> stateStdDevs)`                                  | Model noise standard deviations (Kalman Q)      |
 | `WithMeasurementStdDevs(std::initializer_list<double> measStdDevs)`                             | Sensor noise standard deviations (Kalman R)     |
+| `WithQElems(const std::vector<double>& qElems)`, `WithRElems(...)`, `WithStateStdDevs(...)`, `WithMeasurementStdDevs(...)` | The same, from a `std::vector`, checked: see below |
 | `WithMaxVoltage(wpi::units::volt_t maxVoltage)`                                                      | Saturate output at this voltage                 |
 | `WithPeriod(wpi::units::second_t period)`                                                            | Control loop period (default: 20 ms)            |
+
+The `std::vector` overloads are the ones live tuning uses. They check the values: each throws `std::invalid_argument` if the number of values does not match the mechanism type (one per modeled state for `WithQElems` and `WithStateStdDevs`, one for `WithRElems` and `WithMeasurementStdDevs`) or a value is not above 0. Set the type and system first.
 
 ***
 
@@ -54,17 +73,26 @@ All builder methods return `LQRConfig&` for chaining.
 LQRType GetType() const;
 wpi::units::second_t GetPeriod() const;
 wpi::units::volt_t GetMaxVoltage() const;
+std::vector<double> GetQElems() const;
+std::vector<double> GetRElems() const;
+std::vector<double> GetStateStdDevs() const;
+std::vector<double> GetMeasurementStdDevs() const;
 std::variant<wpi::math::LinearSystem<1, 1, 1>, wpi::math::LinearSystem<2, 1, 1>> GetSystem() const;
-std::variant<Loop1, Loop2> GetLoop() const;
+std::variant<std::unique_ptr<LoopBundle<1>>, std::unique_ptr<LoopBundle<2>>> GetLoop() const;
 ```
+
+`GetQElems()`, `GetStateStdDevs()` and `GetMeasurementStdDevs()` are in SI units: rad/s for a flywheel, rad and rad/s for an arm, m and m/s for an elevator. `GetRElems()` is in volts. A value you never set is the default the loop is built with.
 
 {% hint style="info" %}
-`GetSystem()` and `GetLoop()` return `std::variant`. Access the correct alternative using `std::get`:
+`GetSystem()` and `GetLoop()` return `std::variant`. Access the correct alternative using `std::get`, and use the bundle's `loop`:
 
 ```cpp
-auto loop1 = std::get<LQRConfig::Loop1>(cfg.GetLoop());  // FLYWHEEL
-auto loop2 = std::get<LQRConfig::Loop2>(cfg.GetLoop());  // ARM or ELEVATOR
+auto flywheel = std::get<std::unique_ptr<LQRConfig::LoopBundle<1>>>(cfg.GetLoop());  // FLYWHEEL
+auto arm = std::get<std::unique_ptr<LQRConfig::LoopBundle<2>>>(cfg.GetLoop());       // ARM or ELEVATOR
+arm->loop.Reset(...);  // run the bundle's loop
 ```
+
+Keep the bundle alive as long as you use its `loop`, which points at the bundle's LQR and Kalman filter.
 {% endhint %}
 
 ***

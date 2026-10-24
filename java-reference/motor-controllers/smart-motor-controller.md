@@ -95,7 +95,8 @@ SmartMotorController motor = new TalonFXWrapper(
 
 | Method                                             | Returns                    | Description                                                                        |
 | -------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
-| `startClosedLoopController()`                      | `void`                     | Starts the background closed loop control thread.                                  |
+| `startClosedLoopController()`                      | `void`                     | Starts the background closed loop control thread, and the loosely coupled followers'. Only a stopped one is started, from where the mechanism is now; a running one carries on, so calling it every loop is safe. The mechanism classes' position and velocity setpoints call it for you. |
+| `isClosedLoopControllerStopped()`                  | `boolean`                  | Whether a closed loop run on the SystemCore, such as an LQR or an exponential profile, was stopped, as a duty cycle or voltage command does. `false` when the closed loop runs on the motor controller. |
 | `stopClosedLoopController()`                       | `void`                     | Stops the closed loop control thread.                                              |
 | `getClosedLoopControllerPeriod()`                  | `Time`                     | How often the closed loop runs: `withClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. Published as `closedloop/period`. |
 | `iterateClosedLoopController()`                    | `void`                     | Executes one closed loop iteration. Called automatically by the background thread. |

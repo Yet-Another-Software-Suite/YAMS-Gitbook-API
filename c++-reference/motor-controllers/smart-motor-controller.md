@@ -171,9 +171,15 @@ Used when the closed loop runs on the SystemCore instead of inside the motor con
 ```cpp
 void StartClosedLoopController();
 void StopClosedLoopController();
+bool IsClosedLoopControllerStopped() const;
 void IterateClosedLoopController();
 wpi::units::second_t GetClosedLoopControllerPeriod() const;
+math::LQRController* GetLQRController();
 ```
+
+`StartClosedLoopController()` only starts a stopped closed loop, from where the mechanism is now, and the loosely coupled followers'. One that is already running carries on, so calling it every loop is safe. The mechanism classes' position and velocity setpoints call it for you, and their voltage and duty cycle setpoints call `StopClosedLoopController()`.
+
+`IsClosedLoopControllerStopped()` is whether a closed loop run on the SystemCore was stopped, and is `false` when the closed loop runs on the motor controller. `GetLQRController()` returns the [LQR](../math/lqr-controller.md) this motor controller runs, which live tuning retunes, or `nullptr` without one.
 
 `GetClosedLoopControllerPeriod()` is how often the closed loop runs: `WithClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. It is published as `closedloop/period`.
 

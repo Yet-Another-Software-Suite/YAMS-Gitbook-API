@@ -33,6 +33,18 @@ All builder methods return the `LQRConfig` object for chaining.
 | `withElevator(Distance qelmsPosition, LinearVelocity qelmsVelocity, Distance modelPositionTrust, LinearVelocity modelVelocityTrust, Distance encoderPositionTrust, Mass mass, Distance drumRadius)` | N/A                           | Full elevator configuration with state costs and noise parameters.               |
 | `withArm(Angle qelmsPosition, AngularVelocity qelmsVelocity, Angle modelPositionTrust, AngularVelocity modelVelocityTrust, Angle encoderPositionTrust)`                                             | N/A                           | Arm configuration with state costs and noise parameters.                         |
 
+### Setting the values on their own
+
+These replace the values `withFlyWheel`, `withArm` or `withElevator` set, so call them after it. They take SI units, as the getters below return them: rad/s for a flywheel, rad and rad/s for an arm, m and m/s for an elevator. Live tuning uses them to change one LQR value at a time.
+
+| Method                                  | Parameters                                             | Description                                                                                              |
+| --------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `withQelms(double... qelms)`            | One per modeled state: velocity, or position then velocity | State error tolerances.                                                                               |
+| `withModelStdDevs(double... stdDevs)`   | One per modeled state                                  | The model's standard deviations.                                                                         |
+| `withEncoderStdDevs(double... stdDevs)` | One                                                    | The encoder's standard deviation: velocity for a flywheel, position for an arm or elevator.             |
+
+Each throws an `IllegalArgumentException` if the number of values does not match the mechanism type or a value is not above 0, and a `NoSuchElementException` if no mechanism type has been configured yet.
+
 {% hint style="info" %}
 The qelms parameters ("Q elements") define how much you care about state error. Smaller qelms values mean the controller tolerates more error but uses less voltage. The rElms ("R elements") penalize control effort: larger values produce gentler outputs.
 {% endhint %}
@@ -43,6 +55,11 @@ The qelms parameters ("Q elements") define how much you care about state error. 
 | --------------------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------- |
 | `getType()`                                                     | `LQRType`                           | The configured mechanism type.                                    |
 | `getPeriod()`                                                   | `Time`                              | The control loop period.                                          |
+| `getQelms()`                                                    | `double[]`                          | A copy of the state error tolerances, in SI units.                |
+| `getModelStdDevs()`                                             | `double[]`                          | A copy of the model's standard deviations, in SI units.           |
+| `getEncoderStdDevs()`                                           | `double[]`                          | A copy of the encoder's standard deviation, in SI units.          |
+| `getRelms()`                                                    | `Voltage`                           | The control effort tolerance.                                     |
+| `getMaxVoltage()`                                               | `Voltage`                           | The most voltage the loop outputs.                                |
 | `getSystem()`                                                   | `LinearSystem<?, ?, ?>`             | The computed linear system model.                                 |
 | `getKalmanFilter(LinearSystem<?, ?, ?> plant)`                  | `KalmanFilter<?, ?, ?>`             | Constructs and returns the Kalman observer.                       |
 | `getRegulator(LinearSystem<?, ?, ?> plant)`                     | `LinearQuadraticRegulator<?, ?, ?>` | Constructs and returns the LQR regulator.                         |

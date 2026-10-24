@@ -20,7 +20,24 @@ SmartMotorControllerTelemetryConfig()
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `LOW`  | Setpoint position/velocity, measurement position/velocity/acceleration, mechanism position/velocity/acceleration, rotor position/velocity, external encoder position/velocity, active closed loop slot |
 | `MID`  | Everything in LOW, plus: output voltage, stator current, supply current                                                                                                                                |
-| `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), feedforward gains (kS/kV/kG/kA), setpoint feedforward force, current limits, ramp rates, limit values, motor temperature |
+| `HIGH` | Everything in MID, plus: all boolean status flags, tunable setpoints, PID gains (kP/kI/kD), or the LQR's values with an LQR, feedforward gains (kS/kV/kG/kA), setpoint feedforward force, current limits, ramp rates, limit values, motor temperature |
+
+### LQR fields
+
+With an [LQR](../math/lqr-controller.md) as the closed loop controller, `HIGH` publishes the LQR's values in place of kP, kI and kD. They are tunable, and only appear when the config has an LQR, and only the ones its type uses. They have no named builder method; enable them one by one with `withCustom(DoubleTelemetryField, true)`.
+
+| `DoubleTelemetryField` | Key | Units | Used by |
+| --- | --- | --- | --- |
+| `LQRQelmsPosition` | `closedloop/lqr/qelms/position` | Degrees, or meters for an elevator | Arm, elevator |
+| `LQRQelmsVelocity` | `closedloop/lqr/qelms/velocity` | RPM, or m/s for an elevator | All |
+| `LQRRelms` | `closedloop/lqr/relms` | Volts | All |
+| `LQRModelPosition` | `closedloop/lqr/model/position` | Degrees, or meters for an elevator | Arm, elevator |
+| `LQRModelVelocity` | `closedloop/lqr/model/velocity` | RPM, or m/s for an elevator | All |
+| `LQREncoderPosition` | `closedloop/lqr/encoder/position` | Degrees, or meters for an elevator | Arm, elevator |
+| `LQREncoderVelocity` | `closedloop/lqr/encoder/velocity` | RPM | Flywheel |
+| `LQRMaxVoltage` | `closedloop/lqr/maxVoltage` | Volts | All |
+
+They start at the values in the `LQRConfig`. Live tuning a change rebuilds the LQR from all of them, keeping its state estimate; a value that is not above 0 leaves the LQR as it was, with a warning.
 
 ## Builder methods: Output channels
 

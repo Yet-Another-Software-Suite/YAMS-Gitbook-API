@@ -105,7 +105,7 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 
 **Starting position and zero offset.** `withStartingPosition` is not applied when an external encoder is used for feedback; YAMS raises an alert and the external encoder position is used instead. `withExternalEncoderZeroOffset` is applied to the CANcoder/CANdi, not as a rotor offset; without an external encoder YAMS raises an alert.
 
-**Simulation.** Uses `DCMotorSim` with the configured moment of inertia.
+**Simulation.** Uses `DCMotorSim` with the configured moment of inertia. The simulated TalonFX models the motor of the `DCMotor` you pass: a Kraken X44 when its free speed is above 7,000 RPM (`DCMotor.getKrakenX44(1)`), and a Kraken X60 otherwise.
 
 ## See also
 
