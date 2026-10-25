@@ -151,13 +151,15 @@ Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It
 | `WithTelemetry`      | `SwerveInputStream& WithTelemetry(std::string name, TelemetryVerbosity verbosity)`                | Publishes this stream under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had; `TelemetryVerbosity::NONE` turns it off. |
 | `GetTelemetry`       | `std::optional<std::reference_wrapper<SwerveInputStreamTelemetry<NumModules>>> GetTelemetry()` | The stream's telemetry, or empty if telemetry is not enabled. Creates it on first call. |
 | `GetCurrentModeName` | `std::string GetCurrentModeName() const`                                                          | Active drive mode (`ANGULAR_VELOCITY`, `HEADING`, `AIM`, `TRANSLATION_ONLY`). |
+| `GetRotationControllerMeasurement` | `std::optional<wpi::units::radian_t> GetRotationControllerMeasurement() const` | The measurement the last `Get()` gave the rotation controller in `HEADING`, `AIM` or `TRANSLATION_ONLY`: the robot's heading, in the gyro's frame. Empty if the last `Get()` did not use the controller. |
+| `GetRotationControllerSetpoint`    | `std::optional<wpi::units::radian_t> GetRotationControllerSetpoint() const`    | The setpoint the last `Get()` gave the rotation controller: the heading being turned to, in the gyro's frame. Empty if the last `Get()` did not use the controller. |
 
 `TelemetryVerbosity` is `SwerveDriveConfig::TelemetryVerbosity` (`NONE`, `LOW`, `MEDIUM`, `HIGH`; `MEDIUM` is Java's `MID`):
 
 | Verbosity | Publishes |
 | --------- | --------- |
 | `LOW`     | The current drive mode (`SwerveInputStream/<name>/mode`). |
-| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. |
+| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. And the rotation controller's inputs, `rotationController/measurement` and `rotationController/setpoint`, in radians in the gyro's frame. They are `NaN` while the stream isn't using the controller. |
 | `HIGH`    | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>/`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`. |
 
 The tunable values are `deadband` `[0, 1)`, `translationScale` `(0, 1]`, `rotationScale` `(0, 1]`, `maxLinearVelocity` (m/s, > 0), `maxAngularVelocity` (rad/s, > 0), and the booleans `translationCube`, `rotationCube`, `allianceRelative` and `robotRelative`. The output velocities are not published (reading them would run the heading controller a second time each loop); log the speeds you send to the drive instead.
@@ -170,7 +172,7 @@ At `HIGH`, dashboard edits are applied to the stream every loop while the `Live 
 | ---------------------- | -------------------------------------------------------------------------------- | ----------- |
 | `GetLiveTuningCommand` | `std::optional<std::reference_wrapper<wpi::cmd::Command>> GetLiveTuningCommand()` | The `Live Tuning` command at `HIGH`, otherwise empty. |
 | `ApplyTuningValues`    | `void ApplyTuningValues()`                                                       | Applies dashboard edits and publishes code changes. Called every loop by the `Live Tuning` command; does nothing below `HIGH`. |
-| `UpdateTelemetry`      | `void UpdateTelemetry()`                                                         | Publishes the mode and, at `MEDIUM` and above, the configuration. Called by `Get()`. |
+| `UpdateTelemetry`      | `void UpdateTelemetry()`                                                         | Publishes the mode and, at `MEDIUM` and above, the configuration and the rotation controller's inputs. Called by `Get()`. |
 
 The live-tuning values map to plain getters and setters on the stream, which you can also call yourself: `GetAxisDeadband`/`SetAxisDeadband`, `GetTranslationAxisScale`/`SetTranslationAxisScale`, `GetOmegaAxisScale`/`SetOmegaAxisScale`, `GetMaximumChassisLinearVelocity`/`SetMaximumChassisLinearVelocity`, `GetMaximumChassisAngularVelocity`/`SetMaximumChassisAngularVelocity`, `IsTranslationCubeEnabled`/`SetTranslationCubeEnabled`, `IsOmegaCubeEnabled`/`SetOmegaCubeEnabled`, `IsAllianceRelativeEnabled`/`SetAllianceRelativeEnabled`, and `IsRobotRelativeEnabled`/`SetRobotRelativeEnabled`.
 
