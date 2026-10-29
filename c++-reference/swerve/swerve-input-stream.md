@@ -148,7 +148,7 @@ Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It
 
 | Method               | Signature                                                                                        | Description |
 | -------------------- | ------------------------------------------------------------------------------------------------ | ----------- |
-| `WithTelemetry`      | `SwerveInputStream& WithTelemetry(std::string name, TelemetryVerbosity verbosity)`                | Publishes this stream under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had; `TelemetryVerbosity::NONE` turns it off. |
+| `WithTelemetry`      | `SwerveInputStream& WithTelemetry(std::string name, TelemetryVerbosity verbosity)`                | Publishes this stream under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had; `TelemetryVerbosity::NONE` turns it off. A stream given the name of an earlier one publishes its own values over the ones left on the dashboard. |
 | `GetTelemetry`       | `std::optional<std::reference_wrapper<SwerveInputStreamTelemetry<NumModules>>> GetTelemetry()` | The stream's telemetry, or empty if telemetry is not enabled. Creates it on first call. |
 | `GetCurrentModeName` | `std::string GetCurrentModeName() const`                                                          | Active drive mode (`ANGULAR_VELOCITY`, `HEADING`, `AIM`, `TRANSLATION_ONLY`). |
 | `GetRotationControllerMeasurement` | `std::optional<wpi::units::radian_t> GetRotationControllerMeasurement() const` | The measurement the last `Get()` gave the rotation controller in `HEADING`, `AIM` or `TRANSLATION_ONLY`: the robot's heading, in the gyro's frame. Empty if the last `Get()` did not use the controller. |
@@ -159,10 +159,12 @@ Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It
 | Verbosity | Publishes |
 | --------- | --------- |
 | `LOW`     | The current drive mode (`SwerveInputStream/<name>/mode`). |
-| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. And the rotation controller's inputs, `rotationController/measurement` and `rotationController/setpoint`, in radians in the gyro's frame. They are `NaN` while the stream isn't using the controller. |
+| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. And the rotation controller's inputs, `rotationController/measurement` and `rotationController/setpoint`, in `radians`, in the gyro's frame. They are `NaN` while the stream isn't using the controller. |
 | `HIGH`    | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>/`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`. |
 
-The tunable values are `deadband` `[0, 1)`, `translationScale` `(0, 1]`, `rotationScale` `(0, 1]`, `maxLinearVelocity` (m/s, > 0), `maxAngularVelocity` (rad/s, > 0), and the booleans `translationCube`, `rotationCube`, `allianceRelative` and `robotRelative`. The output velocities are not published (reading them would run the heading controller a second time each loop); log the speeds you send to the drive instead.
+The velocity limits and the rotation controller inputs carry their units on the topic, so AdvantageScope and Elastic label them.
+
+The tunable values are `deadband` `[0, 1)`, `translationScale` `(0, 1]`, `rotationScale` `(0, 1]`, `maxLinearVelocity` (`meters_per_second`, > 0), `maxAngularVelocity` (`radians_per_second`, > 0), and the booleans `translationCube`, `rotationCube`, `allianceRelative` and `robotRelative`. The output velocities are not published (reading them would run the heading controller a second time each loop); log the speeds you send to the drive instead.
 
 At `HIGH`, dashboard edits are applied to the stream every loop while the `Live Tuning` command runs. Start and stop it from the dashboard, or bind it to a button through `SwerveInputStreamTelemetry::GetLiveTuningCommand()`. Values stay in sync both ways: a change made in code (for example a slow-mode binding calling `WithScaleTranslation`) is published to the dashboard and is not overridden, and a dashboard value outside its allowed range is replaced with the stream's current value. The command has no requirements, so it does not interrupt the command driving with the stream.
 
