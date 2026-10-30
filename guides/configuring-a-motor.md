@@ -2,6 +2,8 @@
 
 **Goal:** Build and instantiate a `SmartMotorController` ready for use in a mechanism or standalone.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains.
+
 ***
 
 {% stepper %}
@@ -15,6 +17,8 @@ Identify which motor controller you are using:
 * **Thrifty Nova**: requires the ThriftyLib 2027 vendordep. Wrapped by `NovaWrapper`.
 
 Add the appropriate vendordep to your project before proceeding.
+
+**Check it:** the project builds, and the vendor library shows under **Vendor Dependencies** in the WPILib extension.
 {% endstep %}
 
 {% step %}
@@ -54,8 +58,8 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withMotorInverted(false)
     .withZeroPower(MotorMode.BRAKE)
     .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
-    .withClosedLoopController(0.5, 0.0, 0.01)
-    .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
+    .withClosedLoopController(0.5, 0.0, 0.01)            // Placeholder PID gains.
+    .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01)) // Placeholder kS, kG, kV.
     .withSoftLimits(Degrees.of(-90), Degrees.of(90))
     .withStatorCurrentLimit(Amps.of(40))
     .withTelemetry("ShoulderMotor", TelemetryVerbosity.HIGH);
@@ -77,14 +81,16 @@ config.WithSubsystem(this)
       .WithZeroPower(Cfg::MotorMode::BRAKE)
       .WithMotorGearing(gearing::MechanismGearing{
           gearing::GearBox::FromTeeth({14, 72})})
-      .WithFeedback(0.5, 0.0, 0.01)
-      .WithFeedforward(wpi::math::ArmFeedforward{0.1_V, 0.0_V,
-                                                 wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.5},
-                                                 wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.01}})
+      .WithFeedback(0.5, 0.0, 0.01)                      // Placeholder PID gains.
+      .WithFeedforward(wpi::math::ArmFeedforward{0.1_V, 0.5_V,  // Placeholder kS, kG, kV, kA.
+                                                 wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.01},
+                                                 wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.0}})
       .WithMechanismLimits(-90_deg, 90_deg)
       .WithStatorCurrentLimit(40_A)
       .WithTelemetry("ShoulderMotor", Cfg::TelemetryVerbosity::HIGH);
 ```
+
+**Check it:** the project still builds. Nothing runs yet, because the config is not attached to a motor controller.
 {% endstep %}
 
 {% step %}
@@ -132,15 +138,23 @@ rev::spark::SparkMax spark{wpi::CANPort::CAN_S0, 1, rev::spark::SparkMax::MotorT
 yams::motorcontrollers::local::SparkWrapper motor{&spark, wpi::math::DCMotor::NEO(1), &config};
 ```
 
-**C++ (CTRE TalonFX / TalonFXS):**
+**C++ (CTRE TalonFX):**
 
 ```cpp
 #include "yams/motorcontrollers/remote/TalonFXWrapper.hpp"
+
+ctre::phoenix6::hardware::TalonFX talon{1, ctre::phoenix6::CANBus{}};
+yams::motorcontrollers::remote::TalonFXWrapper motor{&talon, wpi::math::DCMotor::KrakenX60(1), &config};
+```
+
+**C++ (CTRE TalonFXS driving a NEO):**
+
+```cpp
 #include "yams/motorcontrollers/remote/TalonFXSWrapper.hpp"
 
-using namespace yams::motorcontrollers::remote;
+using yams::motorcontrollers::remote::TalonFXSWrapper;
 
-TalonFXWrapper motor{&talon, wpi::math::DCMotor::KrakenX60(1), &config};
+ctre::phoenix6::hardware::TalonFXS talonFXS{1, ctre::phoenix6::CANBus{}};
 TalonFXSWrapper motor{&talonFXS, wpi::math::DCMotor::NEO(1), TalonFXSWrapper::MotorArrangement::NEO, &config};
 ```
 
@@ -154,16 +168,20 @@ yams::motorcontrollers::local::NovaWrapper motor{&nova, wpi::math::DCMotor::NEO(
 ```
 
 In C++ the hardware object and the config are passed by pointer and must outlive the wrapper, so declare them as subsystem members.
+
+**Check it:** the code builds and starts in simulation without an exception. With `TelemetryVerbosity.HIGH`, the motor's values show in NetworkTables under **Mechanisms**, named after `withTelemetry("ShoulderMotor", ...)`.
 {% endstep %}
 
 {% step %}
 #### Pass the result to a mechanism or use it directly
 
-The returned `SmartMotorController` is ready to hand to `Arm`, `Elevator`, `FlyWheel`, or `SwerveDrive`. See the relevant how-to guide for the next steps.
+The returned `SmartMotorController` is ready to hand to a mechanism. Continue with the guide for yours: [an arm](building-an-arm.md), [an elevator](building-an-elevator.md), [a flywheel](building-a-flywheel.md) or [a swerve drive](setting-up-swerve.md), or the [C++ mechanisms](building-mechanisms-cpp.md).
 
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
+
+**Check it:** the mechanism guide's own checks, starting with the mechanism showing up in simulation.
 {% endstep %}
 {% endstepper %}
 
@@ -182,6 +200,14 @@ If you are using a SPARK MAX with an **absolute encoder**, you should call `.wit
 {% hint style="info" %}
 **Encoder getters:** `getMechanismPosition()` / `getMechanismVelocity()` report the feedback the closed loop uses. Use `getRelativeMechanismPosition()` / `getRelativeMechanismVelocity()` to read only the motor's relative encoder, and `getExternalEncoderMechanismPosition()` / `getExternalEncoderMechanismVelocity()` to read only the external encoder. The C++ equivalents use the same names in `PascalCase`.
 {% endhint %}
+
+## If it did not work
+
+* **It does not build.** The vendordep for your motor controller is missing, or an import is. Check step one, then the imports at the top of the arm guide's [complete class](building-an-arm.md#integrate-into-a-subsystem).
+* **It throws when the code starts.** Read the exception message: YAMS names the missing setting and the method that sets it.
+* **Nothing shows in NetworkTables.** Telemetry needs `withTelemetry(...)` on the config, and the mechanism's `updateTelemetry()` running every loop.
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

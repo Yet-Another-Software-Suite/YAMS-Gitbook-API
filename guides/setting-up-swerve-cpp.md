@@ -2,6 +2,8 @@
 
 **Goal:** Create a fully functional `SwerveDrive` subsystem in C++ with field-relative driving, odometry, and simulation.
 
+The gains and encoder offsets in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. The code blocks are pieces of one `DriveSubsystem` class: the hardware, configs, wrappers and modules are all members of it. The complete class is the `SwerveSubsystem.cpp` example at the end of the page.
+
 ***
 
 ## Prerequisites
@@ -51,8 +53,8 @@ driveConfig
     .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(6.75))
-    .WithFeedback(0.1, 0.0, 0.0)
-    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{
+    .WithFeedback(0.1, 0.0, 0.0)                 // Placeholder PID gains.
+    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{   // Placeholder kS, kV, kA.
         0.12_V, wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::kv_unit>{2.2},
         wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::ka_unit>{0.3}})   // kS, kV, kA
     .WithStatorCurrentLimit(60_A)
@@ -64,13 +66,15 @@ azimuthConfig
     .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(12.8))
-    .WithFeedback(7.0, 0.0, 0.3)
+    .WithFeedback(7.0, 0.0, 0.3)                 // Placeholder PID gains.
     .WithContinuousWrapping(-0.5_tr, 0.5_tr)
     .WithStatorCurrentLimit(40_A)
     .WithTelemetry("AzimuthFL");
 ```
 
 Repeat for each module (FR, BL, BR), adjusting the telemetry name and CAN IDs.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -81,6 +85,8 @@ The wrapper takes pointers to the vendor hardware object and to the config. Both
 ```cpp
 ctre::phoenix6::hardware::TalonFX driveTalonFL{10, ctre::phoenix6::CANBus{}};
 ctre::phoenix6::hardware::TalonFX azimuthTalonFL{11, ctre::phoenix6::CANBus{}};
+ctre::phoenix6::hardware::CANcoder encoderFL_{12, ctre::phoenix6::CANBus{}};  // the module's absolute encoder
+ctre::phoenix6::hardware::Pigeon2 imu_{14, ctre::phoenix6::CANBus{}};         // the gyro, one per robot
 
 yams::motorcontrollers::remote::TalonFXWrapper driveMotorFL{
     &driveTalonFL,
@@ -93,6 +99,8 @@ yams::motorcontrollers::remote::TalonFXWrapper azimuthMotorFL{
     &azimuthConfig
 };
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -110,7 +118,7 @@ frontLeftModuleConfig
     .WithAbsoluteEncoder([this]() -> wpi::units::degree_t {
         return wpi::units::degree_t{wpi::units::turn_t{encoderFL_.GetAbsolutePosition().GetValue()}};
     })
-    .WithAbsoluteEncoderOffset(130.0_deg)
+    .WithAbsoluteEncoderOffset(130.0_deg)                       // Placeholder: measure it on the robot
     .WithTelemetry("FrontLeft",
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 ```
@@ -123,6 +131,10 @@ Repeat for `FrontRight`, `BackLeft`, `BackRight` with their positions and offset
 | Front Right | `{ +0.381_m, -0.381_m }` |
 | Back Left   | `{ -0.381_m, +0.381_m }` |
 | Back Right  | `{ -0.381_m, -0.381_m }` |
+
++x is toward the front of the robot and +y toward the left.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -134,12 +146,14 @@ yams::mechanisms::swerve::SwerveModule frontRight{&frontRightModuleConfig};
 yams::mechanisms::swerve::SwerveModule backLeft{&backLeftModuleConfig};
 yams::mechanisms::swerve::SwerveModule backRight{&backRightModuleConfig};
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
 #### Create a `SwerveDriveConfig`
 
-Collect the four modules, set kinematic limits, and provide a gyro supplier. In C++ the gyro supplier returns the yaw as a `wpi::units::degree_t`.
+Collect the four modules, set kinematic limits, and provide a gyro supplier. `WithGyro` takes either the yaw as a `wpi::units::degree_t`, as here, or the gyro's full attitude as a `wpi::math::Rotation3d`.
 
 ```cpp
 yams::mechanisms::swerve::SwerveDriveConfig driveConfig;
@@ -156,6 +170,8 @@ driveConfig
         "swerve",
         yams::motorcontrollers::SmartMotorControllerConfig::TelemetryVerbosity::HIGH);
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -166,12 +182,14 @@ The template parameter must match the number of modules passed to `WithModules`:
 ```cpp
 yams::mechanisms::swerve::SwerveDrive<4> swerveDrive{&driveConfig};
 ```
+
+**Check it:** run the simulation. The code starts without an exception.
 {% endstep %}
 
 {% step %}
 #### Integrate into a subsystem
 
-The subsystem owns the `SwerveInputStream` so it lives as long as the drive command that reads it.
+The subsystem owns the `SwerveInputStream` so it lives as long as the drive command that reads it. The constructor and the members are left out here: they are the pieces above.
 
 ```cpp
 class DriveSubsystem : public wpi::cmd::SubsystemBase {
@@ -206,6 +224,8 @@ private:
     std::optional<InputStream> inputStream_;
 };
 ```
+
+**Check it:** run the simulation. The drive shows in NetworkTables under **Mechanisms -> swerve**, with a field showing the robot at the origin.
 {% endstep %}
 
 {% step %}
@@ -238,6 +258,8 @@ driveSubsystem_.SetDefaultCommand(
 ```
 
 `WithTelemetry(name, verbosity)` publishes the stream under `SwerveInputStream/<name>` every time it is read. At `HIGH` the stream is also live tunable from the dashboard. Call it last, after the rest of the configuration.
+
+**Check it:** in simulation, enable teleop with a controller connected (or a keyboard joystick in the Sim GUI). The left stick drives the robot on the field and the right stick turns it.
 {% endstep %}
 
 {% step %}
@@ -254,6 +276,8 @@ InputStream headingInput =
     )
     .WithHeadingControl([this] { return driverController_.RightStick().Get(); });
 ```
+
+**Check it:** drive with `headingInput` and hold the right stick in. The robot turns to face where the right stick points, and holds that heading.
 {% endstep %}
 
 {% step %}
@@ -267,6 +291,8 @@ frontRight.SeedAzimuthEncoder();
 backLeft.SeedAzimuthEncoder();
 backRight.SeedAzimuthEncoder();
 ```
+
+**Check it:** on the robot, with the robot disabled, turn each wheel by hand. Its azimuth angle in telemetry follows the wheel. If a wheel points the wrong way when enabled, its encoder offset is wrong.
 {% endstep %}
 
 {% step %}
@@ -280,7 +306,9 @@ wpi::cmd::CommandPtr DriveSubsystem::DriveToPoseCommand(wpi::math::Pose2d target
 }
 ```
 
-`SwerveDrive<N>` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning`. Running it checks a tunable `autoalign/enabled` boolean and, while `true`, drives toward a target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y` in meters, `autoalign/setpoint/rot` in degrees) you can edit live in NetworkTables, so you can tune those PID gains without redeploying code. The same command also reads a shared set of module drive/azimuth PID, feedforward, and setpoint fields (`modules/drive/*`, `modules/azimuth/*`, with PID gains under `feedback/` and `kS`/`kV`/`kA` under `feedforward/`) that apply to every module on the drive at once. These are all already live-tunable at `TelemetryVerbosity::HIGH` (the default); see [SwerveDrive (C++): Auto-Align](../c++-reference/swerve/swerve-drive.md#auto-align-drive-to-pose--pid-control).
+At `TelemetryVerbosity::HIGH`, `SwerveDrive<N>` also publishes a live tuning command for these gains and for the module gains, so you can tune them without redeploying. [SwerveDrive (C++): Auto-Align](../c++-reference/swerve/swerve-drive.md#auto-align-drive-to-pose-and-pid-control) lists its fields.
+
+**Check it:** in simulation, schedule `DriveToPoseCommand` with a pose 2 m forward and 1 m left of the origin. The robot drives there and stops.
 {% endstep %}
 {% endstepper %}
 
@@ -300,6 +328,7 @@ wpi::cmd::CommandPtr DriveSubsystem::DriveToPoseCommand(wpi::math::Pose2d target
 | `LockPose()`                                                         | X-pattern to resist pushing                                                                 |
 | `GetPose()`                                                          | Current field-relative pose from odometry                                                   |
 | `GetGyroAngle()`                                                     | Current gyro heading as a `degree_t`                                                        |
+| `GetGyroRotation3d()`                                                | The gyro's full attitude as a `Rotation3d`                                                  |
 | `ResetOdometry(Pose2d)`                                              | Reset odometry to a known pose                                                              |
 | `ZeroGyro()`                                                         | Zero the gyro heading                                                                       |
 | `AddVisionMeasurement(Pose2d, second_t)`                             | Fuse vision pose into odometry                                                              |
@@ -320,8 +349,17 @@ wpi::cmd::CommandPtr DriveSubsystem::DriveToPoseCommand(wpi::math::Pose2d target
 {% endhint %}
 
 {% hint style="info" %}
-The Java-only gyro changes (`GyroAxis`, `withGyroHeadingAxis`, `getGyroRotation3d()`) do not apply to C++. The C++ gyro supplier is still a yaw angle and `SwerveDrive::GetGyroAngle()` is still available.
+**Gyro mounted on its side?** Supply the full attitude with `WithGyro` (a `Rotation3d`), then call `.WithGyroHeadingAxis(yams::mechanisms::config::GyroAxis::ROLL)` or `GyroAxis::PITCH` on `SwerveDriveConfig` to say which gyro axis points up through the robot. The default is `GyroAxis::YAW`, for a gyro mounted flat.
 {% endhint %}
+
+## If it did not work
+
+* **It does not build.** Check the vendordep, the wrapper `#include`, and that every hardware object, config, wrapper and module is a member that outlives what points at it.
+* **The robot drives the wrong way, or spins when it should drive straight.** Check each module's `WithLocation` signs, then that the drive motors are not inverted.
+* **A wheel points the wrong way, or the wheels fight each other.** The absolute encoder offsets are wrong. Measure them as in [On the real robot](https://yams.yassrobotics.com/documentation/tutorials/swerve-drive/real-robot).
+* **Field-relative driving is rotated.** The gyro supplier is wrong, or the gyro was not zeroed facing away from the driver.
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

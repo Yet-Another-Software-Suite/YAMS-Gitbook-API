@@ -2,6 +2,8 @@
 
 **Goal:** Create `Arm`, `Elevator`, and `Pivot` subsystems in C++ with position control and physics simulation.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. They match the Java guides, so you can compare the two line by line.
+
 ***
 
 ## Prerequisites
@@ -61,16 +63,18 @@ motorConfig
     .WithMotorInverted(false)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
-    .WithFeedback(0.5, 0.0, 0.01)
-    .WithFeedforward(wpi::math::ArmFeedforward{           // kS, kG, kV, kA
-        0.1_V, 0.0_V, wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.5},
-        wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.01}})
+    .WithFeedback(0.5, 0.0, 0.01)                // Placeholder PID gains.
+    .WithFeedforward(wpi::math::ArmFeedforward{           // Placeholder kS, kG, kV, kA.
+        0.1_V, 0.5_V, wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.01},
+        wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.0}})
     .WithMechanismLimits(-90_deg, 90_deg)
     .WithStatorCurrentLimit(40_A)
     .WithMOI(0.6_m, 2.0_kg)                     // arm length, arm mass; required for simulation
     .WithStartingPosition(0_deg)                // required for simulation
     .WithTelemetry("ShoulderMotor");
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -89,6 +93,8 @@ yams::motorcontrollers::local::SparkWrapper motor{
 ```
 
 The wrapper applies the config when it is constructed, so finish configuring `motorConfig` first.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -104,6 +110,8 @@ armConfig
     .WithMaxAngle(100_deg)
     .WithTelemetryName("Shoulder");
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -112,6 +120,8 @@ armConfig
 ```cpp
 yams::mechanisms::positional::Arm arm{&armConfig, &motor};
 ```
+
+**Check it:** run the simulation. The code starts without an `ArmConfigurationException`. If it throws, the message names the missing setting.
 {% endstep %}
 
 {% step %}
@@ -129,9 +139,9 @@ public:
             .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
             .WithMotorGearing(yams::gearing::MechanismGearing(yams::gearing::GearBox::FromTeeth({14, 72})))
             .WithFeedback(0.5, 0.0, 0.01)
-            .WithFeedforward(wpi::math::ArmFeedforward{
-                0.1_V, 0.0_V, wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.5},
-                wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.01}})
+            .WithFeedforward(wpi::math::ArmFeedforward{   // Placeholder kS, kG, kV, kA.
+                0.1_V, 0.5_V, wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{0.01},
+                wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{0.0}})
             .WithMechanismLimits(-90_deg, 90_deg)
             .WithStatorCurrentLimit(40_A)
             .WithMOI(0.6_m, 2.0_kg)
@@ -175,6 +185,8 @@ private:
     std::optional<yams::mechanisms::positional::Arm> arm_;
 };
 ```
+
+**Check it:** run the simulation and open **NetworkTables -> Mechanisms -> Shoulder -> mechanism** in the Sim GUI. The arm is drawn at 0 degrees. Schedule `SetAngleCommand(45_deg)` from a button, and the arm moves to 45 degrees.
 {% endstep %}
 {% endstepper %}
 
@@ -192,7 +204,7 @@ private:
 | `Min()`                                     | `Trigger`    | True when at or past lower soft limit       |
 
 {% hint style="info" %}
-The Java `Trigger` factory was renamed from `isNear(...)` to `near(...)`. In C++ the `Trigger` factory is still `IsNear(...)`.
+In C++ the `Trigger` factory is `IsNear(...)`. The Java equivalent is `near(...)`.
 {% endhint %}
 
 ***
@@ -212,15 +224,17 @@ motorConfig
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(9.0))
     .WithMechanismCircumference(wpi::units::meter_t{2 * std::numbers::pi * 0.025})  // 2 * pi * drum radius
-    .WithFeedback(1.2, 0.0, 0.05)
-    .WithFeedforward(wpi::math::ElevatorFeedforward{      // kS, kG, kV, kA
-        0.1_V, 0.0_V, wpi::units::unit_t<wpi::math::ElevatorFeedforward::kv_unit>{0.4},
-        wpi::units::unit_t<wpi::math::ElevatorFeedforward::ka_unit>{0.02}})
+    .WithFeedback(1.2, 0.0, 0.05)                // Placeholder PID gains.
+    .WithFeedforward(wpi::math::ElevatorFeedforward{      // Placeholder kS, kG, kV, kA.
+        0.1_V, 0.4_V, wpi::units::unit_t<wpi::math::ElevatorFeedforward::kv_unit>{0.02},
+        wpi::units::unit_t<wpi::math::ElevatorFeedforward::ka_unit>{0.0}})
     .WithMeasurementLimits(0.0_m, 1.2_m)
     .WithStartingPosition(0.0_m)                // required for simulation
     .WithStatorCurrentLimit(60_A)
     .WithTelemetry("ElevatorMotor");
 ```
+
+**Check it:** the project builds.
 
 > **Note:** Drum radius does NOT go on `ElevatorConfig`; it's set on `SmartMotorControllerConfig` via `WithMechanismCircumference`, `WithMechanismDiameter`, or `WithMechanismRadius`.
 {% endstep %}
@@ -238,14 +252,20 @@ elevatorConfig
     .WithMaximumHeight(1.2_m)
     .WithTelemetryName("Elevator");
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
 #### Construct the `Elevator`
 
+Build the motor controller as for the arm, in [Construct the motor controller](#construct-the-motor-controller), then the elevator:
+
 ```cpp
 yams::mechanisms::positional::Elevator elevator{&elevatorConfig, &motor};
 ```
+
+**Check it:** run the simulation. The code starts without an `ElevatorConfigurationException`.
 {% endstep %}
 
 {% step %}
@@ -265,6 +285,8 @@ yams::mechanisms::positional::Elevator elevator{&elevatorConfig, &motor};
 void Periodic() override { elevator_->UpdateTelemetry(); }
 void SimulationPeriodic() override { elevator_->SimIterate(); }
 ```
+
+**Check it:** open **NetworkTables -> Mechanisms -> Elevator -> mechanism** in the Sim GUI. Schedule `elevator_->Run(1.0_m)` from a button, and the carriage rises to 1 m.
 {% endstep %}
 {% endstepper %}
 
@@ -272,7 +294,7 @@ void SimulationPeriodic() override { elevator_->SimIterate(); }
 
 ## Building a Pivot
 
-A `Pivot` is a single-jointed rotational mechanism (similar to `Arm`) without a load-bearing arm length. Use it for wrist joints, turrets, or any rotation that doesn't require an arm-length-based MOI estimate.
+A `Pivot` is a single-jointed rotational mechanism, like `Arm`, but without gravity acting on it. Use it for turrets, wrists, and other joints that turn in a level plane. It takes no arm length: give its moment of inertia directly with `WithMOI` on the motor config.
 
 {% stepper %}
 {% step %}
@@ -284,8 +306,8 @@ motorConfig
     .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::BRAKE)
     .WithMotorGearing(yams::gearing::MechanismGearing(60.0))
-    .WithFeedback(4.0, 0.0, 0.1)
-    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{
+    .WithFeedback(4.0, 0.0, 0.1)                 // Placeholder PID gains.
+    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{   // Placeholder kS, kV.
         0.05_V, wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::kv_unit>{0.1}})
     .WithMechanismLimits(0_deg, 180_deg)
     .WithMOI(0.2_m, 1.0_kg)                     // required for simulation
@@ -293,6 +315,8 @@ motorConfig
     .WithStatorCurrentLimit(30_A)
     .WithTelemetry("WristMotor");
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -307,6 +331,8 @@ pivotConfig
     .WithMaxAngle(180_deg)
     .WithTelemetryName("Wrist");
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -315,6 +341,8 @@ pivotConfig
 ```cpp
 yams::mechanisms::positional::Pivot pivot{&pivotConfig, &motor};
 ```
+
+**Check it:** run the simulation. The code starts without a `PivotConfigurationException`.
 {% endstep %}
 
 {% step %}
@@ -326,6 +354,8 @@ Same interface as `Arm`: `Run()`, `RunTo()`, `IsNear()`, `Gte()`, `Lte()`, `Betw
 void Periodic() override { pivot_->UpdateTelemetry(); }
 void SimulationPeriodic() override { pivot_->SimIterate(); }
 ```
+
+**Check it:** open **NetworkTables -> Mechanisms -> Wrist -> mechanism** in the Sim GUI. Schedule `pivot_->Run(90_deg)` from a button, and the pivot turns to 90 degrees.
 {% endstep %}
 {% endstepper %}
 
@@ -344,6 +374,15 @@ void SimulationPeriodic() override { pivot_->SimIterate(); }
 {% hint style="warning" %}
 When running in simulation, the mechanism constructors throw their own configuration exception (`ArmConfigurationException`, `PivotConfigurationException` or `ElevatorConfigurationException`) if a value the physics model needs is missing: hard limits, starting position, and MOI for `Arm` and `Pivot` (plus arm length for `Arm`); carriage mass, height limits, starting position, and mechanism circumference for `Elevator`.
 {% endhint %}
+
+## If it did not work
+
+* **It does not build.** Check the vendordep, the `#include` for your motor controller's wrapper (`YAMS.hpp` does not include it), and that the hardware object and the config are members that outlive the wrapper.
+* **It throws when the code starts in simulation.** The exception names the missing value, as the warning above lists.
+* **The mechanism never moves in simulation.** Check that `SimulationPeriodic()` calls `SimIterate()`, and that `WithSubsystem(this)` is set.
+* **It sags or overshoots.** Expected with the placeholder gains. Tune them as in [Tune it](https://yams.yassrobotics.com/documentation/tutorials/arm/tune).
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

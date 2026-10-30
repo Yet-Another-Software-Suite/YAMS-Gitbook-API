@@ -2,6 +2,8 @@
 
 **Goal:** Create an `Elevator` subsystem with height-based position control and physics simulation.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. The setup matches [Building an arm subsystem](building-an-arm.md) apart from the linear units, the drum and the carriage, so this guide spends its words on those.
+
 ***
 
 {% stepper %}
@@ -23,8 +25,8 @@ SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
     .withGearing(new MechanismGearing(GearBox.fromReductionStages(9.0)))
     .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
     .withCascadingElevatorStages(2)                               // 2-stage cascade
-    .withClosedLoopController(1.2, 0.0, 0.05)
-    .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02))
+    .withClosedLoopController(1.2, 0.0, 0.05)                  // Placeholder PID gains.
+    .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02)) // Placeholder kS, kG, kV.
     .withSoftLimits(Meters.of(0.0), Meters.of(1.2))
     .withStartingPosition(Meters.of(0.0))
     .withStatorCurrentLimit(Amps.of(60))
@@ -36,12 +38,14 @@ SmartMotorController motor = new TalonFXWrapper(
     motorConfig
 );
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
 #### Create an `ElevatorConfig`
 
-Carriage weight is required for simulation to model gravity correctly. Drum radius and cascade stage count are configured on `SmartMotorControllerConfig` (see step 1).
+Carriage weight is required for simulation to model gravity correctly. Drum radius and cascade stage count are configured on `SmartMotorControllerConfig`, as in [Configure the motor for linear travel](#configure-the-motor-for-linear-travel).
 
 ```java
 ElevatorConfig elevatorConfig = new ElevatorConfig()
@@ -53,6 +57,8 @@ ElevatorConfig elevatorConfig = new ElevatorConfig()
 {% hint style="info" %}
 Carriage weight, hard limits, and a starting position (`SmartMotorControllerConfig.withStartingPosition(Distance)`) are required for simulation. Without them, the `Elevator` constructor throws when running in simulation: an `ElevatorConfigurationException` for the carriage weight or hard limits, and a `SmartMotorControllerConfigurationException` for the starting position. Drum circumference and cascade stages belong on `SmartMotorControllerConfig` via `.withMechanismCircumference()` and `.withCascadingElevatorStages()`.
 {% endhint %}
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -63,6 +69,8 @@ Import `Elevator` from `yams.commands2.mechanisms` (Commands v2) or `yams.comman
 ```java
 Elevator elevator = new Elevator(elevatorConfig, motor);
 ```
+
+**Check it:** run the simulation. The code starts without an exception. If it throws, the message names the missing setting, as the hint above lists.
 {% endstep %}
 
 {% step %}
@@ -108,8 +116,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             .withGearing(new MechanismGearing(GearBox.fromReductionStages(9.0)))
             .withMechanismCircumference(Meters.of(2 * Math.PI * 0.025))  // drum circumference
             .withCascadingElevatorStages(2)                               // 2-stage cascade
-            .withClosedLoopController(1.2, 0.0, 0.05)
-            .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02))
+            .withClosedLoopController(1.2, 0.0, 0.05)                  // Placeholder PID gains.
+            .withFeedforward(new ElevatorFeedforward(0.1, 0.4, 0.02)) // Placeholder kS, kG, kV.
             .withSoftLimits(Meters.of(0.0), Meters.of(1.2))
             .withStartingPosition(Meters.of(0.0))
             .withStatorCurrentLimit(Amps.of(60))
@@ -239,14 +247,18 @@ public class ElevatorMechanism implements Mechanism {
         elevator.updateTelemetry();
     }
 
-    /** Call from Robot.robotPeriodic() in simulation. */
+    /** Run in its own Notifier, started from Robot.simulationInit(). */
     public void simulationPeriodic() {
         elevator.simIterate();
     }
 }
 ```
+
+In `Robot`, set the default command with `elevator.setDefaultCommand(elevator.stow())`, call `elevator.periodic()` from `robotPeriodic()` before `scheduler.run()`, and start the simulation in `simulationInit()` with `startSimulation("Elevator", elevator::simulationPeriodic)`, as in [Building an arm subsystem](building-an-arm.md#integrate-into-a-subsystem).
 {% endtab %}
 {% endtabs %}
+
+**Check it:** run the simulation and open **NetworkTables -> Mechanisms -> Elevator -> mechanism** in the Sim GUI. The carriage is drawn at 0 m. Schedule `setHeightCommand(Meters.of(1.0))` (Commands v2) or `moveTo(Meters.of(1.0))` (Commands v3) from a button, and the carriage rises to 1 m.
 {% endstep %}
 
 {% step %}
@@ -258,8 +270,18 @@ public class ElevatorMechanism implements Mechanism {
 Trigger atBottom = elevatorSubsystem.lte(Meters.of(0.05));
 Trigger atScore  = elevatorSubsystem.gte(Meters.of(1.0));
 ```
+
+**Check it:** bind `atScore` to a command that prints, such as `atScore.onTrue(Commands.print("At score"))`. Raise the elevator to 1 m in simulation and the message prints.
 {% endstep %}
 {% endstepper %}
+
+## If it did not work
+
+* **The elevator moves the wrong distance.** The circumference or the gearing is wrong. The circumference is the distance the carriage moves for one turn of the drum or sprocket; for a cascade, set the stage count too.
+* **It throws when the code starts in simulation.** A carriage weight, the hard limits, or a starting position inside the hard limits is missing.
+* **The carriage falls or never reaches the setpoint.** Expected with the placeholder gains, especially `kG`. Tune them as in [Tune it](https://yams.yassrobotics.com/documentation/tutorials/elevator/tune).
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

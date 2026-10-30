@@ -2,6 +2,8 @@
 
 **Goal:** Create an `Arm` subsystem with position control and physics simulation.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. To learn what each setting does, follow the [Arm tutorial](https://yams.yassrobotics.com/documentation/tutorials/arm) instead.
+
 ***
 
 {% stepper %}
@@ -9,6 +11,8 @@
 #### Create and configure the `SmartMotorController`
 
 Follow [Configuring a Motor Controller](configuring-a-motor.md) to build the `SmartMotorController` for your arm joint. Use `ArmFeedforward` in the config and set soft limits that match your physical range of motion. The arm's moment of inertia (for simulation) and starting position are also set on `SmartMotorControllerConfig`, via `withMomentOfInertia(length, mass)` and `withStartingPosition(angle)`.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -22,6 +26,8 @@ ArmConfig armConfig = new ArmConfig()
     .withHardLimits(Degrees.of(-100), Degrees.of(100))
     .withTelemetry("Shoulder", TelemetryVerbosity.HIGH);
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -32,6 +38,8 @@ Import `Arm` from `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.m
 ```java
 Arm arm = new Arm(armConfig, motor);
 ```
+
+**Check it:** run the simulation. The code starts without an `ArmConfigurationException`. If it throws, the message names the missing setting: arm length, hard limits, or a starting position inside the hard limits.
 {% endstep %}
 
 {% step %}
@@ -78,8 +86,8 @@ public class ShoulderSubsystem extends SubsystemBase {
             .withMotorInverted(false)
             .withZeroPower(MotorMode.BRAKE)
             .withGearing(new MechanismGearing(GearBox.fromTeeth(14, 72)))
-            .withClosedLoopController(0.5, 0.0, 0.01)
-            .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01))
+            .withClosedLoopController(0.5, 0.0, 0.01)            // Placeholder PID gains.
+            .withFeedforward(new ArmFeedforward(0.1, 0.5, 0.01)) // Placeholder kS, kG, kV.
             .withSoftLimits(Degrees.of(-90), Degrees.of(90))
             .withMomentOfInertia(Meters.of(0.6), Kilograms.of(2.0))
             .withStartingPosition(Degrees.of(0))
@@ -206,16 +214,22 @@ public class ShoulderMechanism implements Mechanism {
         arm.updateTelemetry();
     }
 
-    /** Call from Robot.robotPeriodic() in simulation. */
+    /** Run in its own Notifier, started from Robot.simulationInit(). */
     public void simulationPeriodic() {
         arm.simIterate();
     }
 }
 ```
 
-In `Robot`, set the default command with `shoulder.setDefaultCommand(shoulder.stow())` and call `shoulder.periodic()` (plus `shoulder.simulationPeriodic()` when `RobotBase.isSimulation()`) from `robotPeriodic()` before `Scheduler.getDefault().run()`.
+In `Robot`:
+
+* Set the default command with `shoulder.setDefaultCommand(shoulder.stow())`.
+* Call `shoulder.periodic()` from `robotPeriodic()`, before `scheduler.run()`.
+* Start the simulation in `simulationInit()` with `startSimulation("Shoulder", shoulder::simulationPeriodic)`, which runs it in its own `Notifier` so it does not add to the robot loop's time. [Update it every loop](https://yams.yassrobotics.com/documentation/tutorials/arm/mechanism#update-it-every-loop) in the Arm tutorial shows `startSimulation(...)`.
 {% endtab %}
 {% endtabs %}
+
+**Check it:** run the simulation and open **NetworkTables -> Mechanisms -> Shoulder -> mechanism** in the Sim GUI. The arm is drawn at its starting angle, 0 degrees. Schedule `setAngleCommand(Degrees.of(45))` (Commands v2) or `moveTo(Degrees.of(45))` (Commands v3) from a button, and the arm moves to 45 degrees.
 {% endstep %}
 
 {% step %}
@@ -225,15 +239,23 @@ In `Robot`, set the default command with `shoulder.setDefaultCommand(shoulder.st
 
 ```java
 // In RobotContainer:
-Trigger atStow  = shoulder.near(Degrees.of(-90), Degrees.of(2));
-Trigger atScore = shoulder.near(Degrees.of(45),  Degrees.of(2));
+Trigger atStow  = shoulder.near(Degrees.of(0),  Degrees.of(2));
+Trigger atScore = shoulder.near(Degrees.of(45), Degrees.of(2));
 ```
 
-{% hint style="info" %}
-The `Trigger` factory was renamed from `isNear(...)` to `near(...)`. `isNear(angle, tolerance)` still exists, but it now returns a plain `boolean` for use outside a `Command`/`Trigger` context.
-{% endhint %}
+`near(...)` returns a `Trigger`. To check the same thing once, as a `boolean`, call `arm.isNear(angle, tolerance)`.
+
+**Check it:** bind a trigger to a command that prints, such as `atScore.onTrue(Commands.print("At score"))`. Move the arm to 45 degrees in simulation and the message prints once it arrives.
 {% endstep %}
 {% endstepper %}
+
+## If it did not work
+
+* **The arm is not in the NetworkTables menu.** Look under **Mechanisms**, not **SmartDashboard**, and check that `updateTelemetry()` runs every loop.
+* **The arm never moves in simulation.** Commands v2: check that `simulationPeriodic()` calls `arm.simIterate()`. Commands v3: check that `simulationInit()` calls `startSimulation(...)` for the mechanism.
+* **The arm sags or overshoots.** Expected with the placeholder gains. Tune them as in [Tune it](https://yams.yassrobotics.com/documentation/tutorials/arm/tune).
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

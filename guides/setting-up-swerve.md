@@ -2,6 +2,8 @@
 
 **Goal:** Create a fully functional `SwerveDrive` subsystem with field-relative driving, odometry, and simulation.
 
+The gains and encoder offsets in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. The [Swerve Drive tutorial](https://yams.yassrobotics.com/documentation/tutorials/swerve-drive) explains each setting, how to tune it, and how to measure the offsets on the robot.
+
 ***
 
 {% stepper %}
@@ -10,7 +12,9 @@
 
 Each swerve module needs two `SmartMotorController` instances: one for drive (velocity) and one for azimuth (position). Follow [Configuring a Motor Controller](configuring-a-motor.md) for each.
 
-Drive controllers use velocity PID and a `SimpleMotorFeedforward`. Azimuth controllers use position PID with continuous wrapping, and optionally a `SimpleMotorFeedforward` for friction compensation.
+Drive controllers use velocity PID and a `SimpleMotorFeedforward`. Azimuth controllers use position PID with continuous wrapping, and optionally a `SimpleMotorFeedforward` for friction compensation. The complete class in [Construct `SwerveDrive` and wire command factories](#construct-swervedrive-and-wire-command-factories) builds both in a `createModule(...)` helper.
+
+**Check it:** the project builds with the vendordep for your motor controllers and CANcoders installed.
 {% endstep %}
 
 {% step %}
@@ -27,7 +31,9 @@ SwerveModuleConfig frontLeftConfig = new SwerveModuleConfig(driveMotorFL, azimut
     .withTelemetry("FrontLeft", TelemetryVerbosity.HIGH);
 ```
 
-Repeat for `FrontRight`, `BackLeft`, and `BackRight`, adjusting the `Translation2d` signs and encoder offsets.
+Repeat for `FrontRight`, `BackLeft`, and `BackRight`, adjusting the `Translation2d` signs and encoder offsets. `withLocation` takes meters from the robot center, with +x toward the front and +y toward the left.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -56,6 +62,8 @@ SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft, frontRigh
 {% hint style="info" %}
 **Gyro mounted on its side?** Call `.withGyroHeadingAxis(GyroAxis.ROLL)` or `.withGyroHeadingAxis(GyroAxis.PITCH)` (`yams.core.mechanisms.config.enums.GyroAxis`) to tell YAMS which gyro axis points up through the robot. The default is `GyroAxis.YAW`, for a gyro mounted flat.
 {% endhint %}
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -86,6 +94,7 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.units.measure.Angle;
 import yams.commands2.config.SmartMotorControllerConfig;
 import yams.commands2.config.SwerveDriveConfig;
 import yams.commands2.swerve.SwerveDrive;
@@ -106,54 +115,53 @@ public class DriveSubsystem extends SubsystemBase {
     private final SwerveDrive swerveDrive;
 
     public DriveSubsystem() {
+        // Placeholder encoder offsets: measure each module's offset on the robot.
+        SwerveModule frontLeft  = createModule("FrontLeft",  10, 11, 12, new Translation2d(0.381, 0.381),   Rotations.of(0.24));
+        SwerveModule frontRight = createModule("FrontRight", 20, 21, 22, new Translation2d(0.381, -0.381),  Rotations.of(0.0));
+        SwerveModule backLeft   = createModule("BackLeft",   30, 31, 32, new Translation2d(-0.381, 0.381),  Rotations.of(0.0));
+        SwerveModule backRight  = createModule("BackRight",  40, 41, 42, new Translation2d(-0.381, -0.381), Rotations.of(0.0));
 
-        // --- Front Left ---
-        SmartMotorControllerConfig driveConfigFL = new SmartMotorControllerConfig(this)
-            .withZeroPower(MotorMode.BRAKE)
-            .withGearing(new MechanismGearing(GearBox.fromReductionStages(6.75)))
-            .withClosedLoopController(0.1, 0.0, 0.0)
-            .withFeedforward(new SimpleMotorFeedforward(0.12, 2.2, 0.3))
-            .withStatorCurrentLimit(Amps.of(60));
-
-        SmartMotorControllerConfig azimuthConfigFL = new SmartMotorControllerConfig(this)
-            .withZeroPower(MotorMode.BRAKE)
-            .withGearing(new MechanismGearing(GearBox.fromReductionStages(12.8)))
-            .withClosedLoopController(7.0, 0.0, 0.3)
-            .withContinuousWrapping(Radians.of(-Math.PI), Radians.of(Math.PI))
-            .withStatorCurrentLimit(Amps.of(40));
-
-        SmartMotorController driveMotorFL = new TalonFXWrapper(
-            new TalonFX(10, canBus), DCMotor.getKrakenX60(1), driveConfigFL);
-        SmartMotorController azimuthMotorFL = new TalonFXWrapper(
-            new TalonFX(11, canBus), DCMotor.getKrakenX60(1), azimuthConfigFL);
-        CANcoder cancoderFL = new CANcoder(12, canBus);
-
-        // Repeat for FR, BL, BR with their CAN IDs and encoder offsets...
-
-        SwerveModuleConfig frontLeftModuleConfig = new SwerveModuleConfig(driveMotorFL, azimuthMotorFL)
-            .withWheelRadius(Meters.of(0.0508))
-            .withLocation(new Translation2d(0.381, 0.381))
-            .withAbsoluteEncoder(cancoderFL.getAbsolutePosition().asSupplier())
-            .withAbsoluteEncoderOffset(Rotations.of(0.24))
-            .withTelemetry("FrontLeft", TelemetryVerbosity.HIGH);
-
-        // SwerveModuleConfig frontRightModuleConfig = ...
-        // SwerveModuleConfig backLeftModuleConfig  = ...
-        // SwerveModuleConfig backRightModuleConfig = ...
-
-        SwerveModule frontLeft = new SwerveModule(frontLeftModuleConfig);
-        // SwerveModule frontRight = new SwerveModule(frontRightModuleConfig);
-        // SwerveModule backLeft   = new SwerveModule(backLeftModuleConfig);
-        // SwerveModule backRight  = new SwerveModule(backRightModuleConfig);
-
-        SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft /*, frontRight, backLeft, backRight */)
+        SwerveDriveConfig driveConfig = new SwerveDriveConfig(this, frontLeft, frontRight, backLeft, backRight)
             .withGyro(gyro::getRotation3d)
             .withMaximumChassisSpeed(MetersPerSecond.of(4.5), DegreesPerSecond.of(360))
-            .withTranslationController(new PIDController(1.0, 0, 0))
+            .withTranslationController(new PIDController(1.0, 0, 0)) // Placeholder auto-align gains.
             .withRotationController(new PIDController(1.0, 0, 0))
             .withTelemetry("swerve", TelemetryVerbosity.HIGH);
 
         swerveDrive = new SwerveDrive(driveConfig);
+    }
+
+    /** Build one module: its drive and azimuth motors, its CANcoder, and where it sits on the robot. */
+    private SwerveModule createModule(String name, int driveId, int azimuthId, int encoderId,
+                                      Translation2d location, Angle encoderOffset) {
+        SmartMotorControllerConfig driveConfig = new SmartMotorControllerConfig(this)
+            .withZeroPower(MotorMode.BRAKE)
+            .withGearing(new MechanismGearing(GearBox.fromReductionStages(6.75)))
+            .withClosedLoopController(0.1, 0.0, 0.0)                         // Placeholder PID gains.
+            .withFeedforward(new SimpleMotorFeedforward(0.12, 2.2, 0.3))    // Placeholder kS, kV, kA.
+            .withStatorCurrentLimit(Amps.of(60));
+
+        SmartMotorControllerConfig azimuthConfig = new SmartMotorControllerConfig(this)
+            .withZeroPower(MotorMode.BRAKE)
+            .withGearing(new MechanismGearing(GearBox.fromReductionStages(12.8)))
+            .withClosedLoopController(7.0, 0.0, 0.3)                         // Placeholder PID gains.
+            .withContinuousWrapping(Radians.of(-Math.PI), Radians.of(Math.PI))
+            .withStatorCurrentLimit(Amps.of(40));
+
+        SmartMotorController driveMotor = new TalonFXWrapper(
+            new TalonFX(driveId, canBus), DCMotor.getKrakenX60(1), driveConfig);
+        SmartMotorController azimuthMotor = new TalonFXWrapper(
+            new TalonFX(azimuthId, canBus), DCMotor.getKrakenX60(1), azimuthConfig);
+        CANcoder cancoder = new CANcoder(encoderId, canBus);
+
+        SwerveModuleConfig moduleConfig = new SwerveModuleConfig(driveMotor, azimuthMotor)
+            .withWheelRadius(Meters.of(0.0508))
+            .withLocation(location)
+            .withAbsoluteEncoder(cancoder.getAbsolutePosition().asSupplier())
+            .withAbsoluteEncoderOffset(encoderOffset)
+            .withTelemetry(name, TelemetryVerbosity.HIGH);
+
+        return new SwerveModule(moduleConfig);
     }
 
     public SwerveDrive getSwerveDrive() {
@@ -250,18 +258,22 @@ public class DriveMechanism implements Mechanism {
         swerveDrive.updateTelemetry();
     }
 
-    /** Call from Robot.robotPeriodic() in simulation. */
+    /** Run in its own Notifier, started from Robot.simulationInit(). */
     public void simulationPeriodic() {
         swerveDrive.simIterate();
     }
 }
 ```
+
+In `Robot`, call `drive.periodic()` from `robotPeriodic()` before `scheduler.run()`, and start the simulation in `simulationInit()` with `startSimulation("Drive", drive::simulationPeriodic)`, as in [Building an arm subsystem](building-an-arm.md#integrate-into-a-subsystem).
 {% endtab %}
 {% endtabs %}
 
 {% hint style="info" %}
 `SwerveDrive` already publishes a `Field2d` with the robot pose. Use `swerveDrive.getField2d()` if you want to draw on it instead of creating your own.
 {% endhint %}
+
+**Check it:** run the simulation. The code starts without an exception, and the drive shows in NetworkTables under **Mechanisms -> swerve**, with a field showing the robot at the origin.
 {% endstep %}
 
 {% step %}
@@ -286,13 +298,17 @@ driveSubsystem.setDefaultCommand(
 );
 ```
 
-`withTelemetry(name, verbosity)` publishes the stream every time it is read. `LOW` publishes the current drive mode, `MID` adds the stream's configuration, and `HIGH` adds editable copies of the configuration plus a `Live Tuning` command on the dashboard. Call it last, after the rest of the configuration. A `clone()` of a stream has no telemetry.
+`withTelemetry(name, verbosity)` publishes the stream every time it is read; at `HIGH` you can also edit it live. Call it last, after the rest of the configuration. [SwerveInputStream](../java-reference/swerve/swerve-input-stream.md) lists what each verbosity publishes.
+
+**Check it:** in simulation, enable teleop with a controller connected (or a keyboard joystick in the Sim GUI). The left stick drives the robot on the field and the right stick turns it.
 {% endstep %}
 
 {% step %}
 #### Azimuth encoder seeding
 
 `seedAzimuthEncoder()` is called automatically on each `SwerveModule` during construction. No additional call is required at startup. If you need to re-seed after the CAN bus has fully settled, you can call `seedAzimuthEncoder()` on each `SwerveModule` instance individually.
+
+**Check it:** on the robot, with the robot disabled, turn each wheel by hand. Its azimuth angle in telemetry follows the wheel. If a wheel points the wrong way when enabled, its encoder offset is wrong.
 {% endstep %}
 
 {% step %}
@@ -306,7 +322,9 @@ public Command driveToPose(Pose2d target) {
 }
 ```
 
-`SwerveDrive` also publishes a live-tuning command to SmartDashboard at `Mechanisms/<name>/tuning`. Running it checks a tunable `autoalign/enabled` boolean and, while `true`, drives toward a target pose (`autoalign/setpoint/x`/`autoalign/setpoint/y` in meters, `autoalign/setpoint/rot` in degrees) you can edit live in NetworkTables, so you can tune those PID gains without redeploying code. The same command also reads a shared set of module drive/azimuth PID, feedforward, and setpoint fields (`modules/drive/*`, `modules/azimuth/*`, with PID gains under `feedback/` and `kS`/`kV`/`kA` under `feedforward/`) that apply to every module on the drive at once, useful for tuning drive/azimuth motor gains without repeating the same numbers per module. These fields are already live-tunable at `TelemetryVerbosity.HIGH` (the default); see [SwerveDrive: Auto-Align](../java-reference/swerve/swerve-drive.md#auto-align-drive-to-pose).
+At `TelemetryVerbosity.HIGH`, `SwerveDrive` also publishes a live tuning command for these gains and for the module gains, so you can tune them without redeploying. [SwerveDrive: Auto-Align](../java-reference/swerve/swerve-drive.md#auto-align-drive-to-pose) lists its fields.
+
+**Check it:** in simulation, schedule `driveToPose(new Pose2d(2, 1, Rotation2d.kZero))` from a button. The robot drives to that point on the field and stops.
 {% endstep %}
 {% endstepper %}
 
@@ -314,8 +332,8 @@ public Command driveToPose(Pose2d target) {
 
 ## Notes
 
-{% hint style="warning" %}
-**Breaking change:** `getGyroAngle()` was removed from `SwerveDriveConfig` and `SwerveDrive`. Use `getGyroRotation3d()` instead, for example `swerveDrive.getGyroRotation3d().toRotation2d()` for the heading. The heading wraps at +/-180 degrees.
+{% hint style="info" %}
+For the robot's heading, use `swerveDrive.getGyroRotation3d().toRotation2d()`. The heading wraps at +/-180 degrees.
 {% endhint %}
 
 {% hint style="info" %}
@@ -325,6 +343,15 @@ public Command driveToPose(Pose2d target) {
 {% hint style="info" %}
 Simulated SPARK MAX and SPARK FLEX controllers close their loop at 1 kHz, like the real hardware. See [Simulation](simulation.md).
 {% endhint %}
+
+## If it did not work
+
+* **The robot drives the wrong way, or spins when it should drive straight.** Check each module's `withLocation` signs, then that the drive motors are not inverted.
+* **A wheel points the wrong way, or the wheels fight each other.** The absolute encoder offsets are wrong. Measure them as in [On the real robot](https://yams.yassrobotics.com/documentation/tutorials/swerve-drive/real-robot).
+* **Field-relative driving is rotated.** The gyro supplier or `withGyroHeadingAxis` is wrong, or the gyro was not zeroed facing away from the driver.
+* **Nothing moves in simulation.** Commands v2: check that `simulationPeriodic()` calls `simIterate()`. Commands v3: check that `simulationInit()` calls `startSimulation(...)`.
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

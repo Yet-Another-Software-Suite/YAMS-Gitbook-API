@@ -20,6 +20,8 @@ YAMS builds its simulation model from fields on the mechanism config and on `Sma
 The C++ equivalents are `ArmConfig::WithArmLength`, `ElevatorConfig::WithCarriageMass`, `SmartMotorControllerConfig::WithMOI`, and `SmartMotorControllerConfig::WithMechanismCircumference`.
 
 You do not need to manually construct a sim supplier. The mechanism creates an `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier` and hands it to the motor controller when it is constructed in simulation.
+
+**Check it:** run the simulation. The code starts without an exception. If a value is missing, the mechanism's constructor throws and the message names it, as the warning under [Notes](#notes) lists.
 {% endstep %}
 
 {% step %}
@@ -29,13 +31,32 @@ You do not need to manually construct a sim supplier. The mechanism creates an `
 
 ```java
 motorConfig
-    .withSimClosedLoopController(4, 0, 0)                    // PID used only in simulation
-    .withSimFeedforward(new ArmFeedforward(0, 0.3, 0.5))     // feedforward used only in simulation
+    .withSimClosedLoopController(4, 0, 0)                    // Placeholder PID used only in simulation
+    .withSimFeedforward(new ArmFeedforward(0, 0.3, 0.5))     // Placeholder feedforward used only in simulation
     .withSimStartingPosition(Degrees.of(0))                  // where the simulated mechanism starts
     .withSimulationPeriod(Milliseconds.of(5));               // physics step, defaults to 20 ms
 ```
 
 For most use cases these are not needed.
+
+**Check it:** if you set any of these, the simulated mechanism starts at the simulation starting position and responds to the simulation gains, while the real robot is unchanged.
+{% endstep %}
+
+{% step %}
+#### Call `updateTelemetry()` from `periodic()`
+
+`updateTelemetry()` publishes current state (both real and simulated) to NetworkTables so your dashboard reflects simulated values, and applies anything you change through live tuning.
+
+```java
+@Override
+public void periodic() {
+    arm.updateTelemetry();
+}
+```
+
+In Commands v3, call the mechanism's `periodic()` from `Robot.robotPeriodic()`, before `scheduler.run()`.
+
+**Check it:** the mechanism's values show in NetworkTables under **Mechanisms**, named after its `withTelemetry(...)`.
 {% endstep %}
 
 {% step %}
@@ -54,39 +75,36 @@ public void simulationPeriodic() {
 {% endtab %}
 
 {% tab title="Commands v3" %}
-A Commands v3 `Mechanism` is not polled for you, so call the simulation update from `Robot.robotPeriodic()` before the scheduler runs:
+A Commands v3 `Mechanism` is not polled for you. Start its simulation in `Robot.simulationInit()`, in its own `Notifier`, so it runs every loop without adding to the robot loop's time:
 
 ```java
 @Override
-public void robotPeriodic() {
-    arm.periodic();
-    if (RobotBase.isSimulation()) {
-        arm.simulationPeriodic();   // calls the YAMS Arm's simIterate()
-    }
-    scheduler.run();
+public void simulationInit() {
+    startSimulation("Arm", arm::simulationPeriodic);   // calls the YAMS Arm's simIterate()
+}
+
+/** Run a mechanism's simulation in its own Notifier, every robot loop period. */
+private void startSimulation(String name, Runnable simulationPeriodic) {
+    Notifier notifier = new Notifier(simulationPeriodic);
+    notifier.setName(name + " Simulation");
+    notifier.startPeriodic(getPeriod());
+    simulationNotifiers.add(notifier);   // a List<Notifier> field, so the Notifiers are not garbage collected
 }
 ```
+
+This is the same helper as in the Commands v3 examples and in [Update it every loop](https://yams.yassrobotics.com/documentation/tutorials/arm/mechanism#update-it-every-loop) in the Arm tutorial.
 {% endtab %}
 {% endtabs %}
-{% endstep %}
 
-{% step %}
-#### Call `updateTelemetry()` from `periodic()`
-
-`updateTelemetry()` publishes current state (both real and simulated) to NetworkTables so your dashboard reflects simulated values.
-
-```java
-@Override
-public void periodic() {
-    arm.updateTelemetry();
-}
-```
+**Check it:** command the mechanism to a new setpoint in simulation, and its position or velocity in telemetry changes. If it never moves, this call is missing.
 {% endstep %}
 
 {% step %}
 #### View the Mechanism2d visualization
 
-YAMS publishes a `Mechanism2d` object for each mechanism. In the simulation GUI, open **NetworkTables** and navigate to the mechanism name you set in the config (e.g., `"Shoulder"`) to see the live visualization.
+YAMS publishes a `Mechanism2d` for each mechanism at `Mechanisms/<name>/mechanism`, where `<name>` is the telemetry name on the mechanism config (for example `"Shoulder"`). In the Sim GUI, open **NetworkTables -> Mechanisms -> Shoulder -> mechanism**. In AdvantageScope, drag `Mechanisms/Shoulder/mechanism` onto a **Mechanism** tab.
+
+**Check it:** the mechanism is drawn at its starting position, and moves when you command it.
 {% endstep %}
 {% endstepper %}
 
@@ -129,6 +147,14 @@ With discharge enabled, the open circuit voltage falls and the internal resistan
 ## SPARK closed loop runs at 1 kHz in simulation
 
 A real SPARK MAX or SPARK FLEX closes its loop onboard every millisecond. `SparkWrapper` simulates that: inside each `simIterate()` call it steps the simulated SPARK's closed loop once per millisecond across the simulation period (20 steps for the default 20 ms period), instead of once per period. Gains tuned in simulation therefore behave much closer to the real controller. No configuration is needed.
+
+## If it did not work
+
+* **The mechanism is not in the NetworkTables menu.** Look under **Mechanisms**, not **SmartDashboard**, and check that `updateTelemetry()` runs every loop.
+* **It never moves in simulation.** `simIterate()` is not running: check `simulationPeriodic()` (Commands v2) or `simulationInit()` (Commands v3).
+* **It throws when the code starts.** A physical value from the table in the first step is missing.
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

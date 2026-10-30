@@ -2,6 +2,8 @@
 
 **Goal:** Create a `FlyWheel` subsystem with velocity control and physics simulation.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. The [Shooter/FlyWheels tutorial](https://yams.yassrobotics.com/documentation/tutorials/shooter-flywheels) explains each setting.
+
 ***
 
 {% stepper %}
@@ -16,8 +18,8 @@ SmartMotorControllerConfig motorConfig = new SmartMotorControllerConfig(this)
     .withMotorInverted(false)
     .withZeroPower(MotorMode.COAST)
     .withGearing(new MechanismGearing(GearBox.fromReductionStages(1.5)))
-    .withClosedLoopController(0.0003, 0.0, 0.0)
-    .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))
+    .withClosedLoopController(0.0003, 0.0, 0.0)                 // Placeholder PID gains.
+    .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0)) // Placeholder kS, kV, kA.
     .withMomentOfInertia(Meters.of(0.0508), Kilograms.of(0.18))
     .withStatorCurrentLimit(Amps.of(80))
     .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
@@ -28,6 +30,8 @@ SmartMotorController motor = new TalonFXWrapper(
     motorConfig
 );
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -40,6 +44,8 @@ FlyWheelConfig flywheelConfig = new FlyWheelConfig()
     .withDiameter(Meters.of(0.1016))
     .withTelemetry("Shooter", TelemetryVerbosity.HIGH);
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -50,6 +56,8 @@ Import `FlyWheel` from `yams.commands2.mechanisms` (Commands v2) or `yams.comman
 ```java
 FlyWheel flyWheel = new FlyWheel(flywheelConfig, motor);
 ```
+
+**Check it:** run the simulation. The code starts without an exception.
 {% endstep %}
 
 {% step %}
@@ -97,8 +105,8 @@ public class ShooterSubsystem extends SubsystemBase {
             .withMotorInverted(false)
             .withZeroPower(MotorMode.COAST)
             .withGearing(new MechanismGearing(GearBox.fromReductionStages(1.5)))
-            .withClosedLoopController(0.0003, 0.0, 0.0)
-            .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0))
+            .withClosedLoopController(0.0003, 0.0, 0.0)                 // Placeholder PID gains.
+            .withFeedforward(new SimpleMotorFeedforward(0.1, 0.002, 0.0)) // Placeholder kS, kV, kA.
             .withMomentOfInertia(Meters.of(0.0508), Kilograms.of(0.18))
             .withStatorCurrentLimit(Amps.of(80))
             .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH);
@@ -213,14 +221,18 @@ public class ShooterMechanism implements Mechanism {
         flyWheel.updateTelemetry();
     }
 
-    /** Call from Robot.robotPeriodic() in simulation. */
+    /** Run in its own Notifier, started from Robot.simulationInit(). */
     public void simulationPeriodic() {
         flyWheel.simIterate();
     }
 }
 ```
+
+In `Robot`, set the default command with `shooter.setDefaultCommand(shooter.stop())`, call `shooter.periodic()` from `robotPeriodic()` before `scheduler.run()`, and start the simulation in `simulationInit()` with `startSimulation("Shooter", shooter::simulationPeriodic)`, as in [Building an arm subsystem](building-an-arm.md#integrate-into-a-subsystem).
 {% endtab %}
 {% endtabs %}
+
+**Check it:** run the simulation and open **NetworkTables -> Mechanisms -> Shooter -> mechanism** in the Sim GUI. Schedule `spinUpCommand(RPM.of(4500))` (Commands v2) or `hold(RPM.of(4500))` (Commands v3) from a button, and the wheel's line spins. Its velocity, in the telemetry next to it, climbs toward 4500 RPM.
 {% endstep %}
 
 {% step %}
@@ -251,8 +263,18 @@ Or bind the `readyToShoot()` trigger to allow feeding at any time once the wheel
 ```java
 shooter.readyToShoot().whileTrue(indexer.feedCommand());
 ```
+
+**Check it:** in simulation, the indexer only runs once the shooter is within 100 RPM of the shoot speed.
 {% endstep %}
 {% endstepper %}
+
+## If it did not work
+
+* **The wheel never spins in simulation.** Commands v2: check that `simulationPeriodic()` calls `flyWheel.simIterate()`. Commands v3: check that `simulationInit()` calls `startSimulation(...)` for the mechanism.
+* **The wheel spins up very slowly or never reaches speed.** Expected with the placeholder gains: most of a flywheel's voltage comes from `kV`. Tune them as in [Tune it](https://yams.yassrobotics.com/documentation/tutorials/shooter-flywheels/tune).
+* **`spinUpAndWait` never ends.** The wheel never gets within the tolerance. Check the velocity in telemetry, then the gains or the tolerance.
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 

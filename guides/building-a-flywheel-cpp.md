@@ -2,6 +2,8 @@
 
 **Goal:** Create a `FlyWheel` subsystem in C++ with velocity control and physics simulation.
 
+The gains in this guide are placeholders, as [the overview](README.md#the-gains-in-these-guides) explains. They match the Java [flywheel guide](building-a-flywheel.md).
+
 ***
 
 ## Prerequisites
@@ -43,8 +45,8 @@ motorConfig
     .WithSubsystem(this)
     .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
     .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
-    .WithFeedback(0.0003, 0.0, 0.0)
-    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{
+    .WithFeedback(0.0003, 0.0, 0.0)              // Placeholder PID gains.
+    .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{   // Placeholder kS, kV, kA.
         0.1_V, wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::kv_unit>{0.002},
         wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::ka_unit>{0.0}})    // kS, kV, kA
     .WithMOI(0.0508_m, 0.18_kg)                // roller radius, mass; required for simulation
@@ -53,6 +55,8 @@ motorConfig
 ```
 
 > **Simulation note:** `WithMOI(radius, mass)` sets the moment of inertia for physics simulation. It belongs on `SmartMotorControllerConfig`, not on `FlyWheelConfig`.
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -69,6 +73,8 @@ yams::motorcontrollers::remote::TalonFXWrapper motor{
     &motorConfig
 };
 ```
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -86,6 +92,8 @@ flywheelConfig
 {% hint style="info" %}
 Moment of inertia is set on `SmartMotorControllerConfig` via `WithMOI()`, not on `FlyWheelConfig`. `FlyWheelConfig` only holds the roller diameter, telemetry name, and sim color.
 {% endhint %}
+
+**Check it:** the project builds.
 {% endstep %}
 
 {% step %}
@@ -94,6 +102,8 @@ Moment of inertia is set on `SmartMotorControllerConfig` via `WithMOI()`, not on
 ```cpp
 yams::mechanisms::velocity::FlyWheel flyWheel{&flywheelConfig, &motor};
 ```
+
+**Check it:** run the simulation. The code starts without an exception.
 {% endstep %}
 
 {% step %}
@@ -112,8 +122,8 @@ public:
             .WithSubsystem(this)
             .WithZeroPower(yams::motorcontrollers::SmartMotorControllerConfig::MotorMode::COAST)
             .WithMotorGearing(yams::gearing::MechanismGearing(1.5))
-            .WithFeedback(0.0003, 0.0, 0.0)
-            .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{
+            .WithFeedback(0.0003, 0.0, 0.0)      // Placeholder PID gains.
+            .WithFeedforward(wpi::math::SimpleMotorFeedforward<wpi::units::turns>{   // Placeholder kS, kV, kA.
                 0.1_V, wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::kv_unit>{0.002},
                 wpi::units::unit_t<wpi::math::SimpleMotorFeedforward<wpi::units::turns>::ka_unit>{0.0}})
             .WithMOI(0.0508_m, 0.18_kg)
@@ -159,6 +169,8 @@ private:
     std::optional<yams::mechanisms::velocity::FlyWheel> flyWheel_;
 };
 ```
+
+**Check it:** run the simulation and open **NetworkTables -> Mechanisms -> Shooter -> mechanism** in the Sim GUI. Schedule `SpinUpCommand(kShootSpeed)` from a button, and the wheel's line spins. Its velocity, in the telemetry next to it, climbs toward 4500 RPM.
 {% endstep %}
 
 {% step %}
@@ -190,8 +202,18 @@ Or bind the `ReadyToShoot()` trigger to allow feeding whenever the wheel is up:
 ```cpp
 shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 ```
+
+**Check it:** in simulation, the indexer only runs once the shooter is within about 100 RPM of the shoot speed.
 {% endstep %}
 {% endstepper %}
+
+## If it did not work
+
+* **It does not build.** Check the vendordep, the `#include` for the wrapper (`YAMS.hpp` does not include it), and that the TalonFX and the config are members that outlive the wrapper.
+* **The wheel never spins in simulation.** Check that `SimulationPeriodic()` calls `SimIterate()`, that `WithSubsystem(this)` is set, and that `WithMOI(...)` is on the motor config.
+* **The wheel spins up very slowly or never reaches speed.** Expected with the placeholder gains: most of a flywheel's voltage comes from `kV`. Tune them as in [Tune it](https://yams.yassrobotics.com/documentation/tutorials/shooter-flywheels/tune).
+
+[Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
 ***
 
@@ -200,7 +222,7 @@ shooter_->ReadyToShoot().WhileTrue(indexer_->FeedCommand());
 {% hint style="info" %}
 `RunTo(velocity, tolerance)` ends once the wheel reaches the target. Use it in command sequences where the next step should not begin until the wheel is at speed.
 
-`IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance; use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready. (The Java `Trigger` factory is named `near(...)`; C++ keeps `IsNear(...)`.)
+`IsNear(velocity, tolerance)` (as a `Trigger`) stays true while the wheel remains within tolerance; use it for continuously gated logic such as a conveyor that feeds whenever the shooter is ready. (The Java equivalent is `near(...)`.)
 {% endhint %}
 
 ***
