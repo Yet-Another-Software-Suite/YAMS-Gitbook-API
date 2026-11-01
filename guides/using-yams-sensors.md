@@ -1,129 +1,67 @@
 # Using YAMS sensors
 
-**Goal:** Wire real hardware sensors into the YAMS simulation framework so the same subsystem code runs identically in simulation and on a physical robot, with no `#ifdef` guards, no separate simulation paths, and optional automated test-value injection.
+**Goal:** Wrap a sensor, such as a beam break or a limit switch, in a YAMS `Sensor`, so your code reads it the same way on the robot and in simulation, and so you can say what it reads in simulation.
 
 ***
 
-## What YAMS sensors solve
+## Why wrap a sensor
 
-WPILib's simulation layer lets you override hardware values in the **Glass** GUI. YAMS Sensors expose any arbitrary hardware reading (limit switch, encoder, analog input, color sensor, and so on) to Glass through a `SimDevice`, using the same typed supplier API on robot and in sim.
+In simulation there is no real sensor, so code that waits for a beam break or a limit switch never sees it change. A YAMS `Sensor` fixes that. Your code reads it with the same call everywhere, and:
 
-Additionally, YAMS Sensors support **trigger-based value injection**: you can declare "from match time 10 s to 12 s, make this limit switch read `true`" directly in your subsystem constructor. This makes automated simulation regression testing possible without touching Glass at all.
+* **On the robot**, it returns the real reading, from the supplier you give it.
+* **In simulation**, it returns the value shown in the Sim GUI, which starts at the default you give it and which you can change by hand. You can also script it: make it read a value while a condition is true, such as the arm being at the angle where it breaks the beam.
 
-The examples below use a beam break that detects a game piece. A beam break's `DigitalInput` usually reads `true` while the beam is clear and `false` when something blocks it, so the code inverts it: the `NotePresent` field reads `true` when a note is there. If your sensor reads `true` when it detects something, drop the `!`.
+[Sensors](https://yams.yassrobotics.com/documentation/details/sensors) in the documentation explains the idea with pictures. This guide is the API for it in Java and C++.
+
+The examples use a beam break that detects a game piece. A beam break usually reads `true` while the beam is clear and `false` when something blocks it, so the code inverts it: the `NotePresent` field reads `true` when a note is there. If your sensor reads `true` when it detects something, drop the `!`.
 
 ***
 
-## Java
+## Create and read a sensor
 
+{% tabs %}
+{% tab title="Java" %}
 {% stepper %}
 {% step %}
-### Identify the hardware
+### Create the sensor
 
-Decide which hardware readings to expose. Each reading becomes one field on the sensor.
+Give the sensor a name, and add one field for each reading: a field name, a supplier for the real reading, and the default it starts at in simulation.
 
 ```java
 import org.wpilib.hardware.discrete.DigitalInput;
-
-DigitalInput noteDetector = new DigitalInput(1);  // beam break on DIO 1
-```
-
-**Check it:** the project builds.
-{% endstep %}
-
-{% step %}
-### Describe the sensor with `SensorConfig`
-
-```java
 import yams.core.mechanisms.config.SensorConfig;
-
-SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
-    // A boolean field backed by the real DIO channel, true when a note blocks the beam
-    .withField("NotePresent", () -> !noteDetector.get(), false);
-```
-
-Pass the field name, a supplier for the live value, and a default (used before any Glass override fires).
-
-**Check it:** the project builds.
-{% endstep %}
-
-{% step %}
-### Obtain the `Sensor` instance
-
-```java
 import yams.core.motorcontrollers.simulation.Sensor;
 
-Sensor sensor = intakeSensor.getSensor();
-```
+DigitalInput noteDetector = new DigitalInput(1);  // beam break on DIO 1
 
-`getSensor()` is lazy: call it once, cache the result.
-
-**Check it:** run the simulation and open Glass. The sensor shows under **Other Devices -> Sensor\[IntakeSensor]**, with a `NotePresent` field.
-{% endstep %}
-
-{% step %}
-### Read sensor values in robot code
-
-```java
-// In periodic() or wherever you need the value:
-boolean hasNote = sensor.getAsBoolean("NotePresent");
-```
-
-On a real robot this always calls the supplier, `!noteDetector.get()`. In simulation it reads the Glass widget.
-
-**Check it:** in simulation, change `NotePresent` in Glass. `hasNote` follows it, for example in a value you publish with `Telemetry.log(...)`.
-{% endstep %}
-
-{% step %}
-### Inject simulated values by match time
-
-Declare time windows where a specific value should be returned automatically during simulation:
-
-```java
-import static org.wpilib.units.Units.Seconds;
-
-SensorConfig intakeSensor = new SensorConfig("IntakeSensor")
+Sensor intakeSensor = new SensorConfig("IntakeSensor")
+    // true when a note blocks the beam; starts false in simulation
     .withField("NotePresent", () -> !noteDetector.get(), false)
-    // Simulate a note being detected between 5 s and 8 s of match time
-    .withSimulatedValue("NotePresent", Seconds.of(5), Seconds.of(8), true);
+    .getSensor();
 ```
 
-**Check it:** enable autonomous in the Sim GUI. `NotePresent` turns `true` 5 seconds in and back to `false` at 8 seconds.
+`getSensor()` builds the `Sensor` the first time and returns the same one after that.
+
+**Check it:** run the simulation and open **Other Devices** in the Sim GUI. The sensor shows as **Sensor\[IntakeSensor]**, with a `NotePresent` field reading `false`.
 {% endstep %}
 
 {% step %}
-### Inject simulated values by trigger condition
-
-Use a `BooleanSupplier` trigger instead of a time window when the condition is dynamic:
+### Read it
 
 ```java
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.hardware.hal.HALValue;
-
-intakeSensor.withSimulatedValue(
-    "NotePresent",
-    RobotState::isAutonomous,  // active whenever auto is running
-    true
-);
-
-// Or inject programmatically after the Sensor is built:
-sensor.addSimTrigger(
-    "NotePresent",
-    HALValue.makeBoolean(true),
-    RobotState::isAutonomous
-);
+boolean hasNote = intakeSensor.getAsBoolean("NotePresent");
 ```
 
-**Check it:** enable autonomous in the Sim GUI. `NotePresent` reads `true` for as long as autonomous runs.
+Read a field with the getter for its type: `getAsBoolean`, `getAsDouble`, `getAsInt` or `getAsLong`.
+
+**Check it:** change `NotePresent` to `true` in the Sim GUI, and `hasNote` becomes `true`. Publish it with `Telemetry.log(...)` or bind a trigger to it to see it change.
 {% endstep %}
 {% endstepper %}
 
-### Complete subsystem example
+### The complete subsystem
 
 ```java
 package first.robot.subsystems;
-
-import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.button.Trigger;
@@ -134,22 +72,16 @@ import yams.core.motorcontrollers.simulation.Sensor;
 public class IntakeSubsystem extends SubsystemBase {
 
     private final DigitalInput noteDetector = new DigitalInput(1);
-    private final Sensor       intakeSensor;
-
-    public IntakeSubsystem() {
-        intakeSensor = new SensorConfig("IntakeSensor")
-            // true when a note blocks the beam
-            .withField("NotePresent", () -> !noteDetector.get(), false)
-            // Sim: note appears at 5 s, disappears at 8 s
-            .withSimulatedValue("NotePresent", Seconds.of(5), Seconds.of(8), true)
-            .getSensor();
-    }
+    private final Sensor       intakeSensor = new SensorConfig("IntakeSensor")
+        // true when a note blocks the beam; starts false in simulation
+        .withField("NotePresent", () -> !noteDetector.get(), false)
+        .getSensor();
 
     public boolean hasNote() {
         return intakeSensor.getAsBoolean("NotePresent");
     }
 
-    /** Trigger for binding commands to the sensor. */
+    /** True while a note is in the intake. */
     public Trigger noteDetected() {
         return new Trigger(this::hasNote);
     }
@@ -157,147 +89,68 @@ public class IntakeSubsystem extends SubsystemBase {
 ```
 
 In a Commands v3 project the sensor code is the same: the class implements `org.wpilib.command3.Mechanism` instead of extending `SubsystemBase`, and `Trigger` comes from `org.wpilib.command3`.
+{% endtab %}
 
-### Multiple fields on one sensor
-
-A single `SensorConfig` can hold multiple fields, useful for grouping related readings:
-
-```java
-SensorConfig armSensor = new SensorConfig("Arm")
-    .withField("PositionDegrees", encoder::getPosition, 0.0)
-    .withField("VelocityDPS",     encoder::getVelocity, 0.0)
-    .withField("AtUpperLimit",    upperLimit::get,      false)
-    .withField("AtLowerLimit",    lowerLimit::get,      false)
-    // Simulate the arm reaching its upper limit from 3 s to 5 s of match time
-    .withSimulatedValue("AtUpperLimit",
-                        Seconds.of(3), Seconds.of(5), true);
-
-Sensor sensor = armSensor.getSensor();
-
-double pos = sensor.getAsDouble("PositionDegrees");
-boolean atTop = sensor.getAsBoolean("AtUpperLimit");
-```
-
-***
-
-## C++
-
+{% tab title="C++" %}
 {% stepper %}
 {% step %}
-### Identify the hardware
+### Create the sensor
+
+Give the sensor a name, and add one field for each reading: a field name, a supplier for the real reading, and the default it starts at in simulation. Keep the `SimSensorConfig` and the hardware as members: the sensor reads them for as long as it is used.
 
 ```cpp
 #include <wpi/hardware/discrete/DigitalInput.hpp>
-wpi::DigitalInput noteDetector{1};  // beam break on DIO 1
-```
-
-**Check it:** the project builds.
-{% endstep %}
-
-{% step %}
-### Describe the sensor with `SimSensorConfig`
-
-```cpp
 #include <yams/mechanisms/config/SimSensorConfig.hpp>
-using yams::mechanisms::config::SimSensorConfig;
+#include <yams/motorcontrollers/simulation/Sensor.hpp>
 
-SimSensorConfig intakeSensor{"IntakeSensor"};
+wpi::DigitalInput noteDetector{1};  // beam break on DIO 1
+
+yams::mechanisms::config::SimSensorConfig intakeSensor{"IntakeSensor"};
 intakeSensor
-    // true when a note blocks the beam
+    // true when a note blocks the beam; starts false in simulation
     .WithField("NotePresent", [&noteDetector] { return !noteDetector.Get(); }, false);
 ```
 
-**Check it:** the project builds.
+`GetSensor()` builds the `Sensor` the first time you call it and returns the same one after that.
+
+**Check it:** run the simulation and open **Other Devices** in the Sim GUI. Once your code has called `GetSensor()`, the sensor shows as **Sensor\[IntakeSensor]**, with a `NotePresent` field reading `false`.
 {% endstep %}
 
 {% step %}
-### Obtain the `Sensor` instance
+### Read it
 
 ```cpp
-#include <yams/motorcontrollers/simulation/Sensor.hpp>
-using yams::motorcontrollers::simulation::Sensor;
-
-Sensor& sensor = intakeSensor.GetSensor();
+bool hasNote = intakeSensor.GetSensor().GetAsBoolean("NotePresent");
 ```
 
-`GetSensor()` is lazy: call it once, cache the returned reference.
+Read a field with the getter for its type: `GetAsBoolean`, `GetAsDouble`, `GetAsInt` or `GetAsLong`.
 
-**Check it:** run the simulation and open Glass. The sensor shows under **Other Devices -> Sensor\[IntakeSensor]**.
-{% endstep %}
-
-{% step %}
-### Read sensor values in robot code
-
-```cpp
-bool hasNote = sensor.GetAsBoolean("NotePresent");
-```
-
-**Check it:** in simulation, change `NotePresent` in Glass, and `hasNote` follows it.
-{% endstep %}
-
-{% step %}
-### Inject simulated values by match time
-
-```cpp
-SimSensorConfig intakeSensor{"IntakeSensor"};
-intakeSensor
-    .WithField("NotePresent", [&noteDetector] { return !noteDetector.Get(); }, false)
-    .WithSimulatedValue("NotePresent", 5_s, 8_s, true);  // tripped at 5 s..8 s in sim
-```
-
-**Check it:** enable autonomous in the Sim GUI. `NotePresent` turns `true` 5 seconds in and back to `false` at 8 seconds.
-{% endstep %}
-
-{% step %}
-### Inject simulated values by trigger condition
-
-```cpp
-#include <wpi/driverstation/RobotState.hpp>
-#include <yams/motorcontrollers/simulation/SensorData.hpp>
-using yams::motorcontrollers::simulation::SensorData;
-
-// Declare in the config builder:
-intakeSensor.WithSimulatedValue(
-    "NotePresent",
-    [] { return wpi::RobotState::IsAutonomous(); },
-    true
-);
-
-// Or after the Sensor is built:
-sensor.AddSimTrigger(
-    "NotePresent",
-    SensorData::Convert(true),
-    [] { return wpi::RobotState::IsAutonomous(); }
-);
-```
-
-**Check it:** enable autonomous in the Sim GUI. `NotePresent` reads `true` for as long as autonomous runs.
+**Check it:** change `NotePresent` to `true` in the Sim GUI, and `hasNote` becomes `true`.
 {% endstep %}
 {% endstepper %}
 
-### Complete subsystem example
+### The complete subsystem
 
 ```cpp
-#include <yams/mechanisms/config/SimSensorConfig.hpp>
-#include <yams/motorcontrollers/simulation/Sensor.hpp>
 #include <wpi/commands2/SubsystemBase.hpp>
 #include <wpi/commands2/button/Trigger.hpp>
 #include <wpi/hardware/discrete/DigitalInput.hpp>
+#include <yams/mechanisms/config/SimSensorConfig.hpp>
+#include <yams/motorcontrollers/simulation/Sensor.hpp>
 
 class IntakeSubsystem : public wpi::cmd::SubsystemBase {
  public:
     IntakeSubsystem() {
         intakeSensor_
-            // true when a note blocks the beam
-            .WithField("NotePresent", [this] { return !noteDetector_.Get(); }, false)
-            .WithSimulatedValue("NotePresent", 5_s, 8_s, true);
+            // true when a note blocks the beam; starts false in simulation
+            .WithField("NotePresent", [this] { return !noteDetector_.Get(); }, false);
     }
 
     bool HasNote() {
         return intakeSensor_.GetSensor().GetAsBoolean("NotePresent");
     }
 
-    /** Trigger for binding commands to the sensor. */
+    /** True while a note is in the intake. */
     wpi::cmd::Trigger NoteDetected() {
         return wpi::cmd::Trigger{[this] { return HasNote(); }};
     }
@@ -307,64 +160,154 @@ class IntakeSubsystem : public wpi::cmd::SubsystemBase {
     yams::mechanisms::config::SimSensorConfig intakeSensor_{"IntakeSensor"};
 };
 ```
-
-### Multiple fields on one sensor
-
-```cpp
-SimSensorConfig armSensor{"Arm"};
-armSensor
-    .WithField("PositionDegrees", [&enc] { return enc.GetPosition(); }, 0.0)
-    .WithField("VelocityDPS",     [&enc] { return enc.GetVelocity(); }, 0.0)
-    .WithField("AtUpperLimit", [&lim] { return lim.Get(); }, false)
-    // Simulate the arm reaching its upper limit from 3 s to 5 s of match time
-    .WithSimulatedValue("AtUpperLimit", 3_s, 5_s, true);
-
-auto& sensor = armSensor.GetSensor();
-double pos   = sensor.GetAsDouble("PositionDegrees");
-bool  atTop  = sensor.GetAsBoolean("AtUpperLimit");
-```
+{% endtab %}
+{% endtabs %}
 
 ***
 
-## Using Glass to override values manually
+## Say what it reads in simulation
 
-When running simulation, any `Sensor` appears in Glass under **Other Devices → Sensor\[name]**. Each field shows as an editable widget. You can:
+Changing a field by hand is fine for a quick test. To make the simulation behave like the robot, give the field a **simulated value**: a value it reads while a condition is true. When the condition turns false, the field goes back to the value it had before. On the real robot, simulated values are ignored.
 
-* Read the current value (driven by the supplier or trigger)
-* Type in a new value to override it for manual testing
+### While a condition is true
 
-Trigger-based overrides take priority over Glass edits: if a trigger is active, it writes its value back to Glass each loop, overriding your manual edit until the trigger condition becomes false.
+This is the one to use most of the time. The condition is any `BooleanSupplier` (Java) or `std::function<bool()>` (C++), such as a mechanism being where it would break the beam.
+
+{% tabs %}
+{% tab title="Java" %}
+```java
+Sensor intakeSensor = new SensorConfig("IntakeSensor")
+    .withField("NotePresent", () -> !noteDetector.get(), false)
+    // In simulation, a note is present while the intake roller is spinning
+    .withSimulatedValue("NotePresent", () -> roller.getSpeed().gt(RPM.of(100)), true)
+    .getSensor();
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+intakeSensor_
+    .WithField("NotePresent", [this] { return !noteDetector_.Get(); }, false)
+    // In simulation, a note is present while the intake roller is spinning
+    .WithSimulatedValue("NotePresent", [this] { return roller_->GetVelocity() > 600_deg_per_s; }, true);
+```
+{% endtab %}
+{% endtabs %}
+
+Here `roller` is the intake's YAMS `FlyWheel`. Use whatever condition matches your robot: the [`simple_robot-2027` arm](#examples) uses the arm being near 40 degrees.
+
+**Check it:** in simulation, run the intake. `NotePresent` turns `true` in the Sim GUI while the roller spins, and back to `false` when it stops.
+
+### During a match time window
+
+`withSimulatedValue(field, start, end, value)` makes the field read `value` while the **match time** is between `start` and `end`. Match time is WPILib's `Timer.getMatchTime()`: the time **left** in the current period, counting down, not the time since the period started. So a window of 5 s to 8 s is active from 8 seconds left until 5 seconds left.
+
+{% hint style="warning" %}
+When nothing is running a match timer, match time reads -1 and a time window never opens. WPILib's simulation matches a Driver Station with no FMS, where match time only counts down in practice mode. If the window never fires, use a condition instead.
+{% endhint %}
+
+{% tabs %}
+{% tab title="Java" %}
+```java
+import static org.wpilib.units.Units.Seconds;
+
+// In simulation, a note is present from 8 s left until 5 s left in the period
+.withSimulatedValue("NotePresent", Seconds.of(5), Seconds.of(8), true)
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+// In simulation, a note is present from 8 s left until 5 s left in the period
+.WithSimulatedValue("NotePresent", 5_s, 8_s, true)
+```
+{% endtab %}
+{% endtabs %}
+
+**Check it:** with the match timer running, `NotePresent` turns `true` when 8 seconds are left and back to `false` when 5 are left.
+
+### After the sensor is built
+
+To add a simulated value later, call `addSimTrigger` (Java) or `AddSimTrigger` (C++) on the `Sensor`, with the value as a `HALValue`:
+
+{% tabs %}
+{% tab title="Java" %}
+```java
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.hardware.hal.HALValue;
+
+intakeSensor.addSimTrigger("NotePresent", HALValue.makeBoolean(true), RobotState::isAutonomous);
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+#include <wpi/driverstation/RobotState.hpp>
+#include <yams/motorcontrollers/simulation/SensorData.hpp>
+
+intakeSensor_.GetSensor().AddSimTrigger(
+    "NotePresent",
+    yams::motorcontrollers::simulation::SensorData::Convert(true),
+    [] { return wpi::RobotState::IsAutonomous(); });
+```
+{% endtab %}
+{% endtabs %}
+
+**Check it:** enable autonomous in the Sim GUI, and `NotePresent` reads `true` for as long as autonomous runs.
+
+When several simulated values are active at once, the one added first wins. A simulated value also wins over a value you typed in the Sim GUI, until its condition turns false.
+
+***
+
+## Several fields on one sensor
+
+One sensor can hold several related readings. In this fragment, `encoder` is the arm's encoder and `upperLimit` and `lowerLimit` are `DigitalInput` limit switches:
+
+{% tabs %}
+{% tab title="Java" %}
+```java
+Sensor armSensor = new SensorConfig("Arm")
+    .withField("PositionDegrees", encoder::getPosition, 0.0)
+    .withField("AtUpperLimit",    upperLimit::get,      false)
+    .withField("AtLowerLimit",    lowerLimit::get,      false)
+    .getSensor();
+
+double  position = armSensor.getAsDouble("PositionDegrees");
+boolean atTop    = armSensor.getAsBoolean("AtUpperLimit");
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+armSensor_
+    .WithField("PositionDegrees", [this] { return encoder_.GetPosition(); }, 0.0)
+    .WithField("AtUpperLimit",    [this] { return upperLimit_.Get(); },     false)
+    .WithField("AtLowerLimit",    [this] { return lowerLimit_.Get(); },     false);
+
+double position = armSensor_.GetSensor().GetAsDouble("PositionDegrees");
+bool   atTop    = armSensor_.GetSensor().GetAsBoolean("AtUpperLimit");
+```
+{% endtab %}
+{% endtabs %}
+
+The supplier and the default set the field's type: a `double` supplier with `0.0` makes a `double` field, and a `boolean` supplier with `false` a `boolean` field. Read each field with the getter for its type.
 
 ***
 
 ## If it did not work
 
-* **The sensor is not in Glass.** `getSensor()` was never called, or the code is not running in simulation. Look under **Other Devices**, not **NetworkTables**.
+* **The sensor is not in the Sim GUI.** Look under **Other Devices**, not NetworkTables. In C++, the sensor only appears once `GetSensor()` has been called.
+* **In simulation, the field never changes when the real sensor would.** That is expected: in simulation a sensor reads the Sim GUI and its simulated values, never the supplier. Add a simulated value for it.
+* **A time window never fires.** Match time is -1 when no match timer runs, and it counts down. Use a condition instead, as in [While a condition is true](#while-a-condition-is-true).
 * **The value is the opposite of what you expect.** Your sensor reads `true` when it detects something, so remove the `!` from the supplier.
-* **A Glass edit does not stick.** A time window or trigger is active and writes its value back every loop. Wait until it ends, or remove it.
-* **It throws when you read a field.** The field type and the getter do not match, as the warning below explains.
-
-***
-
-## Notes
-
-{% hint style="info" %}
-Multiple `withSimulatedValue` / `WithSimulatedValue` calls on the same field are all registered. Triggers are checked in registration order; the first active one wins.
-{% endhint %}
-
-{% hint style="info" %}
-YAMS Sensors do not depend on any `SmartMotorController`; they work as standalone sim helpers for any sensor hardware you want to expose to Glass.
-{% endhint %}
-
-{% hint style="warning" %}
-The typed `getAs*` / `GetAs*` methods throw if the field type does not match: an `IllegalStateException` in Java and a `std::logic_error` in C++. Register boolean hardware with a `BooleanSupplier` / `std::function<bool()>`, and always read it with `getAsBoolean` / `GetAsBoolean`.
-{% endhint %}
+* **A value typed in the Sim GUI does not stick.** A simulated value is active and wins. Wait until its condition is false, or remove it.
+* **It throws when you read a field.** The getter does not match the field's type. A field made with a `false` default must be read with `getAsBoolean` / `GetAsBoolean`; Java throws an `IllegalStateException`, and C++ a `std::logic_error`.
 
 ***
 
 ## Examples
 
-The `simple_robot-2027` arm declares a beam break sensor with a time window and a trigger condition:
+The `simple_robot-2027` arm declares a beam break with a time window and a condition:
 
 {% @github-files/github-code-block url="https://github.com/Yet-Another-Software-Suite/YAMS/blob/master/examples/commands2/simple_robot-2027/src/main/java/first/robot/subsystems/ArmSubsystem.java#L87-L92" %}
 
@@ -372,6 +315,8 @@ The `simple_robot-2027` arm declares a beam break sensor with a time window and 
 
 ## Related pages
 
+* [Sensors](https://yams.yassrobotics.com/documentation/details/sensors): what a sensor is and how it gets its value, with pictures
+* [How do I home a mechanism with limit switches?](https://yams.yassrobotics.com/documentation/how-to-mechanisms/how-do-i-home-a-mechanism-with-limit-switches)
 * [SensorConfig (Java)](../java-reference/config/sensor-config.md)
 * [SimSensorConfig (C++)](../c++-reference/config/sim-sensor-config.md)
 * [SensorConfig (C++)](../c++-reference/config/sensorconfig.md): how the Java `SensorConfig` maps to C++
