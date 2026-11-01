@@ -5,8 +5,8 @@
 
 ## API
 
-* [Java](https://yet-another-software-suite.github.io/YAMS/javadocs/)
-* [C++](https://yet-another-software-suite.github.io/YAMS/doxygen/html/)
+* [Java](https://javadocs.yassrobotics.com/yams/)
+* [C++](https://doxygen.yassrobotics.com/yams/)
 
 ## Java reference
 
