@@ -46,7 +46,7 @@ SmartMotorController motor = new TalonFXWrapper(
 
 **Phoenix 6 required.** YAMS only supports Phoenix 6 (26.70 alpha for WPILib 2027) for TalonFX and TalonFXS. Phoenix 5 is not supported. Phoenix 6 devices take a `CANBus`, e.g. `new CANBus(CANPort.CAN_S0)` for a SystemCore CAN port.
 
-**CANcoder support.** Pass a `CANcoder` via `withExternalEncoder(CANcoder)`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source. A discontinuity point is optional for `CANcoder`; when set it maps to `AbsoluteSensorDiscontinuityPoint` in the CANcoder configuration. CANcoder does not have the same dead-zone constraint as SPARK absolute encoders.
+**CANcoder support.** Pass a `CANcoder` via `withExternalEncoder(CANcoder)`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source. A wrapping range is optional for `CANcoder` and `CANdi`; when set with `withWrapping` or `withContinuousWrapping`, its maximum, from 0 to 1 rotation, becomes the encoder's `AbsoluteSensorDiscontinuityPoint`, and any other maximum throws `SmartMotorControllerConfigurationException`. Without one, the encoder keeps its own range. Only `withContinuousWrapping` turns on `ClosedLoopGeneral.ContinuousWrap`.
 
 **CANdi support.** A `CANdi` can be passed via `withExternalEncoder(CANdi)` for both `TalonFXWrapper` and `TalonFXSWrapper`. Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which one your encoder is wired to automatically. You must pass a vendor config that sets the correct `FeedbackSensorSource` (TalonFX) or `ExternalFeedbackSensorSource` (TalonFXS), otherwise the CANdi will not function as an external encoder.
 

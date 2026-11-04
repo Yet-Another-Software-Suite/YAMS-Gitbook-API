@@ -202,7 +202,7 @@ void* GetMotorControllerConfig();
 
 ### CANcoder
 
-Pass a pointer to the `CANcoder` via `WithExternalEncoder(&cancoder)` in the `SmartMotorControllerConfig`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source automatically. A discontinuity point is optional; when set it maps to `AbsoluteSensorDiscontinuityPoint` in the CANcoder configuration.
+Pass a pointer to the `CANcoder` via `WithExternalEncoder(&cancoder)` in the `SmartMotorControllerConfig`. YAMS configures the TalonFX to fuse the CANcoder as the remote feedback source automatically. A wrapping range is optional; when set with `WithWrapping` or `WithContinuousWrapping`, its maximum, from 0 to 1 rotation, becomes the CANcoder's `AbsoluteSensorDiscontinuityPoint` (the same for a CANdi PWM input), and any other maximum throws `SmartMotorControllerConfigurationException`. Without one, the encoder keeps its own range. Only `WithContinuousWrapping` turns on `ClosedLoopGeneral.ContinuousWrap`.
 
 ```cpp
 ctre::phoenix6::hardware::CANcoder cancoder{9};
@@ -340,7 +340,7 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 
 **Telemetry and live tuning.** Both wrappers support every telemetry field. `TelemetryVerbosity::HIGH` together with `WithSubsystem(this)` registers the `Live Tuning` command automatically; see [SmartMotorController](smart-motor-controller.md#telemetry-and-live-tuning).
 
-**Alerts.** Both wrappers raise alerts in the `YAMS` group: `closed loop controller is running on the SystemCore` ([LQR](../math/lqr-controller.md) configured), `starting position is not applied because an external encoder is used`, `zero offset is not supported without an external encoder`, and `discontinuity point is not supported without an external encoder`.
+**Alerts.** Both wrappers raise alerts in the `YAMS` group: `closed loop controller is running on the SystemCore` ([LQR](../math/lqr-controller.md) configured), `starting position is not applied because an external encoder is used`, and `zero offset is not supported without an external encoder`.
 
 **No rotor offset.** `WithExternalEncoderZeroOffset` applies to the external encoder only. The TalonFX rotor is not offset; without an external encoder a zero offset raises the alert above.
 

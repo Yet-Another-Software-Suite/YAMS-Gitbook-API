@@ -166,7 +166,7 @@ SimSupplier* GetSimSupplier() const;
 
 ### Closed loop controller thread
 
-Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), an exponential profile on a SPARK, or any closed loop on a Thrifty Nova).
+Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), or an exponential profile on a SPARK or Thrifty Nova).
 
 ```cpp
 void StartClosedLoopController();
@@ -234,8 +234,6 @@ The wrappers raise WPILib alerts (`wpi::util::Alert`, group `YAMS`) for configur
 | `<name> closed loop controller is running on the SystemCore.`      | MEDIUM | TalonFX, TalonFXS, SPARK, Nova  |
 | Starting position is not applied because an external encoder is used | HIGH | TalonFX, TalonFXS               |
 | Zero offset is not supported without an external encoder           | HIGH   | TalonFX, TalonFXS               |
-| Discontinuity point is not supported without an external encoder   | HIGH   | TalonFX, TalonFXS               |
-| External encoder gearing is set together with a discontinuity point | HIGH  | SPARK                           |
 
 ***
 
@@ -257,7 +255,7 @@ Each wrapper (`SparkWrapper`, `NovaWrapper`, `TalonFXWrapper`, `TalonFXSWrapper`
 
 ### CANdi as external encoder (TalonFXWrapper / TalonFXSWrapper)
 
-A `CANdi` can be passed via `WithExternalEncoder(&candi)` for both `TalonFXWrapper` and `TalonFXSWrapper` (external encoders are passed as pointers). Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the sensor source to one of `SyncCANdiPWM1`, `RemoteCANdiPWM1`, `SyncCANdiPWM2` or `RemoteCANdiPWM2`; otherwise offset, inversion and discontinuity settings are not applied to either channel.
+A `CANdi` can be passed via `WithExternalEncoder(&candi)` for both `TalonFXWrapper` and `TalonFXSWrapper` (external encoders are passed as pointers). Because a CANdi has two PWM inputs (PWM1 and PWM2), YAMS cannot determine which port the encoder is wired to automatically. You must pass a vendor config that sets the sensor source to one of `SyncCANdiPWM1`, `RemoteCANdiPWM1`, `SyncCANdiPWM2` or `RemoteCANdiPWM2`; otherwise offset, inversion and wrapping settings are not applied to either channel.
 
 **TalonFXWrapper + CANdi:**
 

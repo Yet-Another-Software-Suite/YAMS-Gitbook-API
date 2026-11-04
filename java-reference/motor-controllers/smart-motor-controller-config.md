@@ -108,7 +108,8 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withSoftLimits(Distance low, Distance high)` | `low`, `high` | Sets soft limits in distance units. Requires `withMechanismCircumference`. |
 | `withExternalEncoderZeroOffset(Angle offset)` | `offset` | Applies a zero offset to the external encoder reading. Negative values are automatically wrapped. Read it back with `getExternalEncoderZeroOffset()` (formerly `getZeroOffset()`). |
 | `withExternalEncoderZeroOffset(Distance distance)` | `distance` | Zero offset in distance units. Requires `withMechanismCircumference`. |
-| `withContinuousWrapping(Angle min, Angle max)` | `min`, `max` | Enables continuous input for the closed loop controller. Incompatible with soft limits and distance-based mechanisms. Requires `withClosedLoopController` to be called first. |
+| `withWrapping(Angle min, Angle max)` | `min`, `max` | Sets the wrapping range: one rotation an absolute external encoder reads, such as `Rotations.of(-0.5)` to `Rotations.of(0.5)` or `Rotations.of(0)` to `Rotations.of(1)`. The closed loop does not wrap, so it never takes the mechanism the other way round. Can be combined with soft limits. See [Wrapping](#wrapping). |
+| `withContinuousWrapping(Angle min, Angle max)` | `min`, `max` | Sets the same wrapping range as `withWrapping`, and makes the closed loop take the shortest path to a setpoint, which can be the other way round. For a swerve azimuth or turret. Incompatible with soft limits (in either order) and distance-based mechanisms. Requires `withClosedLoopController` to be called first. See [Wrapping](#wrapping). |
 | `withClosedLoopTolerance(Angle tolerance)` | `tolerance` | Sets the position tolerance for the PID controller. |
 | `withClosedLoopTolerance(Distance tolerance)` | `tolerance` | Sets position tolerance in distance units. Requires `withLinearClosedLoopController(true)`. |
 | `withFeedbackSynchronizationThreshold(Angle angle)` | `angle` | Relative encoder is re-seeded from absolute encoder when drift exceeds this angle. Incompatible with distance-based mechanisms. |
@@ -146,7 +147,7 @@ SmartMotorControllerConfig(Mechanism mechanism)
 | `withProfile(ExponentialProfile.Constraints profile)` | `profile` | Sets an exponential profile from raw constraints. Clears any trapezoidal profile. |
 
 {% hint style="info" %}
-`withClosedLoopController` must be called before `withContinuousWrapping` or `withClosedLoopTolerance`. The PID controller must exist to configure those options.
+`withClosedLoopController` must be called before `withContinuousWrapping` or `withClosedLoopTolerance`. The PID controller must exist to configure those options. `withWrapping` does not need one.
 {% endhint %}
 
 ## Builder methods: Simulation overrides
@@ -175,8 +176,36 @@ These methods set values used only when running in simulation. If no sim-specifi
 | `withExternalEncoder(Object encoder)` | `encoder` | Attaches an external encoder. SPARK MAX/Flex: the SPARK's absolute encoder, the SPARK MAX alternate encoder, the SPARK Flex external encoder, or a REVLib `DetachedEncoder`. TalonFX/TalonFXS: a `CANcoder` or `CANdi`. Thrifty Nova: `FeedbackSensorType.ABS`, `FeedbackSensorType.QUAD` or a `CanEncoder` (see [NovaWrapper](nova-wrapper.md)). |
 | `withExternalEncoderGearing(MechanismGearing gearing)` | `gearing` | Gear ratio between the external encoder and the mechanism. |
 | `withExternalEncoderGearing(double reductionRatio)` | `reductionRatio` | Shorthand for a single reduction, e.g. `3` for 3:1 or `0.5` for 1:2. |
-| `withExternalEncoderDiscontinuityPoint(Angle discontinuity)` | `discontinuity` | Sets the absolute encoder wraparound point. Must be `Rotations.of(0.5)` or `Rotations.of(1.0)`. Required for `SparkAbsoluteEncoder`. Optional for `CANcoder`. |
 | `withUseExternalFeedbackEncoder(boolean use)` | `use` | When `true` (default), the external encoder is used as the PID feedback source. |
+
+## Wrapping
+
+`withWrapping(min, max)` and `withContinuousWrapping(min, max)` both set the range an absolute external encoder reads, one rotation from `min` up to `max`. Only `withContinuousWrapping` makes the closed loop wrap (PID continuous input, Talon `ClosedLoopGeneral.ContinuousWrap`, SPARK position wrapping, Nova `absWrapping`). Use `withWrapping` on an arm whose encoder must read across zero, and `withContinuousWrapping` on a mechanism that can turn all the way round.
+
+```java
+// Arm: the encoder reads [-0.5, 0.5) rotations, soft limits still apply
+.withWrapping(Rotations.of(-0.5), Rotations.of(0.5))
+.withSoftLimits(Degrees.of(-30), Degrees.of(100))
+
+// Turret or swerve azimuth: the closed loop takes the shortest path
+.withClosedLoopController(4, 0, 0)
+.withContinuousWrapping(Rotations.of(-0.5), Rotations.of(0.5))
+```
+
+Each vendor limits the range an absolute encoder can read; any other range throws `SmartMotorControllerConfigurationException` when the config is applied:
+
+| Encoder | Accepted wrapping range | Without wrapping |
+|---------|-------------------------|------------------|
+| `CANcoder`, `CANdi` PWM | A maximum from 0 to 1 rotation, sent as the encoder's `AbsoluteSensorDiscontinuityPoint`. | The encoder's own range. |
+| `SparkAbsoluteEncoder` | One rotation from [-1, 0) to [0, 1). REVLib's range offset is the middle of the range, `(min + max) / 2`. | [0, 1) |
+| REVLib `DetachedEncoder` | [-0.5, 0.5) (zero centered) or [0, 1). | [0, 1) |
+| Thrifty Nova `ABS` or `CanEncoder` | Any range when the SystemCore runs the closed loop. [0, 1) when the Nova closes its loop on the encoder. | [0, 1) |
+
+Getters: `getWrappingMax()` and `getWrappingMin()` (formerly `getContinuousWrapping()` and `getContinuousWrappingMin()`) return the range, or empty without wrapping. `isWrappingContinuous()` says whether the closed loop wraps, and throws `SmartMotorControllerConfigurationException` if continuous wrapping and soft limits are both set. `getContinuousWrappingSetpoint(setpoint, current)` returns the setpoint unchanged unless the wrapping is continuous.
+
+{% hint style="info" %}
+`withExternalEncoderDiscontinuityPoint` is removed. Replace `.withExternalEncoderDiscontinuityPoint(Rotations.of(0.5))` with `.withWrapping(Rotations.of(-0.5), Rotations.of(0.5))`, and `Rotations.of(1)` with `.withWrapping(Rotations.of(0), Rotations.of(1))`.
+{% endhint %}
 
 ## Builder methods: Simulation model
 

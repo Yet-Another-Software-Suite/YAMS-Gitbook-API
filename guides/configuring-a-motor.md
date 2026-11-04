@@ -190,7 +190,7 @@ Arm arm = new Arm(armConfig, motor);
 ## Notes
 
 {% hint style="info" %}
-If you are using a SPARK MAX with an **absolute encoder**, you should call `.withExternalEncoderDiscontinuityPoint(angle)` on the config to set the wrap point (`Rotations.of(0.5)` for a [-0.5, 0.5] rotation range, `Rotations.of(1)` for [0, 1]). Without it, the encoder will report a discontinuity at 0/360 degrees and the closed loop controller will behave erratically near that boundary.
+If you are using an **absolute encoder** and the mechanism works across the point where its reading wraps, call `.withWrapping(min, max)` on the config to set the range it reads (`Rotations.of(-0.5), Rotations.of(0.5)` for [-0.5, 0.5), `Rotations.of(0), Rotations.of(1)` for [0, 1)). Without it, a SPARK or Nova absolute encoder reads [0, 1) and jumps from 1 to 0 rotations at that boundary. For a mechanism that turns all the way round, such as a turret, use `.withContinuousWrapping(min, max)` so the closed loop also takes the shortest path. See [Wrapping](../java-reference/motor-controllers/smart-motor-controller-config.md#wrapping).
 {% endhint %}
 
 {% hint style="info" %}

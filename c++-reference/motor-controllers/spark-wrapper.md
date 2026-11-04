@@ -76,13 +76,13 @@ Pass a pointer to the encoder with `WithExternalEncoder(...)`:
 
 | Encoder type                                                                   | Notes                                                                    |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `rev::spark::SparkAbsoluteEncoder*`                                            | Absolute encoder on the SPARK data port. Supports zero offset and discontinuity point. |
-| `rev::spark::SparkMaxAlternateEncoder*` / `rev::spark::SparkFlexExternalEncoder*` | Quadrature encoder. Zero offset and discontinuity point are not available and throw a `SmartMotorControllerConfigurationException`. |
+| `rev::spark::SparkAbsoluteEncoder*`                                            | Absolute encoder on the SPARK data port. Supports zero offset and a wrapping range. |
+| `rev::spark::SparkMaxAlternateEncoder*` / `rev::spark::SparkFlexExternalEncoder*` | Quadrature encoder. Zero offset is not available and throws a `SmartMotorControllerConfigurationException`. |
 | `rev::detached::DetachedEncoder*` / `rev::detached::SplineEncoder*`            | Encoder read over CAN.                                                   |
 
-The external encoder discontinuity point (absolute and detached encoders) accepts 0.5 rotations, which reports `[-0.5, 0.5)`, or 1 rotation (the default), which reports `[0, 1)`.
+An absolute or detached encoder reads `[0, 1)` unless a wrapping range is set with `WithWrapping(min, max)` or `WithContinuousWrapping(min, max)`. The SPARK absolute encoder accepts any one rotation from `[-1, 0)` to `[0, 1)`, sent as REVLib's range offset, the middle of the range `(min + max) / 2`. A detached encoder accepts `[-0.5, 0.5)` (zero centered) or `[0, 1)`. Any other range throws `SmartMotorControllerConfigurationException`. Whenever wrapping is set, the SPARK's `positionWrappingInputRange` is the wrapping range; `positionWrappingEnabled` is only turned on by `WithContinuousWrapping`.
 
-`WithExternalEncoderZeroOffset`, `WithExternalEncoderDiscontinuityPoint`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
+`WithExternalEncoderZeroOffset`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
 
 ***
 
@@ -105,7 +105,6 @@ Alerts are published in the `YAMS` alert group and cleared when the wrapper is d
 | Alert                                                                                                   | When                                                                                 |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | `<name> closed loop controller is running on the SystemCore.`                                           | An exponential profile or [LQR](../math/lqr-controller.md) is configured, so the loop runs on the SystemCore.     |
-| `<name> external encoder gearing set while ExternalEncoderDiscontinuityPoint is also set; ...`          | External encoder gearing and a discontinuity point are both configured. The discontinuity point is not moved by the gearing, so wrapping is non-uniform. |
 
 ***
 

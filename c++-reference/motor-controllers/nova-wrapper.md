@@ -34,9 +34,24 @@ A vendor config passed with `WithVendorConfig` must be a `thrifty::NovaConfigBat
 
 ### Closed loop control
 
-The closed loop controller always runs on the SystemCore and commands the Nova with voltage, the same way the profiled controllers of the other wrappers do. ThriftyLib's simulation ignores the Nova's onboard PID gains, so running the loop on the SystemCore keeps simulation and the real robot the same. PID, feedforward, trapezoidal and exponential profiles, and [LQR](../math/lqr-controller.md) are all evaluated by YAMS.
+Where the closed loop runs depends on the controller (ThriftyLib 2027.0.0-alpha-6):
 
-In closed loop mode the wrapper starts the closed loop notifier and raises an alert (see [Alerts](#alerts)). Set the loop period with `WithClosedLoopControlPeriod(...)` (default 20 ms); it is only valid in closed loop mode.
+| Controller                                                                                 | Where it runs                                                                                                   |
+| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| PID, with or without a trapezoidal position profile                                        | On the Nova: its `Pid0`/`Pid1` slots, and its `Mp0`/`Mp1` motion profile with the feedforward's kS, kV, kA and kG (cosine gravity for an arm feedforward). |
+| [LQR](../math/lqr-controller.md), exponential profile or velocity trapezoidal profile      | On the SystemCore. YAMS runs the loop in a notifier, commands the Nova with voltage, and raises an alert (see [Alerts](#alerts)). |
+
+When the Nova runs the loop, YAMS sends it a sensor-to-mechanism ratio, so targets, gains and soft limits are in mechanism rotations. kI and kD are sent as configured (per second), the closed loop tolerance is the slot's allowable error, the mechanism limits become the Nova's soft limits, and live setters update the Nova. `ApplyConfig` throws `SmartMotorControllerConfigurationException` for:
+
+| Option                                                                                                                   | Why                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| A feedforward without `WithTrapezoidProfile(...)`                                                                        | The Nova applies a feedforward only in its motion profile, which is for position only. For velocity control with a feedforward, use a velocity trapezoidal profile, which runs on the SystemCore. |
+| `SLOT_2` or `SLOT_3`                                                                                                     | The Nova has two closed loop slots.                                                                     |
+| Only one mechanism limit                                                                                                 | The Nova's soft limits need both an upper and a lower limit.                                            |
+| `WithTemperatureCutoff`, `WithClosedLoopControllerMaximumVoltage`, `WithFeedbackSynchronizationThreshold`, `WithClosedLoopControlPeriod` | Only the SystemCore's closed loop applies them.                                                         |
+| An absolute encoder closing the loop with wrapping other than `[0, 1)`                                                   | The Nova reads an absolute encoder closing its loop over `[0, 1)`. `WithContinuousWrapping` also needs that encoder on the mechanism (1:1 external encoder gearing). |
+
+`WithClosedLoopControlPeriod(...)` (default 20 ms) sets the SystemCore's loop period; it is only valid in closed loop mode.
 
 ### Encoder reads
 
@@ -71,9 +86,9 @@ Pass one of the following to `WithExternalEncoder(...)`:
 
 Any other value throws `std::invalid_argument`.
 
-The external encoder discontinuity point (absolute and CAN encoders) accepts 0.5 rotations, which reports `[-0.5, 0.5)`, or 1 rotation (the default), which reports `[0, 1)`. Zero offset and discontinuity point are only available for absolute encoders and throw a `SmartMotorControllerConfigurationException` for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
+An absolute or CAN encoder reads `[0, 1)` unless a wrapping range is set with `WithWrapping(min, max)`, such as `WithWrapping(-0.5_tr, 0.5_tr)`. Any range works when the SystemCore runs the closed loop, but only `[0, 1)` when the Nova closes its loop on the encoder. Only `WithContinuousWrapping` turns on the Nova's `AbsWrapping`. Zero offset is only available for absolute encoders and throws a `SmartMotorControllerConfigurationException` for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
 
-`WithExternalEncoderZeroOffset`, `WithExternalEncoderDiscontinuityPoint`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
+`WithExternalEncoderZeroOffset`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
 
 When no starting position is configured and an absolute or CAN encoder is attached, the internal encoder is seeded from it when the config is applied.
 
@@ -87,7 +102,7 @@ When no starting position is configured and an absolute or CAN encoder is attach
 
 ## Simulation
 
-In simulation the wrapper creates a DC motor simulation from the motor model, the configured MOI and the motor gearing, and reports its current draw to [`BatterySim`](../sensor/battery-sim.md) every loop. `SimIterate()` also steps ThriftyLib's own simulation for the Nova and any attached `thrifty::CanEncoder`. Set a realistic moment of inertia with `SmartMotorControllerConfig::WithMOI(...)` for realistic current draw.
+In simulation the wrapper creates a DC motor simulation from the motor model, the configured MOI and the motor gearing, and reports its current draw to [`BatterySim`](../sensor/battery-sim.md) every loop. `SimIterate()` also steps ThriftyLib's own simulation for the Nova and any attached `thrifty::CanEncoder`. ThriftyLib's simulation ignores the Nova's PID, so a `NovaSimSupplier` runs the Nova's closed loop in simulation. `SetSimSupplier` also makes a ThriftyLib `MotorSim` from the sim supplier, which drives a `thrifty::CanEncoder` (through `CanEncoderConfig::SimMotor`) and the Nova's data port encoders in simulation. Set a realistic moment of inertia with `SmartMotorControllerConfig::WithMOI(...)` for realistic current draw.
 
 ***
 
@@ -97,7 +112,7 @@ Alerts are published in the `YAMS` alert group and cleared when the wrapper is d
 
 | Alert                                                          | When                                                                 |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `<name> closed loop controller is running on the SystemCore.`  | The config uses closed loop mode, which on a Nova always runs on the SystemCore. |
+| `<name> closed loop controller is running on the SystemCore.`  | An [LQR](../math/lqr-controller.md), exponential profile or velocity trapezoidal profile is configured in closed loop mode, so the loop runs on the SystemCore. |
 
 ***
 

@@ -120,7 +120,8 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 | `WithClosedLoopRampRate(wpi::units::second_t rampRate)`                  | Output ramp time for closed loop                                     |
 | `WithMotorInverted(bool inverted)`                                       | Invert motor direction                                               |
 | `WithEncoderInverted(bool inverted)`                                     | Invert encoder direction                                             |
-| `WithContinuousWrapping(wpi::units::turn_t min, wpi::units::turn_t max)` | Enable continuous input for wrapping mechanisms                      |
+| `WithWrapping(wpi::units::turn_t min, wpi::units::turn_t max)`           | Wrapping range an absolute external encoder reads, one rotation such as `-0.5_tr` to `0.5_tr`; the closed loop does not wrap. Works with soft limits |
+| `WithContinuousWrapping(wpi::units::turn_t min, wpi::units::turn_t max)` | The same wrapping range, and the closed loop takes the shortest path. Cannot be combined with soft limits |
 
 ***
 
@@ -136,7 +137,6 @@ See [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-confi
 | `WithExternalEncoderZeroOffset(wpi::units::meter_t zeroOffset)`                | Zero offset as a distance (needs a circumference)              |
 | `WithExternalEncoderGearing(const gearing::MechanismGearing& gearing)`         | Gearing between the external encoder and the mechanism         |
 | `WithExternalEncoderGearing(double reductionRatio)`                            | Same, as a number                                              |
-| `WithExternalEncoderDiscontinuityPoint(wpi::units::turn_t discontinuityPoint)` | Wrap point, exactly `0.5_tr` (reads \[-0.5, 0.5)) or `1_tr` (reads \[0, 1)) |
 
 The zero offset is read back with `GetExternalEncoderZeroOffset()`.
 
@@ -147,6 +147,17 @@ Accepted external encoder types per wrapper:
 | `TalonFXWrapper`, `TalonFXSWrapper` | `ctre::phoenix6::hardware::CANcoder*`, `ctre::phoenix6::hardware::CANdi*` (CANdi needs a vendor config, see [TalonFXWrapper](talonfx-wrapper.md#candi))              |
 | `SparkWrapper`                      | `rev::spark::SparkAbsoluteEncoder*`, `rev::spark::SparkMaxAlternateEncoder*`, `rev::spark::SparkFlexExternalEncoder*`, `rev::detached::DetachedEncoder*`, `rev::detached::SplineEncoder*` |
 | `NovaWrapper`                       | `thrifty::Motor::FeedbackSensorType::ABS`, `thrifty::Motor::FeedbackSensorType::QUAD`, `thrifty::CanEncoder*`                                                       |
+
+The range an absolute external encoder reads is set by `WithWrapping(min, max)` or `WithContinuousWrapping(min, max)` (listed above). Each vendor limits it, and any other range throws `SmartMotorControllerConfigurationException`:
+
+| Encoder                       | Accepted wrapping range                                                                                   | Without wrapping   |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------ |
+| CANcoder, CANdi PWM           | A maximum from 0 to 1 rotation, sent as the encoder's `AbsoluteSensorDiscontinuityPoint`                  | The encoder's own range |
+| `SparkAbsoluteEncoder`        | One rotation from \[-1, 0) to \[0, 1); REVLib's range offset is the middle, `(min + max) / 2`           | \[0, 1)           |
+| `DetachedEncoder`             | \[-0.5, 0.5) (zero centered) or \[0, 1)                                                                 | \[0, 1)           |
+| Nova `ABS` or `CanEncoder`    | Any range when the SystemCore runs the closed loop; \[0, 1) when the Nova closes its loop on the encoder | \[0, 1)           |
+
+Only continuous wrapping makes the closed loop wrap: PID continuous input, Talon `ClosedLoopGeneral.ContinuousWrap`, SPARK position wrapping or Nova `AbsWrapping`. `WithExternalEncoderDiscontinuityPoint` is removed; use `WithWrapping(-0.5_tr, 0.5_tr)` in place of `0.5_tr`, and `WithWrapping(0_tr, 1_tr)` in place of `1_tr`.
 
 ***
 
@@ -205,7 +216,7 @@ Follower types: `ctre::phoenix6::hardware::TalonFX*` or `TalonFXS*` (CTRE wrappe
 
 ## Getters
 
-Every option has a getter, for example `GetKp(slot)`, `GetSlotGains(slot)`, `GetMotorGearing()`, `GetMechanismCircumference()`, `GetMechanismLowerLimit()`, `GetStartingPosition()`, `GetExternalEncoderZeroOffset()`, `GetExternalEncoderDiscontinuityPoint()`, `GetTelemetryName()`, `GetVerbosity()`, `GetSubsystem()` and `GetMOI()`. Unset options return an empty `std::optional`. The unit helpers `ConvertFromMechanism(...)`, `ConvertToMechanism(...)`, `ConvertToVoltage(motor, force)` and `ConvertToCurrent(motor, force)` convert between mechanism rotations, distances and feedforward forces.
+Every option has a getter, for example `GetKp(slot)`, `GetSlotGains(slot)`, `GetMotorGearing()`, `GetMechanismCircumference()`, `GetMechanismLowerLimit()`, `GetStartingPosition()`, `GetExternalEncoderZeroOffset()`, `GetWrappingMax()`, `GetWrappingMin()`, `GetTelemetryName()`, `GetVerbosity()`, `GetSubsystem()` and `GetMOI()`. Unset options return an empty `std::optional`. `IsWrappingContinuous()` is whether the closed loop wraps, and throws `SmartMotorControllerConfigurationException` if continuous wrapping and soft limits are both set; `GetContinuousWrappingSetpoint(...)` returns the setpoint unchanged unless the wrapping is continuous. The unit helpers `ConvertFromMechanism(...)`, `ConvertToMechanism(...)`, `ConvertToVoltage(motor, force)` and `ConvertToCurrent(motor, force)` convert between mechanism rotations, distances and feedforward forces.
 
 ***
 

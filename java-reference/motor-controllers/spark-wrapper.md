@@ -28,7 +28,7 @@ SmartMotorControllerConfig config = new SmartMotorControllerConfig(this)
     .withMotorInverted(false)
     .withStatorCurrentLimit(Amps.of(40))
     .withClosedLoopController(0.2, 0.0, 0.0)
-    .withExternalEncoderDiscontinuityPoint(Rotations.of(0.5)); // required for SparkAbsoluteEncoder
+    .withWrapping(Rotations.of(-0.5), Rotations.of(0.5)); // the absolute encoder reads [-0.5, 0.5)
 
 SmartMotorController motor = new SparkWrapper(
     new SparkMax(CANPort.CAN_S0, 3, MotorType.kBrushless),
@@ -39,13 +39,15 @@ SmartMotorController motor = new SparkWrapper(
 
 ## SPARK-specific notes
 
-**Absolute encoder discontinuity point.** When using a `SparkAbsoluteEncoder` as the external encoder, `withExternalEncoderDiscontinuityPoint` must be called in the config:
+**Absolute encoder wrapping range.** Set where an absolute external encoder's reading wraps with `withWrapping(min, max)`, or `withContinuousWrapping(min, max)` to also have the closed loop take the shortest path (see [Wrapping](smart-motor-controller-config.md#wrapping)). Without either, the encoder reads `[0, 1)`.
 
-* `Rotations.of(0.5)`: sensor range is `[-0.5, 0.5)`. Use when the mechanism zero is in the middle of the encoder range.
-* `Rotations.of(1.0)`: sensor range is `[0, 1)`. Use when the full rotation is the intended range.
+* `SparkAbsoluteEncoder`: any one rotation from `[-1, 0)` to `[0, 1)`, such as `Rotations.of(-0.5)` to `Rotations.of(0.5)`. YAMS sets REVLib's range offset to the middle of the range, `(min + max) / 2`.
+* `DetachedEncoder`: `[-0.5, 0.5)` (zero centered) or `[0, 1)`.
+
+Any other range throws `SmartMotorControllerConfigurationException`. Whenever wrapping is set, the SPARK's `positionWrappingInputRange` is the wrapping range; `positionWrappingEnabled` is only turned on by `withContinuousWrapping`.
 
 {% hint style="info" %}
-It is recommended to call `withExternalEncoderDiscontinuityPoint` when using a `SparkAbsoluteEncoder`. Without it, the encoder reports incorrect positions near the wraparound point.
+Set the wrapping range when the mechanism must read across the point where `[0, 1)` wraps, such as an arm that works on both sides of zero. Without it, the encoder jumps from 1 to 0 rotations there.
 {% endhint %}
 
 **Supported external encoders.** The SPARK's absolute encoder (`SparkAbsoluteEncoder`), the SPARK MAX alternate encoder, the SPARK Flex external encoder (quadrature, counts per revolution from the vendor config), or an encoder the SPARK reads over CAN (a REVLib `DetachedEncoder`).
