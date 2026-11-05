@@ -166,6 +166,7 @@ m_motor.emplace(&m_sparkFlex, wpi::math::DCMotor::NeoVortex(1), &m_motorConfig);
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper / TalonFXSWrapper](talonfx-wrapper.md)
 * [BatterySim](../sensor/battery-sim.md)
 * [Java SparkWrapper](../../java-reference/motor-controllers/spark-wrapper.md)

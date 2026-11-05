@@ -3,7 +3,7 @@
 **Namespace:** `yams::motorcontrollers`\
 **Header:** `#include <yams/motorcontrollers/SmartMotorController.hpp>`
 
-`SmartMotorController` is the abstract base class for all motor controller implementations. Do not instantiate this class directly. Construct concrete instances using vendor-specific subclass constructors such as [`SparkWrapper`](spark-wrapper.md), [`NovaWrapper`](nova-wrapper.md), [`TalonFXWrapper` or `TalonFXSWrapper`](talonfx-wrapper.md).
+`SmartMotorController` is the abstract base class for all motor controller implementations. Do not instantiate this class directly. Construct concrete instances using vendor-specific subclass constructors such as [`SparkWrapper`](spark-wrapper.md), [`NovaWrapper`](nova-wrapper.md), [`A301Wrapper`](a301-wrapper.md), [`TalonFXWrapper` or `TalonFXSWrapper`](talonfx-wrapper.md).
 
 All quantities use the WPILib 2027 C++ units library in the `wpi::units` namespace (for example `wpi::units::turn_t`), and motor models use `wpi::math::DCMotor`.
 
@@ -166,7 +166,7 @@ SimSupplier* GetSimSupplier() const;
 
 ### Closed loop controller thread
 
-Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), or an exponential profile on a SPARK or Thrifty Nova).
+Used when the closed loop runs on the SystemCore instead of inside the motor controller (for example an [LQR](../math/lqr-controller.md), an exponential profile on a SPARK or Thrifty Nova, or any closed loop on an [A301](a301-wrapper.md)).
 
 ```cpp
 void StartClosedLoopController();
@@ -178,6 +178,8 @@ math::LQRController* GetLQRController();
 ```
 
 `StartClosedLoopController()` only starts a stopped closed loop, from where the mechanism is now, and the loosely coupled followers'. One that is already running carries on, so calling it every loop is safe. The mechanism classes' position and velocity setpoints call it for you, and their voltage and duty cycle setpoints call `StopClosedLoopController()`.
+
+While the robot is disabled, `IterateClosedLoopController()` sends no voltage. It follows the mechanism instead, resetting its PID, motion profile and LQR to where the mechanism is, so enabling starts from there rather than from where the mechanism was. Without a setpoint, the motion profile also follows the mechanism, so the next setpoint is profiled from where it is.
 
 `IsClosedLoopControllerStopped()` is whether a closed loop run on the SystemCore was stopped, and is `false` when the closed loop runs on the motor controller. `GetLQRController()` returns the [LQR](../math/lqr-controller.md) this motor controller runs, which live tuning retunes, or `nullptr` without one.
 
@@ -231,7 +233,7 @@ The wrappers raise WPILib alerts (`wpi::util::Alert`, group `YAMS`) for configur
 
 | Alert                                                              | Level  | Wrappers                        |
 | ------------------------------------------------------------------ | ------ | ------------------------------- |
-| `<name> closed loop controller is running on the SystemCore.`      | MEDIUM | TalonFX, TalonFXS, SPARK, Nova  |
+| `<name> closed loop controller is running on the SystemCore.`      | MEDIUM | TalonFX, TalonFXS, SPARK, Nova, A301 |
 | Starting position is not applied because an external encoder is used | HIGH | TalonFX, TalonFXS               |
 | Zero offset is not supported without an external encoder           | HIGH   | TalonFX, TalonFXS               |
 
@@ -247,7 +249,9 @@ The wrappers raise WPILib alerts (`wpi::util::Alert`, group `YAMS`) for configur
 | `simulation::ArmSimSupplier`      | `yams/motorcontrollers/simulation/ArmSimSupplier.hpp`      | Single-jointed arm physics |
 | `simulation::ElevatorSimSupplier` | `yams/motorcontrollers/simulation/ElevatorSimSupplier.hpp` | Linear elevator physics    |
 
-Each wrapper (`SparkWrapper`, `NovaWrapper`, `TalonFXWrapper`, `TalonFXSWrapper`) reports its simulated current draw into [`BatterySim`](../sensor/battery-sim.md) every loop, using its own instance address as a stable identity. `BatterySim` combines the draw of every registered mechanism into one shared, loaded battery voltage, which the mechanisms write with `wpi::sim::RoboRioSim::SetVInVoltage(...)`.
+While the robot is disabled, these three apply 0 V to the simulated motor on every step, so a mechanism falls or coasts as an unpowered one would, instead of holding its last voltage.
+
+Each wrapper (`SparkWrapper`, `NovaWrapper`, `A301Wrapper`, `TalonFXWrapper`, `TalonFXSWrapper`) reports its simulated current draw into [`BatterySim`](../sensor/battery-sim.md) every loop, using its own instance address as a stable identity. `BatterySim` combines the draw of every registered mechanism into one shared, loaded battery voltage, which the mechanisms write with `wpi::sim::RoboRioSim::SetVInVoltage(...)`.
 
 ***
 
@@ -308,6 +312,7 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 * [SmartMotorControllerTelemetryConfig](smart-motor-controller-telemetry-config.md)
 * [SparkWrapper](spark-wrapper.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper / TalonFXSWrapper](talonfx-wrapper.md)
 * [BatterySim](../sensor/battery-sim.md)
 * [Java SmartMotorController](../../java-reference/motor-controllers/smart-motor-controller.md)

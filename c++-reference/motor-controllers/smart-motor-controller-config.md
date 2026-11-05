@@ -147,6 +147,7 @@ Accepted external encoder types per wrapper:
 | `TalonFXWrapper`, `TalonFXSWrapper` | `ctre::phoenix6::hardware::CANcoder*`, `ctre::phoenix6::hardware::CANdi*` (CANdi needs a vendor config, see [TalonFXWrapper](talonfx-wrapper.md#candi))              |
 | `SparkWrapper`                      | `rev::spark::SparkAbsoluteEncoder*`, `rev::spark::SparkMaxAlternateEncoder*`, `rev::spark::SparkFlexExternalEncoder*`, `rev::detached::DetachedEncoder*`, `rev::detached::SplineEncoder*` |
 | `NovaWrapper`                       | `thrifty::Motor::FeedbackSensorType::ABS`, `thrifty::Motor::FeedbackSensorType::QUAD`, `thrifty::CanEncoder*`                                                       |
+| `A301Wrapper`                       | The wrapper's own `first::a301::A301*`, for its absolute encoder (see [A301Wrapper](a301-wrapper.md#external-encoders))                                            |
 
 The range an absolute external encoder reads is set by `WithWrapping(min, max)` or `WithContinuousWrapping(min, max)` (listed above). Each vendor limits it, and any other range throws `SmartMotorControllerConfigurationException`:
 
@@ -156,6 +157,7 @@ The range an absolute external encoder reads is set by `WithWrapping(min, max)` 
 | `SparkAbsoluteEncoder`        | One rotation from \[-1, 0) to \[0, 1); REVLib's range offset is the middle, `(min + max) / 2`           | \[0, 1)           |
 | `DetachedEncoder`             | \[-0.5, 0.5) (zero centered) or \[0, 1)                                                                 | \[0, 1)           |
 | Nova `ABS` or `CanEncoder`    | Any range when the SystemCore runs the closed loop; \[0, 1) when the Nova closes its loop on the encoder | \[0, 1)           |
+| A301 absolute encoder         | Any range, applied by the wrapper                                                                         | \[0, 1)           |
 
 Only continuous wrapping makes the closed loop wrap: PID continuous input, Talon `ClosedLoopGeneral.ContinuousWrap`, SPARK position wrapping or Nova `AbsWrapping`. `WithExternalEncoderDiscontinuityPoint` is removed; use `WithWrapping(-0.5_tr, 0.5_tr)` in place of `0.5_tr`, and `WithWrapping(0_tr, 1_tr)` in place of `1_tr`.
 
@@ -208,9 +210,9 @@ Live tuning is registered automatically at `TelemetryVerbosity::HIGH` when a sub
 | `ClearFollowers()`                                                          | Remove the tightly coupled followers                         |
 | `Clone() const`                                                             | Returns a deep copy of this config                           |
 
-Vendor config types: `ctre::phoenix6::configs::TalonFXConfiguration` (TalonFX), `ctre::phoenix6::configs::TalonFXSConfiguration` (TalonFXS), `rev::spark::SparkMaxConfig` / `rev::spark::SparkFlexConfig` (SPARK), `thrifty::NovaConfigBatch` (Nova).
+Vendor config types: `ctre::phoenix6::configs::TalonFXConfiguration` (TalonFX), `ctre::phoenix6::configs::TalonFXSConfiguration` (TalonFXS), `rev::spark::SparkMaxConfig` / `rev::spark::SparkFlexConfig` (SPARK), `thrifty::NovaConfigBatch` (Nova). The A301 has no vendor config.
 
-Follower types: `ctre::phoenix6::hardware::TalonFX*` or `TalonFXS*` (CTRE wrappers), `rev::spark::SparkMax*` or `rev::spark::SparkFlex*` (SparkWrapper), `thrifty::Nova*` (NovaWrapper).
+Follower types: `ctre::phoenix6::hardware::TalonFX*` or `TalonFXS*` (CTRE wrappers), `rev::spark::SparkMax*` or `rev::spark::SparkFlex*` (SparkWrapper), `thrifty::Nova*` (NovaWrapper). The A301 has no follower mode; use `WithLooselyCoupledFollowers`.
 
 ***
 

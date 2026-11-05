@@ -97,4 +97,5 @@ Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOff
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper](talonfx-wrapper.md)

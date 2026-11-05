@@ -354,4 +354,5 @@ m_smc.emplace(&m_talonFXS, wpi::math::DCMotor::NEO(1),
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [Java TalonFXWrapper / TalonFXSWrapper](../../java-reference/motor-controllers/talonfx-wrapper.md)

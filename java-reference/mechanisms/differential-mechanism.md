@@ -122,7 +122,7 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 |--------|---------|-------------|
 | `simIterate()` | `void` | Advances mechanism physics simulation one loop and updates the visualization; call in `simulationPeriodic()` |
 | `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
-| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
+| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`), and logs the Mechanism2d again so it moves in the Sim GUI and dashboards |
 | `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
 | `getPose3d()` | `Pose3d` | The mechanism's axis, tilted, then twisted about its own length, relative to the robot, from its [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `getName()` | `String` | The mechanism telemetry name |

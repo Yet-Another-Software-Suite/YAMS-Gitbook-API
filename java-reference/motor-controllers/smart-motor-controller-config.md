@@ -173,7 +173,7 @@ These methods set values used only when running in simulation. If no sim-specifi
 
 | Method | Parameters | Description |
 |--------|-----------|-------------|
-| `withExternalEncoder(Object encoder)` | `encoder` | Attaches an external encoder. SPARK MAX/Flex: the SPARK's absolute encoder, the SPARK MAX alternate encoder, the SPARK Flex external encoder, or a REVLib `DetachedEncoder`. TalonFX/TalonFXS: a `CANcoder` or `CANdi`. Thrifty Nova: `FeedbackSensorType.ABS`, `FeedbackSensorType.QUAD` or a `CanEncoder` (see [NovaWrapper](nova-wrapper.md)). |
+| `withExternalEncoder(Object encoder)` | `encoder` | Attaches an external encoder. SPARK MAX/Flex: the SPARK's absolute encoder, the SPARK MAX alternate encoder, the SPARK Flex external encoder, or a REVLib `DetachedEncoder`. TalonFX/TalonFXS: a `CANcoder` or `CANdi`. Thrifty Nova: `FeedbackSensorType.ABS`, `FeedbackSensorType.QUAD` or a `CanEncoder` (see [NovaWrapper](nova-wrapper.md)). FIRST A301: the `A301` itself, for its absolute encoder (see [A301Wrapper](a301-wrapper.md)). |
 | `withExternalEncoderGearing(MechanismGearing gearing)` | `gearing` | Gear ratio between the external encoder and the mechanism. |
 | `withExternalEncoderGearing(double reductionRatio)` | `reductionRatio` | Shorthand for a single reduction, e.g. `3` for 3:1 or `0.5` for 1:2. |
 | `withUseExternalFeedbackEncoder(boolean use)` | `use` | When `true` (default), the external encoder is used as the PID feedback source. |
@@ -200,6 +200,7 @@ Each vendor limits the range an absolute encoder can read; any other range throw
 | `SparkAbsoluteEncoder` | One rotation from [-1, 0) to [0, 1). REVLib's range offset is the middle of the range, `(min + max) / 2`. | [0, 1) |
 | REVLib `DetachedEncoder` | [-0.5, 0.5) (zero centered) or [0, 1). | [0, 1) |
 | Thrifty Nova `ABS` or `CanEncoder` | Any range when the SystemCore runs the closed loop. [0, 1) when the Nova closes its loop on the encoder. | [0, 1) |
+| FIRST A301 absolute encoder | Any range, applied by the wrapper. | [0, 1) |
 
 Getters: `getWrappingMax()` and `getWrappingMin()` (formerly `getContinuousWrapping()` and `getContinuousWrappingMin()`) return the range, or empty without wrapping. `isWrappingContinuous()` says whether the closed loop wraps, and throws `SmartMotorControllerConfigurationException` if continuous wrapping and soft limits are both set. `getContinuousWrappingSetpoint(setpoint, current)` returns the setpoint unchanged unless the wrapping is continuous.
 
@@ -249,4 +250,5 @@ Both methods throw `SmartMotorControllerConfigurationException` if no mechanism 
 - [SmartMotorController](smart-motor-controller.md)
 - [SparkWrapper](spark-wrapper.md)
 - [NovaWrapper](nova-wrapper.md)
+- [A301Wrapper](a301-wrapper.md)
 - [TalonFXWrapper](talonfx-wrapper.md)

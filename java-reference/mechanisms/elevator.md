@@ -176,7 +176,7 @@ public Command hold(Distance height)
 | `getName()`                      | `String`               | The elevator telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the elevator physics simulation by one loop and updates the visualization |
 | `updateTelemetry()`              | `void`                 | Publishes current state to NetworkTables                                           |
-| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current height and setpoint               |
+| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current height and setpoint, and logs the Mechanism2d again so it moves in the Sim GUI and dashboards |
 
 `simIterate()` uses `ElevatorSim` internally, with the drum radius derived from the `SmartMotorControllerConfig` mechanism circumference. Gravity is simulated unless `ElevatorConfig.withHorizontalElevator()` is set.
 

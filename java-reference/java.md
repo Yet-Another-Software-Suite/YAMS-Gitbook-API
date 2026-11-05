@@ -19,8 +19,8 @@ Install exactly one YAMS vendordep: `https://cdn.yassrobotics.com/yams_commands2
 | `yams.core.mechanisms.config` | ArmConfig, ElevatorConfig, PivotConfig, FlyWheelConfig, DifferentialMechanismConfig, SensorConfig, SwerveModuleConfig |
 | `yams.core.mechanisms.config.enums` | GyroAxis |
 | `yams.core.mechanisms.swerve` | SwerveModule |
-| `yams.core.motorcontrollers` | SmartMotorController |
-| `yams.core.motorcontrollers.local` | SparkWrapper, NovaWrapper |
+| `yams.core.motorcontrollers` | SmartMotorController, YMotors |
+| `yams.core.motorcontrollers.local` | SparkWrapper, NovaWrapper, A301Wrapper |
 | `yams.core.motorcontrollers.remote` | TalonFXWrapper, TalonFXSWrapper |
 | `yams.core.motorcontrollers.enums` | ControlMode, MotorMode |
 | `yams.core.motorcontrollers.simulation` | Sensor, SensorData, BatterySim |

@@ -83,7 +83,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 | `GetMotor`                     | `motorcontrollers::SmartMotorController* GetMotor()`      | Returns the underlying motor controller pointer              |
 | `SimIterate`                   | `void SimIterate() override`                              | Advances flywheel physics simulation one loop iteration      |
 | `UpdateTelemetry`              | `void UpdateTelemetry() override`                         | Publishes current state to NetworkTables                     |
-| `VisualizationUpdate`          | `void VisualizationUpdate() override` | Syncs Mechanism2d with the current state |
+| `VisualizationUpdate`          | `void VisualizationUpdate() override` | Syncs Mechanism2d with the current state, and publishes the Mechanism2d window again (protected `SmartMechanism::PublishMechanismWindow()`) so it moves in the Sim GUI and dashboards |
 | `GetMechanismLigament`         | `wpi::MechanismLigament2d* GetMechanismLigament()` | The Mechanism2d visualization ligament |
 | `GetMechanismRoot`             | `wpi::MechanismRoot2d* GetMechanismRoot()` | The Mechanism2d visualization root |
 | `GetName`                      | `std::string GetName() const override`                    | Returns the mechanism name                                   |

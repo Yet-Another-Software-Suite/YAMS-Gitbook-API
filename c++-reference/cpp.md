@@ -10,7 +10,7 @@ YAMS C++ targets WPILib 2027, where the WPILib C++ types live in the `wpi::` nam
 
 **Headers**
 
-Every class has its own header under `yams/` that matches its namespace, for example `#include <yams/mechanisms/positional/Arm.hpp>` or `#include <yams/motorcontrollers/local/SparkWrapper.hpp>`. The convenience header `#include <yams/YAMS.hpp>` pulls in the gearing, math, units, mechanism, swerve, telemetry and exception headers, but not the vendor-specific motor controller wrappers (`SparkWrapper`, `NovaWrapper`, `TalonFXWrapper`, `TalonFXSWrapper`), `EasyCRT`, or the simulation `Sensor` / `BatterySim` headers; include those directly.
+Every class has its own header under `yams/` that matches its namespace, for example `#include <yams/mechanisms/positional/Arm.hpp>` or `#include <yams/motorcontrollers/local/SparkWrapper.hpp>`. The convenience header `#include <yams/YAMS.hpp>` pulls in the gearing, math, units, mechanism, swerve, telemetry and exception headers, but not the vendor-specific motor controller wrappers (`SparkWrapper`, `NovaWrapper`, `A301Wrapper`, `TalonFXWrapper`, `TalonFXSWrapper`), `EasyCRT`, or the simulation `Sensor` / `BatterySim` headers; include those directly.
 
 **Top-level namespaces**
 
@@ -20,8 +20,8 @@ Every class has its own header under `yams/` that matches its namespace, for exa
 - `yams::mechanisms::config`: ArmConfig, ElevatorConfig, PivotConfig, FlyWheelConfig, MechanismPositionConfig, SimSensorConfig, SwerveModuleConfig
 - `yams::mechanisms::swerve`: SwerveDrive\<N\>, SwerveDriveConfig, SwerveModule
 - `yams::mechanisms::swerve::utility`: SwerveInputStream\<N\>, SwerveInputStreamTelemetry\<N\>
-- `yams::motorcontrollers`: SmartMotorController, SmartMotorControllerConfig
-- `yams::motorcontrollers::local`: SparkWrapper, NovaWrapper
+- `yams::motorcontrollers`: SmartMotorController, SmartMotorControllerConfig, YMotors
+- `yams::motorcontrollers::local`: SparkWrapper, NovaWrapper, A301Wrapper
 - `yams::motorcontrollers::remote`: TalonFXWrapper, TalonFXSWrapper
 - `yams::motorcontrollers::simulation`: Sensor, SensorData, BatterySim, sim suppliers
 - `yams::telemetry`: SmartMotorControllerTelemetryConfig, SwerveDriveTelemetryConfig, SwerveModuleTelemetryConfig, MechanismTelemetry

@@ -175,7 +175,7 @@ public Command pickUp()
 | `getName()`                      | `String`               | The arm telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the arm physics simulation by one loop and updates the visualization |
 | `updateTelemetry()`              | `void`                 | Publishes current state to NetworkTables                                      |
-| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current angle and setpoint           |
+| `visualizationUpdate()`          | `void`                 | Syncs the Mechanism2d ligaments with the current angle and setpoint, and logs the Mechanism2d again so it moves in the Sim GUI and dashboards |
 
 Call `updateTelemetry()` from `periodic()` and `simIterate()` from `simulationPeriodic()`. `simIterate()` already calls `visualizationUpdate()`.
 

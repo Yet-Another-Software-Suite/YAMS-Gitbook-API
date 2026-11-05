@@ -27,6 +27,7 @@ Install the Commands v2 YAMS vendordep (`https://cdn.yassrobotics.com/yams_comma
 // Vendor wrappers (always included individually):
 #include <yams/motorcontrollers/local/SparkWrapper.hpp>
 #include <yams/motorcontrollers/local/NovaWrapper.hpp>
+#include <yams/motorcontrollers/local/A301Wrapper.hpp>
 #include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>
 #include <yams/motorcontrollers/remote/TalonFXSWrapper.hpp>
 ```

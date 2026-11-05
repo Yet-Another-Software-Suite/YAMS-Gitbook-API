@@ -2,7 +2,7 @@
 
 **Package:** `yams.core.motorcontrollers`
 
-Abstract base class for all motor controller wrappers. Do not instantiate directly; construct a concrete subclass (`SparkWrapper`, `NovaWrapper`, `TalonFXWrapper`, or `TalonFXSWrapper`) and assign it to a `SmartMotorController` variable. Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
+Abstract base class for all motor controller wrappers. Do not instantiate directly; construct a concrete subclass (`SparkWrapper`, `NovaWrapper`, `A301Wrapper`, `TalonFXWrapper`, or `TalonFXSWrapper`) and assign it to a `SmartMotorController` variable. Configure all implementations via [SmartMotorControllerConfig](smart-motor-controller-config.md).
 
 `SmartMotorController` is the same class for Commands v2 and Commands v3 robot code. Only the config you pass to the wrapper differs: `yams.commands2.config.SmartMotorControllerConfig` (bound to a `Subsystem`) or `yams.commands3.config.SmartMotorControllerConfig` (bound to a `Mechanism`).
 
@@ -99,7 +99,7 @@ SmartMotorController motor = new TalonFXWrapper(
 | `isClosedLoopControllerStopped()`                  | `boolean`                  | Whether a closed loop run on the SystemCore, such as an LQR or an exponential profile, was stopped, as a duty cycle or voltage command does. `false` when the closed loop runs on the motor controller. |
 | `stopClosedLoopController()`                       | `void`                     | Stops the closed loop control thread.                                              |
 | `getClosedLoopControllerPeriod()`                  | `Time`                     | How often the closed loop runs: `withClosedLoopControlPeriod(...)`, 20 ms by default, when it runs on the SystemCore, or 1 ms when it runs on the motor controller. Published as `closedloop/period`. |
-| `iterateClosedLoopController()`                    | `void`                     | Executes one closed loop iteration. Called automatically by the background thread. |
+| `iterateClosedLoopController()`                    | `void`                     | Executes one closed loop iteration. Called automatically by the background thread. While the robot is disabled it sends no voltage, and resets its PID, motion profile and LQR to where the mechanism is, so enabling starts from there. |
 | `setClosedLoopSlot(ClosedLoopControllerSlot slot)` | `void`                     | Selects the active PID slot.                                                       |
 | `setKp(double kP)` / `setKi(double kI)` / `setKd(double kD)` | `void`           | Sets one PID gain at runtime.                                                      |
 | `setFeedback(double kP, double kI, double kD)`     | `void`                     | Sets all PID gains at runtime.                                                     |
@@ -170,6 +170,8 @@ At `TelemetryVerbosity.HIGH`, `setupTelemetry()` registers a `Live Tuning` comma
 
 `simIterate()` also reports this controller's simulated current draw into [`BatterySim`](../sensor/battery-sim.md) under a UUID unique to this instance (`m_batterySimUUID`), which combines the draw of every simulated `SmartMotorController` on the robot into one shared, loaded battery voltage.
 
+While the robot is disabled, the `ArmSimSupplier`, `DCMotorSimSupplier` and `ElevatorSimSupplier` apply 0 V to the simulated motor on every step, so a mechanism falls or coasts as an unpowered one would, instead of holding its last voltage.
+
 ## Introspection
 
 | Method                       | Returns   | Description                                                         |
@@ -187,6 +189,7 @@ At `TelemetryVerbosity.HIGH`, `setupTelemetry()` registers a `Live Tuning` comma
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper](talonfx-wrapper.md)
 * [BatterySim](../sensor/battery-sim.md)
 * [C++ SmartMotorController](../../c++-reference/motor-controllers/smart-motor-controller.md)

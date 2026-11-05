@@ -259,7 +259,7 @@ public Command hold(AngularVelocity speed)
 | `getName()`                      | `String`               | The flywheel telemetry name                                                        |
 | `simIterate()`                   | `void`                 | Advances the flywheel physics simulation by one loop and updates the visualization |
 | `updateTelemetry()`              | `void`                 | Publishes the current flywheel state to NetworkTables                              |
-| `visualizationUpdate()`          | `void`                 | Updates the Mechanism2d visualization                                              |
+| `visualizationUpdate()`          | `void`                 | Updates the Mechanism2d visualization, and logs the Mechanism2d again so it moves in the Sim GUI and dashboards |
 
 Call `updateTelemetry()` from `periodic()` and `simIterate()` from `simulationPeriodic()`. `simIterate()` already calls `visualizationUpdate()`.
 

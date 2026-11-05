@@ -72,7 +72,7 @@ C++ keeps the `IsNear(...)` name for this trigger factory. The Java API renamed 
 | `GetMechanismRoot`             | `wpi::MechanismRoot2d* GetMechanismRoot()`                | The Mechanism2d visualization root                        |
 | `SimIterate`                   | `void SimIterate() override`                              | Advances pivot physics simulation one loop iteration      |
 | `UpdateTelemetry`              | `void UpdateTelemetry() override`                         | Publishes current state to NetworkTables                  |
-| `VisualizationUpdate`          | `void VisualizationUpdate() override`                     | Syncs Mechanism2d with current encoder reading            |
+| `VisualizationUpdate`          | `void VisualizationUpdate() override`                     | Syncs Mechanism2d with current encoder reading, and publishes the Mechanism2d window again (protected `SmartMechanism::PublishMechanismWindow()`) so it moves in the Sim GUI and dashboards |
 | `GetName`                      | `std::string GetName() const override`                    | Returns the mechanism name                                |
 
 ***

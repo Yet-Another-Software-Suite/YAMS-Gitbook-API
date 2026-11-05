@@ -165,7 +165,7 @@ Both packages have the same method names and parameters. Commands v2 returns `or
 |--------|---------|-------------|
 | `simIterate()` | `void` | Advances joint physics simulation one loop and updates the visualization; call in `simulationPeriodic()` |
 | `updateTelemetry()` | `void` | Publishes current state to NetworkTables; call in `periodic()` |
-| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`) |
+| `visualizationUpdate()` | `void` | Updates the Mechanism2d visualization (called by `simIterate()`), and logs the Mechanism2d again so it moves in the Sim GUI and dashboards |
 | `getMechanismWindow()` | `Mechanism2d` | The Mechanism2d window (simulation only) |
 | `getPose3d()` | `Pose3d` | The lower arm's axis, turned to its angle, relative to the robot, from the lower arm's [`MechanismPositionConfig`](../config/mechanism-position-config.md) |
 | `getUpperPose3d()` | `Pose3d` | The upper arm at the end of the lower arm, turned to its angle |

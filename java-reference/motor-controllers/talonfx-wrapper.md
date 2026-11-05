@@ -24,7 +24,7 @@ TalonFXSWrapper(TalonFXS talonFXS, DCMotor motor, SmartMotorControllerConfig<?> 
 | TalonFXS (NEO Vortex) | `TalonFXSWrapper` | `DCMotor.getNeoVortex(1)`, driven as `VORTEX_JST` |
 | TalonFXS (Thrifty Pulsar 775) | `TalonFXSWrapper` | `YMotors.getThriftyPulsar(1)`, driven as `NEO_JST` |
 
-`TalonFXSWrapper` picks the TalonFXS's motor arrangement from the `DCMotor`, and throws `IllegalArgumentException` for one it does not know. WPILib has no `DCMotor` of the Thrifty Pulsar, so YAMS has one in `yams.core.motorcontrollers.YMotors`, from Thrifty's specs. It will be removed once WPILib has one.
+`TalonFXSWrapper` picks the TalonFXS's motor arrangement from the `DCMotor`, and throws `IllegalArgumentException` for one it does not know. WPILib has no `DCMotor` of the Thrifty Pulsar, so YAMS has one in `yams.core.motorcontrollers.YMotors`, from Thrifty's specs. It will be removed once WPILib has one. `YMotors` also has the FIRST A301's motor (see [A301Wrapper](a301-wrapper.md)).
 
 ## Example
 
@@ -113,4 +113,5 @@ Without a vendor config that explicitly sets the sensor source, YAMS has no way 
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [C++ SmartMotorController](../../c++-reference/motor-controllers/smart-motor-controller.md)

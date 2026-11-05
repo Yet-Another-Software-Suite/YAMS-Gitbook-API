@@ -2,7 +2,7 @@
 
 **Package:** `yams.core.motorcontrollers.simulation`
 
-`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which the sim suppliers write to the simulated SystemCore input voltage (WPILib's `RoboRioSim.setVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
+`BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`A301Wrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which the sim suppliers write to the simulated SystemCore input voltage (WPILib's `RoboRioSim.setVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 
 {% hint style="info" %}
 This class is entirely static and requires no setup for basic voltage sag under combined load; every built-in sim supplier and hardware wrapper registers with it automatically.

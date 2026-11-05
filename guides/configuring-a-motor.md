@@ -15,6 +15,7 @@ Identify which motor controller you are using:
 * **REV SPARK MAX / SPARK FLEX**: requires the REVLib 2027 vendordep. Wrapped by `SparkWrapper`.
 * **CTRE TalonFX / TalonFXS**: requires the Phoenix 6 vendordep. Wrapped by `TalonFXWrapper` / `TalonFXSWrapper`.
 * **Thrifty Nova**: requires the ThriftyLib 2027 vendordep. Wrapped by `NovaWrapper`.
+* **FIRST A301**: requires the REVLib 2027 vendordep. Wrapped by `A301Wrapper`.
 
 Add the appropriate vendordep to your project before proceeding.
 
@@ -96,7 +97,7 @@ config.WithSubsystem(this)
 {% step %}
 #### Construct the concrete motor controller
 
-Pass the vendor hardware object, the WPILib `DCMotor` model, and the config to the appropriate constructor. The Java wrappers live in `yams.core.motorcontrollers.local` (`SparkWrapper`, `NovaWrapper`) and `yams.core.motorcontrollers.remote` (`TalonFXWrapper`, `TalonFXSWrapper`).
+Pass the vendor hardware object, the WPILib `DCMotor` model, and the config to the appropriate constructor. The Java wrappers live in `yams.core.motorcontrollers.local` (`SparkWrapper`, `NovaWrapper`, `A301Wrapper`) and `yams.core.motorcontrollers.remote` (`TalonFXWrapper`, `TalonFXSWrapper`).
 
 **Java (REV SPARK):**
 
@@ -125,6 +126,16 @@ SmartMotorController motor = new TalonFXWrapper(
 SmartMotorController motor = new NovaWrapper(
     new Nova(0, 3, MotorType.NEO),
     DCMotor.getNEO(1),
+    config
+);
+```
+
+**Java (FIRST A301):**
+
+```java
+// A301 on CAN bus 1, CAN ID 20. Every A301 has the same motor, so there is no DCMotor.
+SmartMotorController motor = new A301Wrapper(
+    new A301(CANPorts.fromBusId(1), 20),
     config
 );
 ```
@@ -165,6 +176,15 @@ TalonFXSWrapper motor{&talonFXS, wpi::math::DCMotor::NEO(1), TalonFXSWrapper::Mo
 
 thrifty::Nova nova{0, 3, thrifty::Motor::NEO};
 yams::motorcontrollers::local::NovaWrapper motor{&nova, wpi::math::DCMotor::NEO(1), &config};
+```
+
+**C++ (FIRST A301):**
+
+```cpp
+#include "yams/motorcontrollers/local/A301Wrapper.hpp"
+
+first::a301::A301 a301{wpi::CANPort::CAN_S0, 3};
+yams::motorcontrollers::local::A301Wrapper motor{&a301, &config};
 ```
 
 In C++ the hardware object and the config are passed by pointer and must outlive the wrapper, so declare them as subsystem members.

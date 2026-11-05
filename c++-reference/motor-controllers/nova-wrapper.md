@@ -159,6 +159,7 @@ class ArmSubsystem : public wpi::cmd::SubsystemBase {
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [SparkWrapper](spark-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper / TalonFXSWrapper](talonfx-wrapper.md)
 * [BatterySim](../sensor/battery-sim.md)
 * [Java NovaWrapper](../../java-reference/motor-controllers/nova-wrapper.md)

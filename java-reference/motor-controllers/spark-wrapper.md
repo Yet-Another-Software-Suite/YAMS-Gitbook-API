@@ -65,4 +65,5 @@ Set the wrapping range when the mechanism must read across the point where `[0, 
 * [SmartMotorController](smart-motor-controller.md)
 * [SmartMotorControllerConfig](smart-motor-controller-config.md)
 * [NovaWrapper](nova-wrapper.md)
+* [A301Wrapper](a301-wrapper.md)
 * [TalonFXWrapper](talonfx-wrapper.md)

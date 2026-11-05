@@ -102,7 +102,7 @@ This is the same helper as in the Commands v3 examples and in [Update it every l
 {% step %}
 #### View the Mechanism2d visualization
 
-YAMS publishes a `Mechanism2d` for each mechanism at `Mechanisms/<name>/mechanism`, where `<name>` is the telemetry name on the mechanism config (for example `"Shoulder"`). In the Sim GUI, open **NetworkTables -> Mechanisms -> Shoulder -> mechanism**. In AdvantageScope, drag `Mechanisms/Shoulder/mechanism` onto a **Mechanism** tab.
+YAMS publishes a `Mechanism2d` for each mechanism at `Mechanisms/<name>/mechanism`, where `<name>` is the telemetry name on the mechanism config (for example `"Shoulder"`). Telemetry logs a `Mechanism2d` as it is when it is logged, so each mechanism logs it again on every visualization update, which `simIterate()` runs. In the Sim GUI, open **NetworkTables -> Mechanisms -> Shoulder -> mechanism**. In AdvantageScope, drag `Mechanisms/Shoulder/mechanism` onto a **Mechanism** tab.
 
 **Check it:** the mechanism is drawn at its starting position, and moves when you command it.
 {% endstep %}
@@ -144,6 +144,14 @@ double stateOfCharge = BatterySim::GetStateOfCharge();  // 1.0 = full, 0.0 = emp
 
 With discharge enabled, the open circuit voltage falls and the internal resistance rises as the state of charge drops. `resetDischarge()` refills the battery and `disableDischarge()` returns to the fixed model.
 
+## A disabled robot's simulated motors get no power
+
+While the robot is disabled, the `ArmSimSupplier`, `DCMotorSimSupplier` and `ElevatorSimSupplier` apply 0 V to the simulated motor on every simulation step, as a real disabled robot does. An arm falls and a flywheel coasts down, instead of holding the last voltage it was given.
+
+A closed loop that YAMS runs on the SystemCore (an [LQR](../java-reference/math/lqr-controller.md), an exponential profile, a velocity trapezoidal profile, or any closed loop on an [A301](../java-reference/motor-controllers/a301-wrapper.md)) sends no voltage while the robot is disabled. It follows the mechanism instead, resetting its PID, motion profile and LQR to where the mechanism is, so when the robot is enabled it starts from there rather than jumping back to where the mechanism was. Without a setpoint, the motion profile also follows the mechanism, so the first setpoint after enabling is profiled from where the mechanism is.
+
+**Check it:** command an arm up, then disable the robot, and the arm falls in the Mechanism2d. Enable it and command it again, and it moves from where it fell, without first jumping back. Commands end when the robot is disabled, so a button still held must be pressed again.
+
 ## SPARK closed loop runs at 1 kHz in simulation
 
 A real SPARK MAX or SPARK FLEX closes its loop onboard every millisecond. `SparkWrapper` simulates that: inside each `simIterate()` call it steps the simulated SPARK's closed loop once per millisecond across the simulation period (20 steps for the default 20 ms period), instead of once per period. Gains tuned in simulation therefore behave much closer to the real controller. No configuration is needed.
@@ -153,6 +161,7 @@ A real SPARK MAX or SPARK FLEX closes its loop onboard every millisecond. `Spark
 * **The mechanism is not in the NetworkTables menu.** Look under **Mechanisms**, not **SmartDashboard**, and check that `updateTelemetry()` runs every loop.
 * **It never moves in simulation.** `simIterate()` is not running: check `simulationPeriodic()` (Commands v2) or `simulationInit()` (Commands v3).
 * **It throws when the code starts.** A physical value from the table in the first step is missing.
+* **It falls or stops when the robot is disabled.** That is expected: a disabled robot's simulated motors get 0 V.
 
 [Troubleshooting](https://yams.yassrobotics.com/documentation/tutorials/troubleshooting) covers more.
 
