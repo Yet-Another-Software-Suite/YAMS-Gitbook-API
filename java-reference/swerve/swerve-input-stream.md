@@ -1,6 +1,7 @@
 # SwerveInputStream
 
-**Package:** `yams.commands2.swerve` (Commands v2) or `yams.commands3.swerve` (Commands v3)
+**Package:** `yams.commands2.swerve` (Commands v2) or `yams.commands3.swerve` (Commands v3)\
+**Javadoc:** [`SwerveInputStream`](https://javadocs.yassrobotics.com/yams/yams/commands2/swerve/SwerveInputStream.html) (Commands v2), [`SwerveInputStream`](https://javadocs.yassrobotics.com/yams/yams/commands3/swerve/SwerveInputStream.html) (Commands v3)
 
 Converts raw joystick axis values into field-relative `ChassisVelocities` for swerve drive control. Handles deadbands, cubic input curves, axis scaling, alliance-relative flipping, and multiple drive modes (angular-velocity, heading-snap, translation-only, aim-at-target). Implements `Supplier<ChassisVelocities>` so it can be passed directly wherever a `ChassisVelocities` supplier is expected.
 

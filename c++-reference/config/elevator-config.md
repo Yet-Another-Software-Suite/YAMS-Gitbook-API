@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::config`\
 **Header:** `<yams/mechanisms/config/ElevatorConfig.hpp>`\
-**Java equivalent:** [Java ElevatorConfig](../../java-reference/config/elevator-config.md)
+**Java equivalent:** [Java ElevatorConfig](../../java-reference/config/elevator-config.md)\
+**Doxygen:** [`ElevatorConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1ElevatorConfig.html)
 
 `ElevatorConfig` holds physical and simulation parameters for an `Elevator` mechanism.
 

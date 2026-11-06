@@ -1,7 +1,8 @@
 # Sensor
 
 **Namespace:** `yams::motorcontrollers::simulation`\
-**Header:** `#include <yams/motorcontrollers/simulation/Sensor.hpp>`
+**Header:** `#include <yams/motorcontrollers/simulation/Sensor.hpp>`\
+**Doxygen:** [`Sensor`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1simulation_1_1Sensor.html)
 
 A `Sensor` models a named hardware sensor whose fields are readable from robot code and, in simulation, visible in the WPILib **Glass** GUI. Every field delegates to a real hardware supplier on a physical robot. In simulation, Glass can override any field's value, and trigger-based overrides can inject specific readings at scripted moments during automated testing.
 

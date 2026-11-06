@@ -2,7 +2,8 @@
 
 Namespace: `yams::mechanisms::positional`\
 Header: `<yams/mechanisms/positional/Elevator.hpp>`\
-Inherits: `SmartPositionalMechanism`
+Inherits: `SmartPositionalMechanism`\
+Doxygen: [`Elevator`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1positional_1_1Elevator.html)
 
 **Java equivalent:** [Java Elevator](../../java-reference/mechanisms/elevator.md)
 

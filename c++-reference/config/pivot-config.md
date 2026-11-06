@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::config`\
 **Header:** `<yams/mechanisms/config/PivotConfig.hpp>`\
-**Java equivalent:** [Java PivotConfig](../../java-reference/config/pivot-config.md)
+**Java equivalent:** [Java PivotConfig](../../java-reference/config/pivot-config.md)\
+**Doxygen:** [`PivotConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1PivotConfig.html)
 
 `PivotConfig` holds physical and simulation parameters for a `Pivot` mechanism. A pivot is a single-jointed rotational mechanism without a load-bearing length (use `ArmConfig` if arm length affects simulation accuracy).
 

@@ -1,6 +1,7 @@
 # Sensor
 
-**Package:** `yams.core.motorcontrollers.simulation`
+**Package:** `yams.core.motorcontrollers.simulation`\
+**Javadoc:** [`Sensor`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/simulation/Sensor.html)
 
 A `Sensor` models a named hardware sensor whose fields are readable from robot code and, in simulation, visible in the WPILib **Glass** GUI. Every field delegates to a real hardware supplier on a physical robot. In simulation, Glass can override any field's value, and trigger-based overrides can inject specific readings at scripted moments during automated testing.
 

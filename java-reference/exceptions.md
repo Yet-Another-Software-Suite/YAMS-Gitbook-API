@@ -1,6 +1,7 @@
 # Exceptions
 
-Package: `yams.core.exceptions`
+Package: `yams.core.exceptions`\
+Javadoc: [`yams.core.exceptions`](https://javadocs.yassrobotics.com/yams/yams/core/exceptions/package-summary.html)
 
 YAMS throws typed `RuntimeException` subclasses for configuration and runtime errors. All exceptions extend `RuntimeException` so they are unchecked; you do not need to declare or catch them unless you want to handle configuration problems gracefully.
 

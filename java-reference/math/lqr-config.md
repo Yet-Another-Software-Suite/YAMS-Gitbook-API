@@ -1,6 +1,7 @@
 # LQRConfig
 
-**Package:** `yams.core.math`
+**Package:** `yams.core.math`\
+**Javadoc:** [`LQRConfig`](https://javadocs.yassrobotics.com/yams/yams/core/math/LQRConfig.html)
 
 `LQRConfig` is a builder for `LinearSystemLoop` objects used by `LQRController`. It encapsulates the linear system model, Kalman filter, and LQR regulator into a single configurable object.
 

@@ -1,7 +1,8 @@
 # SparkWrapper
 
 **Package:** `yams.core.motorcontrollers.local`\
-**Extends:** `SmartMotorController`
+**Extends:** `SmartMotorController`\
+**Javadoc:** [`SparkWrapper`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/local/SparkWrapper.html)
 
 `SmartMotorController` implementation for REV SPARK MAX and SPARK FLEX controllers.
 

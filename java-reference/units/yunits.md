@@ -1,6 +1,7 @@
 # YUnits
 
-Package: `yams.core.units`
+Package: `yams.core.units`\
+Javadoc: [`YUnits`](https://javadocs.yassrobotics.com/yams/yams/core/units/YUnits.html)
 
 `YUnits` is a static utility class containing extended unit constants for use with WPILib's `org.wpilib.units` system. All values are defined as `Unit` instances compatible with WPILib's `Measure` types.
 

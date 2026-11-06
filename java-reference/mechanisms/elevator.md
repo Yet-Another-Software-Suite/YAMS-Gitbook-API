@@ -2,7 +2,8 @@
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
 **Extends:** `yams.core.mechanisms.positional.Elevator` (which extends `SmartPositionalMechanism`)\
-**Implements:** `CommandMechanism`
+**Implements:** `CommandMechanism`\
+**Javadoc:** [`Elevator`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/Elevator.html) (Commands v2), [`Elevator`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/Elevator.html) (Commands v3)
 
 Controls a linear elevator mechanism. Position is expressed as carriage height above the zero reference point.
 

@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::motorcontrollers::remote`\
 **Extends:** `SmartMotorController`\
-**Header:** `#include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>`
+**Header:** `#include <yams/motorcontrollers/remote/TalonFXWrapper.hpp>`\
+**Doxygen:** [`TalonFXWrapper`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1remote_1_1TalonFXWrapper.html), [`TalonFXSWrapper`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1remote_1_1TalonFXSWrapper.html)
 
 `SmartMotorController` implementations for CTRE TalonFX and TalonFXS motor controllers using Phoenix 6. `TalonFXWrapper` targets the TalonFX (Kraken X60, Kraken X44, Falcon 500). `TalonFXSWrapper` targets the TalonFXS, which supports third-party brushed and brushless motors such as REV NEO and Minion.
 

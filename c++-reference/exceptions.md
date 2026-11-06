@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::exceptions`\
 **Header:** `#include <yams/exceptions.hpp>`\
-**Java equivalent:** [Java Exceptions](../java-reference/exceptions.md)
+**Java equivalent:** [Java Exceptions](../java-reference/exceptions.md)\
+**Doxygen:** [`yams::exceptions`](https://doxygen.yassrobotics.com/yams/namespaceyams_1_1exceptions.html)
 
 All YAMS C++ exceptions extend `yams::exceptions::YamsException`, which extends `std::runtime_error`.
 

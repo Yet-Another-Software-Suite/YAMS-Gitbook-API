@@ -1,6 +1,7 @@
 # DifferentialMechanismConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`DifferentialMechanismConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/DifferentialMechanismConfig.html)
 
 `DifferentialMechanismConfig` configures a two-motor differential mechanism. Unlike the other config classes, it holds the two motor controllers. Supply them in the constructor, or with `withSmartMotorControllers(...)` once; they cannot be replaced after they are set.
 

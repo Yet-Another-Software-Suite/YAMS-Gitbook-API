@@ -1,7 +1,8 @@
 # DifferentialMechanism
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
-**Extends:** `yams.core.mechanisms.positional.DifferentialMechanism` (which extends `SmartPositionalMechanism`)
+**Extends:** `yams.core.mechanisms.positional.DifferentialMechanism` (which extends `SmartPositionalMechanism`)\
+**Javadoc:** [`DifferentialMechanism`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/DifferentialMechanism.html) (Commands v2), [`DifferentialMechanism`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/DifferentialMechanism.html) (Commands v3)
 
 `DifferentialMechanism` mixes two motor outputs to produce independent tilt and twist motion. For a position target, the left motor goes to `tilt + twist * twistRatio` and the right motor to `tilt - twist * twistRatio`, where `twistRatio` is the twist gearing from the `DifferentialMechanismConfig`. This is common in wrist mechanisms that need to tilt and rotate simultaneously.
 

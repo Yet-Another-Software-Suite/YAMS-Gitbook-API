@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::motorcontrollers::local`\
 **Extends:** `SmartMotorController`\
-**Header:** `#include <yams/motorcontrollers/local/A301Wrapper.hpp>`
+**Header:** `#include <yams/motorcontrollers/local/A301Wrapper.hpp>`\
+**Doxygen:** [`A301Wrapper`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1local_1_1A301Wrapper.html)
 
 `SmartMotorController` implementation for the FIRST A301 smart motor, using REVLib 2027.
 
@@ -23,7 +24,7 @@ A301Wrapper(first::a301::A301* a301, SmartMotorControllerConfig* config)
 
 `first::a301::A301` comes from `<first/A301.h>` (REVLib 2027.0.0-alpha-9) and is created with a `wpi::CANPort` and a CAN ID, for example `first::a301::A301 a301{wpi::CANPort::CAN_S0, 3};`.
 
-There is no motor parameter: every A301 has the same motor, so the wrapper always uses `YMotors::A301()`.
+There is no motor parameter: every A301 has the same motor, so the wrapper uses `YMotors::A301(n)`, where `n` is this A301 and the A301s following it. See [Followers](#followers).
 
 ***
 
@@ -76,7 +77,7 @@ The A301 has none of the following, so `ApplyConfig` rejects them:
 | `WithVoltageCompensation`                                      | Throws `SmartMotorControllerConfigurationException`.                                                          |
 | `WithVendorConfig`                                             | Throws `SmartMotorControllerConfigurationException`. The A301 has no vendor config.                           |
 | `WithVendorControlRequest`                                     | Throws `SmartMotorControllerConfigurationException`.                                                          |
-| `WithFollowers`                                                | Throws `SmartMotorControllerConfigurationException`. See [Followers](#followers).                             |
+| `WithFollowers` with anything but an `A301Wrapper*`           | Throws `SmartMotorControllerConfigurationException`. See [Followers](#followers).                             |
 | `WithEncoderInverted(true)`                                    | Throws `std::invalid_argument`. The A301's internal encoder cannot be inverted.                               |
 | Closed loop tolerance with an [LQR](../math/lqr-controller.md) | Throws `std::invalid_argument`.                                                                               |
 
@@ -98,13 +99,31 @@ When no starting position is configured and the absolute encoder is attached, th
 
 ## Followers
 
-The A301 has no follower mode, so `WithFollowers` throws `SmartMotorControllerConfigurationException`. Use `WithLooselyCoupledFollowers` to forward setpoints to other `SmartMotorController` instances instead.
+The A301 has no follower mode, so the wrapper follows in software. Wrap each other A301 on the mechanism in its own `A301Wrapper`, and give them to the main A301's `WithFollowers` as `(A301Wrapper*, inverted)` pairs. Only an `A301Wrapper` can follow an A301; anything else throws `SmartMotorControllerConfigurationException`.
+
+```cpp
+// The right side of the arm: create it before the main A301, and destroy it after.
+m_rightConfig.WithMotorGearing(yams::gearing::MechanismGearing{64.0 * 3.0});
+m_rightMotor.emplace(&m_rightA301, &m_rightConfig);
+
+// The main A301. true: the right A301 faces it across the arm.
+m_leftConfig.WithMotorGearing(yams::gearing::MechanismGearing{64.0 * 3.0})
+    .WithFeedback(30.0, 0.0, 0.0)
+    .WithMotorInverted(false)
+    .WithFollowers({{std::any{&m_rightMotor.value()}, true}});
+m_leftMotor.emplace(&m_leftA301, &m_leftConfig);
+```
+
+* The main A301 sends each follower its voltage and duty cycle, inverted where it is, and the follower's own closed loop is stopped. Command and tune the main A301 only.
+* The main A301's `GetDCMotor()` is `YMotors::A301(n)` with every A301, so its simulation and a mechanism's, such as an `Arm`'s, have the torque of all of them.
+* In simulation a follower reads the main A301's simulation, with its share of the current, and does not draw current from [`BatterySim`](../sensor/battery-sim.md) again. The main A301's `SimIterate()` iterates its followers, so do not call theirs.
+* `WithLooselyCoupledFollowers` still works as on any motor controller, for an A301 with its own closed loop.
 
 ***
 
 ## Simulation
 
-REVLib does not simulate the A301, so the wrapper creates a DC motor simulation of the A301's motor from `YMotors::A301()`, the configured MOI and the motor gearing, and reports its current draw to [`BatterySim`](../sensor/battery-sim.md) every loop. A mechanism's own sim, such as an `Arm`'s, replaces it as usual. In simulation the absolute encoder follows the simulated mechanism. Set a realistic moment of inertia with `SmartMotorControllerConfig::WithMOI(...)` for realistic current draw.
+REVLib does not simulate the A301, so the wrapper creates a DC motor simulation of the A301's motor from `YMotors::A301(n)`, this A301 and its followers, the configured MOI and the motor gearing, and reports its current draw to [`BatterySim`](../sensor/battery-sim.md) every loop. A mechanism's own sim, such as an `Arm`'s, replaces it as usual. In simulation the absolute encoder follows the simulated mechanism. Set a realistic moment of inertia with `SmartMotorControllerConfig::WithMOI(...)` for realistic current draw.
 
 ***
 

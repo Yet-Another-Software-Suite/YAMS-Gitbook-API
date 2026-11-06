@@ -1,6 +1,7 @@
 # SensorConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`SensorConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/SensorConfig.html)
 
 Builder for a simulated sensor that bridges real hardware I/O and the YAMS simulation framework. Attach typed fields backed by live hardware suppliers, then inject override values during simulation by match-time window or an arbitrary trigger.
 

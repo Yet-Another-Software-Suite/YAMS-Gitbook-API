@@ -1,7 +1,8 @@
 # BatterySim
 
 **Namespace:** `yams::motorcontrollers::simulation`\
-**Header:** `#include <yams/motorcontrollers/simulation/BatterySim.hpp>`
+**Header:** `#include <yams/motorcontrollers/simulation/BatterySim.hpp>`\
+**Doxygen:** [`BatterySim`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1simulation_1_1BatterySim.html)
 
 `BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`A301Wrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own supply current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation (using `wpi::sim::BatterySim::Calculate`), which the sim suppliers write to the simulated input voltage (`wpi::sim::RoboRioSim::SetVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 

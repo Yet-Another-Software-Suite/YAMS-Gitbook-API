@@ -2,7 +2,8 @@
 
 Namespace: `yams::mechanisms::positional`\
 Header: `<yams/mechanisms/positional/Pivot.hpp>`\
-Inherits: `SmartPositionalMechanism`
+Inherits: `SmartPositionalMechanism`\
+Doxygen: [`Pivot`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1positional_1_1Pivot.html)
 
 **Java equivalent:** [Java Pivot](../../java-reference/mechanisms/pivot.md)
 

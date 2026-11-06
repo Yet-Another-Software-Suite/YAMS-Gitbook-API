@@ -2,7 +2,8 @@
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
 **Extends:** `yams.core.mechanisms.velocity.FlyWheel` (which extends `SmartVelocityMechanism`)\
-**Implements:** `CommandMechanism`
+**Implements:** `CommandMechanism`\
+**Javadoc:** [`FlyWheel`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/FlyWheel.html) (Commands v2), [`FlyWheel`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/FlyWheel.html) (Commands v3)
 
 `FlyWheel` controls a continuously spinning wheel or roller at a target angular velocity. It is not position-controlled; hard limits do not apply. Use `FlyWheel` for shooters and also for intakes, rollers, feeders and indexers, even when they only run open loop with `set(double)`.
 

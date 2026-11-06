@@ -3,7 +3,8 @@
 **Namespace:** `yams::mechanisms::swerve`\
 **Header:** `#include <yams/mechanisms/swerve/SwerveDrive.hpp>`\
 **Template:** `template <size_t NumModules = 4>`\
-**Java equivalent:** [Java SwerveDrive](../../java-reference/swerve/swerve-drive.md)
+**Java equivalent:** [Java SwerveDrive](../../java-reference/swerve/swerve-drive.md)\
+**Doxygen:** [`SwerveDrive`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1swerve_1_1SwerveDrive.html)
 
 `SwerveDrive<N>` manages a swerve drivetrain with `N` modules (default 4). The template parameter must match the number of modules passed to `SwerveDriveConfig::WithModules(...)`.
 

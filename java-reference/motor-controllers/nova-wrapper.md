@@ -1,7 +1,8 @@
 # NovaWrapper
 
 **Package:** `yams.core.motorcontrollers.local`\
-**Extends:** `SmartMotorController`
+**Extends:** `SmartMotorController`\
+**Javadoc:** [`NovaWrapper`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/local/NovaWrapper.html)
 
 `SmartMotorController` implementation for The Thrifty Bot's Thrifty Nova motor controller, using ThriftyLib 2027.
 

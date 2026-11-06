@@ -2,7 +2,8 @@
 
 **Package (robot code):** `yams.commands2.config` (Commands v2) or `yams.commands3.config` (Commands v3)\
 **Extends:** `yams.core.mechanisms.config.SwerveDriveConfig<SwerveDriveConfig>`\
-**C++ equivalent:** [C++ SwerveDriveConfig](../../c++-reference/swerve/swerve-drive-config.md)
+**C++ equivalent:** [C++ SwerveDriveConfig](../../c++-reference/swerve/swerve-drive-config.md)\
+**Javadoc:** [`SwerveDriveConfig`](https://javadocs.yassrobotics.com/yams/yams/commands2/config/SwerveDriveConfig.html) (Commands v2), [`SwerveDriveConfig`](https://javadocs.yassrobotics.com/yams/yams/commands3/config/SwerveDriveConfig.html) (Commands v3)
 
 Configures a complete swerve drivetrain. Takes the owning `Subsystem` (Commands v2) or `Mechanism` (Commands v3) and a varargs array of `SwerveModule` objects, one per module. All builder methods live on the shared `yams.core` base class, so they are the same in both frameworks; only the constructor and the subsystem/mechanism binding differ.
 

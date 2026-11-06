@@ -1,7 +1,8 @@
 # SmartMotorControllerTelemetryConfig
 
 **Namespace:** `yams::telemetry`\
-**Header:** `#include <yams/telemetry/SmartMotorControllerTelemetryConfig.hpp>`
+**Header:** `#include <yams/telemetry/SmartMotorControllerTelemetryConfig.hpp>`\
+**Doxygen:** [`SmartMotorControllerTelemetryConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1telemetry_1_1SmartMotorControllerTelemetryConfig.html)
 
 Fine-grained telemetry configuration for a `SmartMotorController`. Every field is **disabled by default**. Opt-in using `WithTelemetryVerbosity()` for a preset bundle, individual `With*()` methods for specific fields, or both to supplement a preset.
 

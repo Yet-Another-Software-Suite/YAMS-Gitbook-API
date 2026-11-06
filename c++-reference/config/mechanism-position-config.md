@@ -1,7 +1,8 @@
 # MechanismPositionConfig
 
 **Header:** `yams/mechanisms/config/MechanismPositionConfig.hpp`
-**Namespace:** `yams::mechanisms::config`
+**Namespace:** `yams::mechanisms::config`\
+**Doxygen:** [`MechanismPositionConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1MechanismPositionConfig.html)
 
 `MechanismPositionConfig` places a mechanism on the robot: where it is mounted, how it is turned there, the plane it moves in, and the mechanism it is mounted on, if any. Each mechanism's `GetPose3d()` is worked out from it, to publish as a component of an AdvantageScope robot model. All builder methods return `*this` for chaining.
 

@@ -2,7 +2,8 @@
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
 **Extends:** `yams.core.mechanisms.positional.Arm` (which extends `SmartPositionalMechanism`)\
-**Implements:** `CommandMechanism`
+**Implements:** `CommandMechanism`\
+**Javadoc:** [`Arm`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/Arm.html) (Commands v2), [`Arm`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/Arm.html) (Commands v3)
 
 Controls a single-jointed arm rotating in the XZ plane (gravity-affected rotation). For a turret or shooter hood rotating in the XY plane, use [Pivot](pivot.md) instead. For a double-jointed arm, see [DoubleJointedArm](double-jointed-arm.md).
 

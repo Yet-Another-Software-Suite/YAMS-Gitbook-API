@@ -1,7 +1,8 @@
 # SwerveDrive
 
 **Package (robot code):** `yams.commands2.swerve` (Commands v2) or `yams.commands3.swerve` (Commands v3)\
-**Extends:** `yams.core.mechanisms.swerve.SwerveDrive`
+**Extends:** `yams.core.mechanisms.swerve.SwerveDrive`\
+**Javadoc:** [`SwerveDrive`](https://javadocs.yassrobotics.com/yams/yams/commands2/swerve/SwerveDrive.html) (Commands v2), [`SwerveDrive`](https://javadocs.yassrobotics.com/yams/yams/commands3/swerve/SwerveDrive.html) (Commands v3)
 
 Manages a complete swerve drivetrain: kinematics, module states, odometry via `SwerveDrivePoseEstimator`, and optional vision measurement fusion.
 

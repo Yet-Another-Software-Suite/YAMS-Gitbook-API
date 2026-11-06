@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::gearing`\
 **Header:** `#include <yams/gearing/MechanismGearing.hpp>`\
-**Java equivalent:** [Java MechanismGearing](../../java-reference/gearing/mechanism-gearing.md)
+**Java equivalent:** [Java MechanismGearing](../../java-reference/gearing/mechanism-gearing.md)\
+**Doxygen:** [`MechanismGearing`](https://doxygen.yassrobotics.com/yams/classyams_1_1gearing_1_1MechanismGearing.html)
 
 `MechanismGearing` is the composite gearing type accepted by `SmartMotorControllerConfig::WithMotorGearing()`. It may combine a `GearBox` with an optional `Sprocket`.
 

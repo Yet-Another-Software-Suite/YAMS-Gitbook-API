@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::math`\
 **Header:** `#include <yams/math/DerivativeTimeFilter.hpp>`\
-**Java equivalent:** [Java DerivativeTimeFilter](../../java-reference/math/derivative-time-filter.md)
+**Java equivalent:** [Java DerivativeTimeFilter](../../java-reference/math/derivative-time-filter.md)\
+**Doxygen:** [`DerivativeTimeFilter`](https://doxygen.yassrobotics.com/yams/classyams_1_1math_1_1DerivativeTimeFilter.html)
 
 `DerivativeTimeFilter` computes a numerical derivative of a signal and applies a debounce filter to suppress transient spikes.
 

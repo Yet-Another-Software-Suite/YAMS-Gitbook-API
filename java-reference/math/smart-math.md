@@ -1,6 +1,7 @@
 # SmartMath
 
-**Package:** `yams.core.math`
+**Package:** `yams.core.math`\
+**Javadoc:** [`SmartMath`](https://javadocs.yassrobotics.com/yams/yams/core/math/SmartMath.html)
 
 `SmartMath` contains static utility methods for gear ratio calculations. It cannot be instantiated.
 

@@ -1,7 +1,8 @@
 # TalonFXWrapper / TalonFXSWrapper
 
 **Package:** `yams.core.motorcontrollers.remote`\
-**Extends:** `SmartMotorController`
+**Extends:** `SmartMotorController`\
+**Javadoc:** [`TalonFXWrapper`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/remote/TalonFXWrapper.html), [`TalonFXSWrapper`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/remote/TalonFXSWrapper.html)
 
 `SmartMotorController` implementations for CTRE TalonFX and TalonFXS controllers. `TalonFXWrapper` targets the TalonFX (Falcon 500, Kraken X60). `TalonFXSWrapper` targets the TalonFXS.
 

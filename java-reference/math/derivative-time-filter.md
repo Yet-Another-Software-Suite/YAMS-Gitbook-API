@@ -1,6 +1,7 @@
 # DerivativeTimeFilter
 
-**Package:** `yams.core.math`
+**Package:** `yams.core.math`\
+**Javadoc:** [`DerivativeTimeFilter`](https://javadocs.yassrobotics.com/yams/yams/core/math/DerivativeTimeFilter.html)
 
 `DerivativeTimeFilter` computes a numerical derivative of a signal while debouncing noise below a minimum rate of change. Useful for estimating velocity from a position signal.
 

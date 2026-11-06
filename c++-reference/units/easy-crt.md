@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::units`\
 **Header:** `#include <yams/units/EasyCRT.hpp>`\
-**Java equivalent:** [Java EasyCRT](../../java-reference/units/easy-crt.md)
+**Java equivalent:** [Java EasyCRT](../../java-reference/units/easy-crt.md)\
+**Doxygen:** [`EasyCRT`](https://doxygen.yassrobotics.com/yams/classyams_1_1units_1_1EasyCRT.html)
 
 `EasyCRT` finds the absolute angle of a gear that turns more than once, from two absolute encoders on pinions with different tooth counts that both mesh with it. Each encoder only knows its angle within one of its own rotations, but the two readings together are unique over `GetUniqueRange()`, which is `lcm(encoderATeeth, encoderBTeeth) / sharedGearTeeth` rotations of the shared gear.
 

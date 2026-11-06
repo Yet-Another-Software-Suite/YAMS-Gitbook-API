@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::gearing`\
 **Header:** `#include <yams/gearing/GearBox.hpp>`\
-**Java equivalent:** [Java GearBox](../../java-reference/gearing/gearbox.md)
+**Java equivalent:** [Java GearBox](../../java-reference/gearing/gearbox.md)\
+**Doxygen:** [`GearBox`](https://doxygen.yassrobotics.com/yams/classyams_1_1gearing_1_1GearBox.html)
 
 `GearBox` models a multi-stage gear reduction. Semantically represents meshed gears. Use `Sprocket` for chain or belt drives.
 

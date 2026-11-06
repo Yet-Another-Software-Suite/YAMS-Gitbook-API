@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::motorcontrollers::local`\
 **Extends:** `SmartMotorController`\
-**Header:** `#include <yams/motorcontrollers/local/SparkWrapper.hpp>`
+**Header:** `#include <yams/motorcontrollers/local/SparkWrapper.hpp>`\
+**Doxygen:** [`SparkWrapper`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1local_1_1SparkWrapper.html)
 
 `SmartMotorController` implementation for REV SPARK MAX and SPARK Flex motor controllers using REVLib 2027. One class covers both controllers; the constructor overload selects the hardware.
 

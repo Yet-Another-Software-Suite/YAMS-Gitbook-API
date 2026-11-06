@@ -1,6 +1,7 @@
 # SwerveModule
 
-**Package:** `yams.core.mechanisms.swerve`
+**Package:** `yams.core.mechanisms.swerve`\
+**Javadoc:** [`SwerveModule`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/swerve/SwerveModule.html)
 
 Represents one swerve module: a drive motor and an azimuth (steering) motor. You construct one `SwerveModule` per corner and pass them to the [`SwerveDriveConfig`](swerve-drive-config.md); `SwerveDrive` then manages them. The same class is used with Commands v2 and Commands v3.
 

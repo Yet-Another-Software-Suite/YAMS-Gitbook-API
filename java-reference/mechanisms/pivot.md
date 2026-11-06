@@ -2,7 +2,8 @@
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
 **Extends:** `yams.core.mechanisms.positional.Pivot` (which extends `SmartPositionalMechanism`)\
-**Implements:** `CommandMechanism`
+**Implements:** `CommandMechanism`\
+**Javadoc:** [`Pivot`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/Pivot.html) (Commands v2), [`Pivot`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/Pivot.html) (Commands v3)
 
 Controls rotation around a vertical axis, suitable for shooter hoods, turrets, or any mechanism rotating in the XY plane. For a gravity-affected arm rotating in the XZ plane, use [Arm](arm.md) instead.
 

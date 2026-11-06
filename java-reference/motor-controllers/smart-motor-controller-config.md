@@ -1,7 +1,8 @@
 # SmartMotorControllerConfig
 
 **Package:** `yams.commands2.config` (Commands v2) or `yams.commands3.config` (Commands v3)\
-**Extends:** `yams.core.motorcontrollers.SmartMotorControllerConfig<T>`
+**Extends:** `yams.core.motorcontrollers.SmartMotorControllerConfig<T>`\
+**Javadoc:** [`SmartMotorControllerConfig`](https://javadocs.yassrobotics.com/yams/yams/commands2/config/SmartMotorControllerConfig.html) (Commands v2), [`SmartMotorControllerConfig`](https://javadocs.yassrobotics.com/yams/yams/commands3/config/SmartMotorControllerConfig.html) (Commands v3)
 
 Configuration class for [SmartMotorController](smart-motor-controller.md). All builder methods return the `SmartMotorControllerConfig` instance for chaining. Pass the completed config to a `SmartMotorController` wrapper constructor.
 
@@ -227,8 +228,8 @@ Getters: `getWrappingMax()` and `getWrappingMin()` (formerly `getContinuousWrapp
 | `withTelemetry(TelemetryVerbosity verbosity)` | `verbosity` | Enables telemetry with the default name `"motor"`. |
 | `withTelemetry(String name, SmartMotorControllerTelemetryConfig telemetryConfig)` | N/A | Enables telemetry with a custom field selection. Sets the verbosity to `HIGH`. |
 | `setupLiveTuning()` | N/A | Registers the `Live Tuning` command for the motor controller this config is attached to, on the config's `Subsystem` (v2) or `Mechanism` (v3). Called automatically at `TelemetryVerbosity.HIGH`; call it yourself to opt in at other verbosities. Returns `void`. |
-| `withFollowers(Pair<Object, Boolean>... followers)` | `followers` | Adds native follower motors (varargs). Each `Pair` contains the vendor motor controller object and an inversion boolean relative to the leader. Followers must be the same vendor as the leader. |
-| `withLooselyCoupledFollowers(SmartMotorController... followers)` | `followers` | Adds `SmartMotorController` followers on separate shafts, each with its own config and closed loop. They are sent the leader's position and velocity setpoints and live tuning changes, but not its configuration, other duty cycles or voltages, or `setEncoderPosition`. Stopping the leader's closed loop, as a mechanism does before driving it at a duty cycle or voltage, stops theirs and sets them to a duty cycle of 0, and starting it starts theirs. Call `updateTelemetry()` and `simIterate()` on each follower yourself. |
+| `withFollowers(Pair<Object, Boolean>... followers)` | `followers` | Adds native follower motors (varargs). Each `Pair` contains the vendor motor controller object and an inversion boolean relative to the leader. Followers must be the same vendor as the leader. An A301 is followed by `A301Wrapper`s instead (see [A301Wrapper](a301-wrapper.md#several-a301s-on-one-mechanism)). |
+| `withLooselyCoupledFollowers(SmartMotorController... followers)` | `followers` | Adds `SmartMotorController` followers on separate shafts, each with its own config and closed loop. They are sent the leader's position and velocity setpoints and live tuning changes, but not its configuration, other duty cycles or voltages, or `setEncoderPosition`. Stopping the leader's closed loop, as a mechanism does before driving it at a duty cycle or voltage, stops theirs and sets them to a duty cycle of 0, and starting it starts theirs. Call `updateTelemetry()` on each follower yourself. In a mechanism class, such as an `Arm`, the followers are simulated with the leader: from its `getMechanismDCMotor()`, with each motor controller's own output, and the mechanism iterates them. Without one, call `simIterate()` on each follower too. See [Simulation](smart-motor-controller.md#simulation). |
 | `withVendorConfig(Object vendorConfig)` | `vendorConfig` | Provides a vendor-specific base configuration. YAMS options applied via this class always take precedence and overwrite it. |
 | `withVendorControlRequest(Object vendorControlRequest)` | `vendorControlRequest` | Provides a vendor-specific control request object that overrides YAMS default control requests for velocity and position. |
 

@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::gearing`\
 **Header:** `#include <yams/gearing/Sprocket.hpp>`\
-**Java equivalent:** [Java Sprocket](../../java-reference/gearing/sprocket.md)
+**Java equivalent:** [Java Sprocket](../../java-reference/gearing/sprocket.md)\
+**Doxygen:** [`Sprocket`](https://doxygen.yassrobotics.com/yams/classyams_1_1gearing_1_1Sprocket.html)
 
 `Sprocket` models a chain or belt drive stage. The API is identical to `GearBox`; the distinction is semantic. Use `GearBox` for meshed gears.
 

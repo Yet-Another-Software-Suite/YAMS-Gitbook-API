@@ -1,6 +1,7 @@
 # SmartMotorControllerTelemetryConfig
 
-**Package:** `yams.core.telemetry`
+**Package:** `yams.core.telemetry`\
+**Javadoc:** [`SmartMotorControllerTelemetryConfig`](https://javadocs.yassrobotics.com/yams/yams/core/telemetry/SmartMotorControllerTelemetryConfig.html)
 
 Fine-grained telemetry configuration for a [SmartMotorController](smart-motor-controller.md). Every field is **disabled by default**. Opt-in using `withTelemetryVerbosity()` for a preset bundle, individual `with*()` methods for specific fields, or both to supplement a preset.
 

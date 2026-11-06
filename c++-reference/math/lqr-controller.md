@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::math`\
 **Header:** `#include <yams/math/LQRController.hpp>`\
-**Java equivalent:** [Java LQRController](../../java-reference/math/lqr-controller.md)
+**Java equivalent:** [Java LQRController](../../java-reference/math/lqr-controller.md)\
+**Doxygen:** [`LQRController`](https://doxygen.yassrobotics.com/yams/classyams_1_1math_1_1LQRController.html)
 
 `LQRController` wraps a `LinearSystemLoop` and exposes a unified `Calculate` interface for arm, elevator, and flywheel mechanisms.
 

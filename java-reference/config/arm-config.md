@@ -1,6 +1,7 @@
 # ArmConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`ArmConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/ArmConfig.html)
 
 `ArmConfig` configures a single-jointed arm mechanism. All builder methods return the `ArmConfig` instance for chaining.
 

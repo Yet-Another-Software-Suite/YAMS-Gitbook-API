@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::config`\
 **Header:** `#include <yams/mechanisms/config/SwerveModuleConfig.hpp>`\
-**Java equivalent:** [Java SwerveModuleConfig](../../java-reference/swerve/swerve-module-config.md)
+**Java equivalent:** [Java SwerveModuleConfig](../../java-reference/swerve/swerve-module-config.md)\
+**Doxygen:** [`SwerveModuleConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1SwerveModuleConfig.html)
 
 Configures one swerve module. Takes pointers to the drive and azimuth `SmartMotorController`s. Uses a fluent builder pattern: every `With*` method returns `*this` for chaining.
 

@@ -1,7 +1,8 @@
 # SimSensorConfig
 
 **Namespace:** `yams::mechanisms::config`\
-**Header:** `yams/mechanisms/config/SimSensorConfig.hpp`
+**Header:** `yams/mechanisms/config/SimSensorConfig.hpp`\
+**Doxygen:** [`SimSensorConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1SimSensorConfig.html)
 
 Builder for a simulated sensor that bridges real hardware I/O and the YAMS simulation framework. This is the C++ equivalent of the Java [`SensorConfig`](../../java-reference/config/sensor-config.md).
 

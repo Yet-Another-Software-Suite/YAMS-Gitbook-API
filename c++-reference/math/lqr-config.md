@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::math`\
 **Header:** `#include <yams/math/LQRConfig.hpp>`\
-**Java equivalent:** [Java LQRConfig](../../java-reference/math/lqr-config.md)
+**Java equivalent:** [Java LQRConfig](../../java-reference/math/lqr-config.md)\
+**Doxygen:** [`LQRConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1math_1_1LQRConfig.html)
 
 `LQRConfig` is a builder for `LinearSystemLoop` objects consumed by `LQRController`.
 

@@ -1,6 +1,7 @@
 # GearBox
 
-**Package:** `yams.core.gearing`
+**Package:** `yams.core.gearing`\
+**Javadoc:** [`GearBox`](https://javadocs.yassrobotics.com/yams/yams/core/gearing/GearBox.html)
 
 `GearBox` models a multi-stage gear reduction. Each stage reduces or increases speed by a fixed ratio. Multiple stages are combined by multiplication.
 

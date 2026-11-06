@@ -1,6 +1,7 @@
 # MechanismPositionConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`MechanismPositionConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/MechanismPositionConfig.html)
 
 `MechanismPositionConfig` places a mechanism on the robot: where it is mounted, how it is turned there, the plane it moves in, and the mechanism it is mounted on, if any. Each mechanism's `getPose3d()` is worked out from it, to publish as a component of an AdvantageScope robot model. It also sizes and places the mechanism's `Mechanism2d` in simulation. All builder methods return the `MechanismPositionConfig` for chaining.
 

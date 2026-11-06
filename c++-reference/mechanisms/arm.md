@@ -2,7 +2,8 @@
 
 Namespace: `yams::mechanisms::positional`\
 Header: `<yams/mechanisms/positional/Arm.hpp>`\
-Inherits: `SmartPositionalMechanism`
+Inherits: `SmartPositionalMechanism`\
+Doxygen: [`Arm`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1positional_1_1Arm.html)
 
 **Java equivalent:** [Java Arm](../../java-reference/mechanisms/arm.md)
 

@@ -1,6 +1,7 @@
 # FlyWheelConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`FlyWheelConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/FlyWheelConfig.html)
 
 `FlyWheelConfig` configures a velocity-controlled spinning mechanism: shooters, and also intakes, rollers, feeders and indexers (even when driven open loop).
 

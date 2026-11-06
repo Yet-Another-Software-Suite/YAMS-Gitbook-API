@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::swerve`\
 **Header:** `#include <yams/mechanisms/swerve/SwerveDriveConfig.hpp>`\
-**Java equivalent:** [Java SwerveDriveConfig](../../java-reference/swerve/swerve-drive-config.md)
+**Java equivalent:** [Java SwerveDriveConfig](../../java-reference/swerve/swerve-drive-config.md)\
+**Doxygen:** [`SwerveDriveConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1swerve_1_1SwerveDriveConfig.html)
 
 Configures a complete `SwerveDrive<N>`. Uses a fluent builder pattern: every `With*` method returns `*this` for chaining.
 

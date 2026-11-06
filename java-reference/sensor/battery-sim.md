@@ -1,6 +1,7 @@
 # BatterySim
 
-**Package:** `yams.core.motorcontrollers.simulation`
+**Package:** `yams.core.motorcontrollers.simulation`\
+**Javadoc:** [`BatterySim`](https://javadocs.yassrobotics.com/yams/yams/core/motorcontrollers/simulation/BatterySim.html)
 
 `BatterySim` models a single, shared robot battery in simulation. Every simulated `SmartMotorController` (via its `ArmSimSupplier`, `ElevatorSimSupplier`, or `DCMotorSimSupplier`, or directly from `SparkWrapper`/`NovaWrapper`/`A301Wrapper`/`TalonFXWrapper`/`TalonFXSWrapper`) registers its own current draw here every loop. `BatterySim` combines the currently-registered draw of every mechanism into one loaded-voltage calculation, which the sim suppliers write to the simulated SystemCore input voltage (WPILib's `RoboRioSim.setVInVoltage(...)`), so voltage sag reflects the whole robot's load, not just one mechanism in isolation.
 

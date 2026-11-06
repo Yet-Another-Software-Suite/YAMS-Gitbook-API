@@ -2,7 +2,8 @@
 
 Namespace: `yams::mechanisms::velocity`\
 Header: `<yams/mechanisms/velocity/FlyWheel.hpp>`\
-Inherits: `SmartVelocityMechanism`
+Inherits: `SmartVelocityMechanism`\
+Doxygen: [`FlyWheel`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1velocity_1_1FlyWheel.html)
 
 **Java equivalent:** [Java FlyWheel](../../java-reference/mechanisms/flywheel.md)
 

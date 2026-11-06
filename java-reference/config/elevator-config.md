@@ -1,6 +1,7 @@
 # ElevatorConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`ElevatorConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/ElevatorConfig.html)
 
 `ElevatorConfig` configures a linear elevator mechanism. All builder methods return the `ElevatorConfig` instance for chaining.
 

@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::config`\
 **Header:** `<yams/mechanisms/config/FlyWheelConfig.hpp>`\
-**Java equivalent:** [Java FlyWheelConfig](../../java-reference/config/flywheel-config.md)
+**Java equivalent:** [Java FlyWheelConfig](../../java-reference/config/flywheel-config.md)\
+**Doxygen:** [`FlyWheelConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1FlyWheelConfig.html)
 
 `FlyWheelConfig` holds physical and simulation parameters for a `FlyWheel` mechanism.
 

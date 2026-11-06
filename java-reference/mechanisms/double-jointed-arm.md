@@ -1,7 +1,8 @@
 # DoubleJointedArm
 
 **Package:** `yams.commands2.mechanisms` (Commands v2) or `yams.commands3.mechanisms` (Commands v3)\
-**Extends:** `yams.core.mechanisms.positional.DoubleJointedArm` (which extends `SmartPositionalMechanism`)
+**Extends:** `yams.core.mechanisms.positional.DoubleJointedArm` (which extends `SmartPositionalMechanism`)\
+**Javadoc:** [`DoubleJointedArm`](https://javadocs.yassrobotics.com/yams/yams/commands2/mechanisms/DoubleJointedArm.html) (Commands v2), [`DoubleJointedArm`](https://javadocs.yassrobotics.com/yams/yams/commands3/mechanisms/DoubleJointedArm.html) (Commands v3)
 
 `DoubleJointedArm` controls a serial two-joint arm: a lower link (shoulder) and an upper link (elbow). Each joint has its own `SmartMotorController`. The class provides both direct joint angle control and inverse kinematics to a Cartesian target.
 

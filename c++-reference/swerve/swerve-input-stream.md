@@ -3,7 +3,8 @@
 **Namespace:** `yams::mechanisms::swerve::utility`\
 **Header:** `#include <yams/mechanisms/swerve/utility/SwerveInputStream.hpp>`\
 **Template:** `template <size_t NumModules = 4>`\
-**Java equivalent:** [Java SwerveInputStream](../../java-reference/swerve/swerve-input-stream.md)
+**Java equivalent:** [Java SwerveInputStream](../../java-reference/swerve/swerve-input-stream.md)\
+**Doxygen:** [`SwerveInputStream`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1swerve_1_1utility_1_1SwerveInputStream.html)
 
 `SwerveInputStream<N>` converts raw joystick inputs into **field-relative** `wpi::math::ChassisVelocities` for a `SwerveDrive<N>`. Handles deadbands, cubic input curves, axis scaling, alliance flipping, and multiple drive modes (angular-velocity, heading-angle, aim-at-target, translation-only). It can also publish its own telemetry and be live tuned from the dashboard (see [Telemetry & Live Tuning](#telemetry--live-tuning)).
 

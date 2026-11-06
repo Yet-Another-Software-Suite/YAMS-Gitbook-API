@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::swerve`\
 **Header:** `#include <yams/mechanisms/swerve/SwerveModule.hpp>`\
-**Java equivalent:** [Java SwerveModule](../../java-reference/swerve/swerve-module.md)
+**Java equivalent:** [Java SwerveModule](../../java-reference/swerve/swerve-module.md)\
+**Doxygen:** [`SwerveModule`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1swerve_1_1SwerveModule.html)
 
 `SwerveModule` represents one swerve module: a drive motor and an azimuth motor. You construct one per corner from a `SwerveModuleConfig` (which must outlive the module) and pass pointers to them into `SwerveDriveConfig::WithModules(...)`; `SwerveDrive<N>` then drives, simulates and publishes them.
 

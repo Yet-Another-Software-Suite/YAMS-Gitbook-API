@@ -1,7 +1,8 @@
 # SmartMotorControllerConfig
 
 **Namespace:** `yams::motorcontrollers`\
-**Header:** `#include <yams/motorcontrollers/SmartMotorControllerConfig.hpp>`
+**Header:** `#include <yams/motorcontrollers/SmartMotorControllerConfig.hpp>`\
+**Doxygen:** [`SmartMotorControllerConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1SmartMotorControllerConfig.html)
 
 `SmartMotorControllerConfig` configures a [`SmartMotorController`](smart-motor-controller.md). All builder methods return `SmartMotorControllerConfig&` for chaining. Units are `wpi::units::*` types and motor models are `wpi::math::DCMotor`. The wrappers take the config by pointer, so it must outlive the wrapper.
 
@@ -204,7 +205,7 @@ Live tuning is registered automatically at `TelemetryVerbosity::HIGH` when a sub
 | --------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | `WithSubsystem(wpi::cmd::SubsystemBase* subsystem)`                         | Associate with a Commands v2 subsystem (throws a `SmartMotorControllerConfigurationException` if already set) |
 | `WithFollowers(std::vector<std::pair<std::any, bool>> followers)`           | Tightly coupled vendor followers: (hardware pointer, oppose master) pairs |
-| `WithLooselyCoupledFollowers(std::vector<SmartMotorController*> followers)` | Followers on separate shafts, each with its own config and closed loop. They are sent the leader's position and velocity setpoints and live tuning changes. Stopping the leader's closed loop stops theirs and sets them to a duty cycle of 0, and starting it starts theirs. Call `UpdateTelemetry()` and `SimIterate()` on each follower yourself |
+| `WithLooselyCoupledFollowers(std::vector<SmartMotorController*> followers)` | Followers on separate shafts, each with its own config and closed loop. They are sent the leader's position and velocity setpoints and live tuning changes. Stopping the leader's closed loop stops theirs and sets them to a duty cycle of 0, and starting it starts theirs. Call `UpdateTelemetry()` on each follower yourself. In a mechanism class, such as an `Arm`, they are simulated with the leader, from its `GetMechanismDCMotor()` with each motor controller's own output, and the mechanism iterates them; without one, call `SimIterate()` on each follower too |
 | `WithVendorConfig(std::any cfg)`                                            | Vendor config applied first; YAMS options override it        |
 | `WithVendorControlRequest(std::any req)`                                    | Phoenix 6 position or velocity control request to use (TalonFX/TalonFXS) |
 | `ClearFollowers()`                                                          | Remove the tightly coupled followers                         |
@@ -212,7 +213,7 @@ Live tuning is registered automatically at `TelemetryVerbosity::HIGH` when a sub
 
 Vendor config types: `ctre::phoenix6::configs::TalonFXConfiguration` (TalonFX), `ctre::phoenix6::configs::TalonFXSConfiguration` (TalonFXS), `rev::spark::SparkMaxConfig` / `rev::spark::SparkFlexConfig` (SPARK), `thrifty::NovaConfigBatch` (Nova). The A301 has no vendor config.
 
-Follower types: `ctre::phoenix6::hardware::TalonFX*` or `TalonFXS*` (CTRE wrappers), `rev::spark::SparkMax*` or `rev::spark::SparkFlex*` (SparkWrapper), `thrifty::Nova*` (NovaWrapper). The A301 has no follower mode; use `WithLooselyCoupledFollowers`.
+Follower types: `ctre::phoenix6::hardware::TalonFX*` or `TalonFXS*` (CTRE wrappers), `rev::spark::SparkMax*` or `rev::spark::SparkFlex*` (SparkWrapper), `thrifty::Nova*` (NovaWrapper), `A301Wrapper*` (A301Wrapper, which follows in software; see [A301Wrapper](a301-wrapper.md#followers)).
 
 ***
 

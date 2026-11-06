@@ -1,6 +1,7 @@
 # PivotConfig
 
-**Package:** `yams.core.mechanisms.config`
+**Package:** `yams.core.mechanisms.config`\
+**Javadoc:** [`PivotConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/PivotConfig.html)
 
 `PivotConfig` configures a rotational mechanism in the XY plane (e.g., a turret or shooter hood). For mechanisms rotating in the XZ plane, use [ArmConfig](arm-config.md) instead.
 

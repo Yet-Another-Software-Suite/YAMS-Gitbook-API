@@ -1,6 +1,7 @@
 # Sprocket
 
-**Package:** `yams.core.gearing`
+**Package:** `yams.core.gearing`\
+**Javadoc:** [`Sprocket`](https://javadocs.yassrobotics.com/yams/yams/core/gearing/Sprocket.html)
 
 `Sprocket` models a chain or belt drive stage. The API is identical to `GearBox`. The distinction is semantic, reflecting the physical mechanism (toothed sprockets and chain vs. meshed gears).
 

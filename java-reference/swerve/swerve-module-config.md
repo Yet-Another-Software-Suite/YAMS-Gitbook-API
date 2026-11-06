@@ -1,7 +1,8 @@
 # SwerveModuleConfig
 
 **Package:** `yams.core.mechanisms.config`\
-**C++ equivalent:** [C++ SwerveModuleConfig](../../c++-reference/swerve/swerve-module-config.md)
+**C++ equivalent:** [C++ SwerveModuleConfig](../../c++-reference/swerve/swerve-module-config.md)\
+**Javadoc:** [`SwerveModuleConfig`](https://javadocs.yassrobotics.com/yams/yams/core/mechanisms/config/SwerveModuleConfig.html)
 
 Configures one swerve module. Takes drive and azimuth motor controllers in the constructor. It does not need a `Subsystem` or `Mechanism`, so the same class is used with Commands v2 and Commands v3.
 

@@ -1,6 +1,7 @@
 # LQRController
 
-**Package:** `yams.core.math`
+**Package:** `yams.core.math`\
+**Javadoc:** [`LQRController`](https://javadocs.yassrobotics.com/yams/yams/core/math/LQRController.html)
 
 `LQRController` wraps a `LinearSystemLoop` and provides type-safe `calculate()` overloads for different mechanism types.
 

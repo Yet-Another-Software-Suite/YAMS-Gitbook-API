@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::motorcontrollers::local`\
 **Extends:** `SmartMotorController`\
-**Header:** `#include <yams/motorcontrollers/local/NovaWrapper.hpp>`
+**Header:** `#include <yams/motorcontrollers/local/NovaWrapper.hpp>`\
+**Doxygen:** [`NovaWrapper`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1local_1_1NovaWrapper.html)
 
 `SmartMotorController` implementation for The Thrifty Bot's Thrifty Nova motor controller, using ThriftyLib 2027.
 

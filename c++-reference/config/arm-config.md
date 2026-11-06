@@ -2,7 +2,8 @@
 
 **Namespace:** `yams::mechanisms::config`\
 **Header:** `<yams/mechanisms/config/ArmConfig.hpp>`\
-**Java equivalent:** [Java ArmConfig](../../java-reference/config/arm-config.md)
+**Java equivalent:** [Java ArmConfig](../../java-reference/config/arm-config.md)\
+**Doxygen:** [`ArmConfig`](https://doxygen.yassrobotics.com/yams/classyams_1_1mechanisms_1_1config_1_1ArmConfig.html)
 
 `ArmConfig` holds physical and simulation parameters for an `Arm` mechanism.
 

@@ -1,7 +1,8 @@
 # SmartMotorController
 
 **Namespace:** `yams::motorcontrollers`\
-**Header:** `#include <yams/motorcontrollers/SmartMotorController.hpp>`
+**Header:** `#include <yams/motorcontrollers/SmartMotorController.hpp>`\
+**Doxygen:** [`SmartMotorController`](https://doxygen.yassrobotics.com/yams/classyams_1_1motorcontrollers_1_1SmartMotorController.html)
 
 `SmartMotorController` is the abstract base class for all motor controller implementations. Do not instantiate this class directly. Construct concrete instances using vendor-specific subclass constructors such as [`SparkWrapper`](spark-wrapper.md), [`NovaWrapper`](nova-wrapper.md), [`A301Wrapper`](a301-wrapper.md), [`TalonFXWrapper` or `TalonFXSWrapper`](talonfx-wrapper.md).
 
@@ -162,7 +163,15 @@ These apply a change immediately without a full `ApplyConfig` call. They are als
 ```cpp
 void SetSimSupplier(std::shared_ptr<SimSupplier> supplier);
 SimSupplier* GetSimSupplier() const;
+void SetMechanismSimSupplier(std::shared_ptr<SimSupplier> supplier);
+wpi::math::DCMotor GetMechanismDCMotor();
+double GetMechanismDutyCycle(double dutyCycle);
+void SimIterateLooselyCoupledFollowers();
 ```
+
+`GetMechanismDCMotor()` is the `DCMotor` of every motor on the mechanism: `GetDCMotor()` and each loosely coupled follower's, with a follower's torque given at this motor's rotor. The mechanism classes simulate it, and attach their simulation with `SetMechanismSimSupplier`, which each loosely coupled follower then reads; its current is not counted again by `BatterySim`.
+
+`GetMechanismDutyCycle(dutyCycle)` is the duty cycle a mechanism's simulation applies: each motor controller's own duty cycle, as its vendor simulation limits it, weighted by its share of the torque. The mechanism iterates its followers right after it steps, with `SimIterateLooselyCoupledFollowers()`, and a follower's own `SimIterate()` does nothing while it reads a mechanism's simulation. Without a mechanism class, each follower simulates its own motor and load, and you call its `SimIterate()`.
 
 ### Closed loop controller thread
 

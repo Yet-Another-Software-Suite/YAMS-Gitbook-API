@@ -1,6 +1,7 @@
 # ExponentialProfilePIDController
 
-**Package:** `yams.core.math`
+**Package:** `yams.core.math`\
+**Javadoc:** [`ExponentialProfilePIDController`](https://javadocs.yassrobotics.com/yams/yams/core/math/ExponentialProfilePIDController.html)
 
 `ExponentialProfilePIDController` wraps a `PIDController` with an `ExponentialProfile` to produce smooth, physically-motivated setpoints. The exponential profile models a first-order system response; unlike the trapezoidal profile, it does not have a constant-velocity segment, so it tends to feel more natural for arm and flywheel mechanisms.
 
