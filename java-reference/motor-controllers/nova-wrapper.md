@@ -53,6 +53,7 @@ SmartMotorController motor = new NovaWrapper(
 **Closed loop runs on the Nova.** In `ControlMode.CLOSED_LOOP` a PID, with or without a trapezoidal position profile, runs on the Nova (ThriftyLib 2027.0.0-alpha-6):
 
 * `SLOT_0` and `SLOT_1` are the Nova's `Pid0` and `Pid1` slots, and its `Mp0` and `Mp1` motion profile slots, which take the feedforward's kS, kV, kA and kG (cosine gravity for an `ArmFeedforward`).
+* A feedforward also works without a motion profile: YAMS sends kV times the velocity target with each velocity request, as ThriftyLib's per-request feedforward in volts, added to any feedforward force from `setVelocity(velocity, force)`. So a swerve drive motor or flywheel keeps its kV on the Nova. Velocity requests with a trapezoidal profile get kV per request too.
 * YAMS sends the Nova a sensor-to-mechanism ratio, so targets, gains and soft limits are in mechanism rotations. kI and kD are sent as configured (per second).
 * The closed loop tolerance is the slot's allowable error.
 * The mechanism limits become the Nova's soft limits.
@@ -62,16 +63,16 @@ SmartMotorController motor = new NovaWrapper(
 The closed loop runs on the SystemCore instead, which commands the Nova with voltage, for:
 
 * an [LQR controller](../math/lqr-controller.md), an exponential profile or a velocity trapezoidal profile;
-* a feedforward with a nonzero gain and no `withTrapezoidalProfile(...)`, such as a velocity loop's kV on a swerve drive motor. The Nova applies a feedforward only in its motion profile, which is for position only. A feedforward whose gains are all 0 counts as no feedforward;
 * an absolute encoder closing the loop read over a range other than `[0, 1)` without continuous wrapping, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))` on an arm. The Nova's `[0, 1)` wrapping point would fall inside the range;
 * continuous wrapping of an absolute encoder geared to the mechanism (external encoder gearing other than 1:1). It wraps once per encoder rotation, inside the mechanism's range.
 
-The SystemCore wraps any range on any sensor and applies any feedforward. YAMS raises the `closed loop controller is running on the SystemCore` alert whenever the loop runs there. `getClosedLoopControllerPeriod()` also shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
+The SystemCore wraps any range on any sensor. YAMS raises the `closed loop controller is running on the SystemCore` alert whenever the loop runs there. `getClosedLoopControllerPeriod()` also shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
 
 When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerConfigurationException` for:
 
 | Option | Why |
 | ------ | --- |
+| A feedforward with a nonzero kS, kG or kA without `withTrapezoidalProfile(...)` | The Nova applies kS, kG and kA only in its motion profile. Add `withTrapezoidalProfile`, or use a feedforward with only kV. |
 | `SLOT_2` or `SLOT_3` | The Nova has two closed loop slots. |
 | Only one mechanism limit | The Nova's soft limits need both an upper and a lower limit. |
 | `withTemperatureCutoff`, `withClosedLoopControllerMaximumVoltage`, `withFeedbackSynchronizationThreshold`, `withClosedLoopControlPeriod` | Only the SystemCore's closed loop applies them. |
