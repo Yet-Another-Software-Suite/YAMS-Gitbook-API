@@ -166,12 +166,11 @@ SimSupplier* GetSimSupplier() const;
 void SetMechanismSimSupplier(std::shared_ptr<SimSupplier> supplier);
 wpi::math::DCMotor GetMechanismDCMotor();
 double GetMechanismDutyCycle(double dutyCycle);
-void SimIterateLooselyCoupledFollowers();
 ```
 
 `GetMechanismDCMotor()` is the `DCMotor` of every motor on the mechanism: `GetDCMotor()` and each loosely coupled follower's, with a follower's torque given at this motor's rotor. The mechanism classes simulate it, and attach their simulation with `SetMechanismSimSupplier`, which each loosely coupled follower then reads; its current is not counted again by `BatterySim`.
 
-`GetMechanismDutyCycle(dutyCycle)` is the duty cycle a mechanism's simulation applies: each motor controller's own duty cycle, as its vendor simulation limits it, weighted by its share of the torque. The mechanism iterates its followers right after it steps, with `SimIterateLooselyCoupledFollowers()`, and a follower's own `SimIterate()` does nothing while it reads a mechanism's simulation. Without a mechanism class, each follower simulates its own motor and load, and you call its `SimIterate()`.
+`GetMechanismDutyCycle(dutyCycle)` is the duty cycle a mechanism's simulation applies: each motor controller's own duty cycle, as its vendor simulation limits it, weighted by its share of the torque. The leader's `SimIterate()`, which the mechanism calls right after it steps, iterates its followers, and a follower's own `SimIterate()` does nothing while it reads a mechanism's simulation. Without a mechanism class, each follower simulates its own motor and load, and you call its `SimIterate()`.
 
 ### Closed loop controller thread
 

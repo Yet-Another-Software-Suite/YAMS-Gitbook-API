@@ -170,13 +170,12 @@ At `TelemetryVerbosity.HIGH`, `setupTelemetry()` registers a `Live Tuning` comma
 | `setSimSupplier(SimSupplier supplier)` | `void`                  | Attaches or replaces the simulation supplier.                                    |
 | `setMechanismSimSupplier(SimSupplier supplier)` | `void`         | Attaches the simulation of the mechanism this controller drives, made with `getMechanismDCMotor()`. Each loosely coupled follower reads it, and its current is not counted again by `BatterySim`. The mechanism classes call it. |
 | `getMechanismDutyCycle(double dutyCycle)` | `double`             | The duty cycle the motors of this controller's simulation apply. In a mechanism's simulation, each motor controller's own duty cycle weighted by its share of `getMechanismDCMotor()`'s torque; otherwise the given duty cycle. The simulation suppliers use it. |
-| `simIterateLooselyCoupledFollowers()` | `void`                     | Iterates the loosely coupled followers reading this controller's mechanism's simulation. The mechanism classes call it right after they step. |
 
 In a mechanism class, such as an `Arm`, the leader's loosely coupled followers are simulated with it:
 
 * The mechanism's simulation is made from the leader's `getMechanismDCMotor()`, which has every motor.
 * It applies each motor controller's own output, as its vendor simulation limits it, weighted by its share of the torque: `getMechanismDutyCycle(double)`.
-* The mechanism iterates the followers right after it steps, with `simIterateLooselyCoupledFollowers()`, and each follower's encoder reads its simulation. A follower's own `simIterate()` does nothing while it reads a mechanism's simulation, so it is not iterated twice in a loop.
+* The leader's `simIterate()`, which the mechanism calls right after it steps, iterates the followers, and each follower's encoder reads its simulation. A follower's own `simIterate()` does nothing while it reads a mechanism's simulation, so it is not iterated twice in a loop.
 
 Without a mechanism class, each follower simulates its own motor and load, and you call its `simIterate()`.
 
