@@ -199,7 +199,7 @@ Each vendor limits the range an absolute encoder can read; any other range throw
 | `CANcoder`, `CANdi` PWM | A maximum from 0 to 1 rotation, sent as the encoder's `AbsoluteSensorDiscontinuityPoint`. | The encoder's own range. |
 | `SparkAbsoluteEncoder` | One rotation from [-1, 0) to [0, 1). REVLib's range offset is the middle of the range, `(min + max) / 2`. | [0, 1) |
 | REVLib `DetachedEncoder` | [-0.5, 0.5) (zero centered) or [0, 1). | [0, 1) |
-| Thrifty Nova `ABS` or `CanEncoder` | Any range when the SystemCore runs the closed loop. [0, 1) when the Nova closes its loop on the encoder. | [0, 1) |
+| Thrifty Nova `ABS` or `CanEncoder` | Any range. [0, 1) of the absolute encoder closing the loop runs on the Nova, any other range on the SystemCore. | [0, 1) |
 | FIRST A301 absolute encoder | Any range, applied by the wrapper. | [0, 1) |
 
 Getters: `getWrappingMax()` and `getWrappingMin()` (formerly `getContinuousWrapping()` and `getContinuousWrappingMin()`) return the range, or empty without wrapping. `isWrappingContinuous()` says whether the closed loop wraps, and throws `SmartMotorControllerConfigurationException` if continuous wrapping and soft limits are both set. `getContinuousWrappingSetpoint(setpoint, current)` returns the setpoint unchanged unless the wrapping is continuous.

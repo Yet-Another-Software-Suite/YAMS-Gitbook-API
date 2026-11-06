@@ -40,16 +40,18 @@ Where the closed loop runs depends on the controller (ThriftyLib 2027.0.0-alpha-
 | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
 | PID, with or without a trapezoidal position profile                                        | On the Nova: its `Pid0`/`Pid1` slots, and its `Mp0`/`Mp1` motion profile with the feedforward's kS, kV, kA and kG (cosine gravity for an arm feedforward). |
 | [LQR](../math/lqr-controller.md), exponential profile or velocity trapezoidal profile      | On the SystemCore. YAMS runs the loop in a notifier, commands the Nova with voltage, and raises an alert (see [Alerts](#alerts)). |
+| A feedforward without `WithTrapezoidProfile(...)`, such as a velocity loop's kV on a swerve drive motor | On the SystemCore, as above. The Nova applies a feedforward only in its motion profile, which is for position only. |
+| An absolute encoder closing the loop with wrapping other than `[0, 1)`, or continuous wrapping of anything but `[0, 1)` of an absolute encoder on the mechanism (1:1 external encoder gearing) closing the loop | On the SystemCore, as above. This covers continuous wrapping of the motor's own encoder on a swerve azimuth seeded from a CANcoder. |
+
+The SystemCore wraps any range on any sensor and applies any feedforward, so a Nova azimuth with a CANcoder works like a SPARK MAX with one. `GetClosedLoopControllerPeriod()` shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
 
 When the Nova runs the loop, YAMS sends it a sensor-to-mechanism ratio, so targets, gains and soft limits are in mechanism rotations. kI and kD are sent as configured (per second), the closed loop tolerance is the slot's allowable error, the mechanism limits become the Nova's soft limits, and live setters update the Nova. `ApplyConfig` throws `SmartMotorControllerConfigurationException` for:
 
 | Option                                                                                                                   | Why                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| A feedforward without `WithTrapezoidProfile(...)`                                                                        | The Nova applies a feedforward only in its motion profile, which is for position only. For velocity control with a feedforward, use a velocity trapezoidal profile, which runs on the SystemCore. |
 | `SLOT_2` or `SLOT_3`                                                                                                     | The Nova has two closed loop slots.                                                                     |
 | Only one mechanism limit                                                                                                 | The Nova's soft limits need both an upper and a lower limit.                                            |
 | `WithTemperatureCutoff`, `WithClosedLoopControllerMaximumVoltage`, `WithFeedbackSynchronizationThreshold`, `WithClosedLoopControlPeriod` | Only the SystemCore's closed loop applies them.                                                         |
-| An absolute encoder closing the loop with wrapping other than `[0, 1)`                                                   | The Nova reads an absolute encoder closing its loop over `[0, 1)`. `WithContinuousWrapping` also needs that encoder on the mechanism (1:1 external encoder gearing). |
 
 `WithClosedLoopControlPeriod(...)` (default 20 ms) sets the SystemCore's loop period; it is only valid in closed loop mode.
 
@@ -86,7 +88,7 @@ Pass one of the following to `WithExternalEncoder(...)`:
 
 Any other value throws `std::invalid_argument`.
 
-An absolute or CAN encoder reads `[0, 1)` unless a wrapping range is set with `WithWrapping(min, max)`, such as `WithWrapping(-0.5_tr, 0.5_tr)`. Any range works when the SystemCore runs the closed loop, but only `[0, 1)` when the Nova closes its loop on the encoder. Only `WithContinuousWrapping` turns on the Nova's `AbsWrapping`. Zero offset is only available for absolute encoders and throws a `SmartMotorControllerConfigurationException` for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
+An absolute or CAN encoder reads `[0, 1)` unless a wrapping range is set with `WithWrapping(min, max)`, such as `WithWrapping(-0.5_tr, 0.5_tr)`. Any range works. With `[0, 1)` the Nova closes its loop on the encoder; with any other range the closed loop runs on the SystemCore. Only `WithContinuousWrapping` turns on the Nova's `AbsWrapping`. Zero offset is only available for absolute encoders and throws a `SmartMotorControllerConfigurationException` for a quadrature encoder. A quadrature encoder counts from where it powers on, so it is set to the starting position (or zero) when the config is applied.
 
 `WithExternalEncoderZeroOffset`, `WithExternalEncoderInverted` and `WithExternalEncoderGearing` all require `WithExternalEncoder(...)`; setting them without one throws `SmartMotorControllerConfigurationException`.
 
@@ -112,7 +114,7 @@ Alerts are published in the `YAMS` alert group and cleared when the wrapper is d
 
 | Alert                                                          | When                                                                 |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `<name> closed loop controller is running on the SystemCore.`  | An [LQR](../math/lqr-controller.md), exponential profile or velocity trapezoidal profile is configured in closed loop mode, so the loop runs on the SystemCore. |
+| `<name> closed loop controller is running on the SystemCore.`  | The loop runs on the SystemCore in closed loop mode: an [LQR](../math/lqr-controller.md), exponential profile or velocity trapezoidal profile, or a config the Nova can't run (see [Closed loop control](#closed-loop-control)). |
 
 ***
 

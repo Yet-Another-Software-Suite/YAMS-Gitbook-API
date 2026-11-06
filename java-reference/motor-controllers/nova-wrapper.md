@@ -58,17 +58,22 @@ SmartMotorController motor = new NovaWrapper(
 * The mechanism limits become the Nova's soft limits.
 * Live setters (gains, profile, tolerance, limits) update the Nova.
 
-Only an [LQR controller](../math/lqr-controller.md), an exponential profile or a velocity trapezoidal profile run on the SystemCore, which commands the Nova with voltage. Only then does YAMS raise the `closed loop controller is running on the SystemCore` alert.
+The closed loop runs on the SystemCore instead, which commands the Nova with voltage, for:
+
+* an [LQR controller](../math/lqr-controller.md), an exponential profile or a velocity trapezoidal profile;
+* a feedforward without `withTrapezoidalProfile(...)`, such as a velocity loop's kV on a swerve drive motor. The Nova applies a feedforward only in its motion profile, which is for position only;
+* an absolute encoder closing the loop with wrapping other than `[0, 1)`;
+* continuous wrapping of anything but `[0, 1)` of an absolute encoder on the mechanism (1:1 external encoder gearing) closing the loop, such as continuous wrapping of the motor's own encoder on a swerve azimuth seeded from a CANcoder.
+
+The SystemCore wraps any range on any sensor and applies any feedforward, so a Nova azimuth with a CANcoder works like a SPARK MAX with one. YAMS raises the `closed loop controller is running on the SystemCore` alert whenever the loop runs there. `getClosedLoopControllerPeriod()` also shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
 
 When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerConfigurationException` for:
 
 | Option | Why |
 | ------ | --- |
-| A feedforward without `withTrapezoidalProfile(...)` | The Nova applies a feedforward only in its motion profile, which is for position only. For velocity control with a feedforward, use a velocity trapezoidal profile, which runs on the SystemCore. |
 | `SLOT_2` or `SLOT_3` | The Nova has two closed loop slots. |
 | Only one mechanism limit | The Nova's soft limits need both an upper and a lower limit. |
 | `withTemperatureCutoff`, `withClosedLoopControllerMaximumVoltage`, `withFeedbackSynchronizationThreshold`, `withClosedLoopControlPeriod` | Only the SystemCore's closed loop applies them. |
-| An absolute encoder closing the loop with wrapping other than `[0, 1)` | The Nova reads an absolute encoder closing its loop over `[0, 1)`. `withContinuousWrapping` also needs that encoder on the mechanism (1:1 external encoder gearing). |
 
 **External encoders.** Pass one of the following to `withExternalEncoder(Object)`:
 
@@ -76,7 +81,7 @@ When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerCo
 * `FeedbackSensorType.QUAD`: a quadrature encoder wired to the Nova's data port. Its type comes from the vendor config, such as `NovaConfig.quadratureEncoderType(Motor.QuadratureEncoderType.custom(2048))`.
 * A `CanEncoder` (`com.thrifty.canEncoder.CanEncoder`): a Thrifty CAN Encoder on the same CAN bus.
 
-Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOffset` is only available for absolute encoders (`ABS` or a `CanEncoder`). An absolute encoder reads `[0, 1)` by default. Set another range with `withWrapping(min, max)`, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))`; any range works when the SystemCore runs the closed loop, but only `[0, 1)` when the Nova closes its loop on the encoder. Only `withContinuousWrapping` turns on the Nova's `absWrapping` (see [Wrapping](smart-motor-controller-config.md#wrapping)).
+Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOffset` is only available for absolute encoders (`ABS` or a `CanEncoder`). An absolute encoder reads `[0, 1)` by default. Set another range with `withWrapping(min, max)`, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))`; any range works. With `[0, 1)` the Nova closes its loop on the encoder; with any other range the closed loop runs on the SystemCore. Only `withContinuousWrapping` turns on the Nova's `absWrapping` (see [Wrapping](smart-motor-controller-config.md#wrapping)).
 
 **Limitations.**
 
