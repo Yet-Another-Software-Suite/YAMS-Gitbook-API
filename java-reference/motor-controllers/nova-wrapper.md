@@ -57,15 +57,16 @@ SmartMotorController motor = new NovaWrapper(
 * The closed loop tolerance is the slot's allowable error.
 * The mechanism limits become the Nova's soft limits.
 * Live setters (gains, profile, tolerance, limits) update the Nova.
+* Continuous wrapping runs on the Nova over any one rotation range, such as `[-0.5, 0.5)` or `[0, 1)`. For an absolute encoder (`ABS` or a `CanEncoder`) closing the loop with 1:1 external encoder gearing, the Nova wraps it itself (`absWrapping`), and YAMS sends each position target folded into `[0, 1)`. Positions are still reported in the configured range. For the motor's own encoder or a quadrature encoder, YAMS sends each target as the equivalent nearest the mechanism (at 3.2 rotations, a target of 0.25 is sent as 3.25), so the Nova's position loop takes the short way. A swerve azimuth seeded from a CANcoder runs entirely on the Nova, like a SPARK MAX with one.
 
 The closed loop runs on the SystemCore instead, which commands the Nova with voltage, for:
 
 * an [LQR controller](../math/lqr-controller.md), an exponential profile or a velocity trapezoidal profile;
-* a feedforward without `withTrapezoidalProfile(...)`, such as a velocity loop's kV on a swerve drive motor. The Nova applies a feedforward only in its motion profile, which is for position only;
-* an absolute encoder closing the loop with wrapping other than `[0, 1)`;
-* continuous wrapping of anything but `[0, 1)` of an absolute encoder on the mechanism (1:1 external encoder gearing) closing the loop, such as continuous wrapping of the motor's own encoder on a swerve azimuth seeded from a CANcoder.
+* a feedforward with a nonzero gain and no `withTrapezoidalProfile(...)`, such as a velocity loop's kV on a swerve drive motor. The Nova applies a feedforward only in its motion profile, which is for position only. A feedforward whose gains are all 0 counts as no feedforward;
+* an absolute encoder closing the loop read over a range other than `[0, 1)` without continuous wrapping, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))` on an arm. The Nova's `[0, 1)` wrapping point would fall inside the range;
+* continuous wrapping of an absolute encoder geared to the mechanism (external encoder gearing other than 1:1). It wraps once per encoder rotation, inside the mechanism's range.
 
-The SystemCore wraps any range on any sensor and applies any feedforward, so a Nova azimuth with a CANcoder works like a SPARK MAX with one. YAMS raises the `closed loop controller is running on the SystemCore` alert whenever the loop runs there. `getClosedLoopControllerPeriod()` also shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
+The SystemCore wraps any range on any sensor and applies any feedforward. YAMS raises the `closed loop controller is running on the SystemCore` alert whenever the loop runs there. `getClosedLoopControllerPeriod()` also shows where the loop runs: 1 ms on the Nova, the closed loop control period (20 ms by default) on the SystemCore.
 
 When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerConfigurationException` for:
 
@@ -81,7 +82,7 @@ When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerCo
 * `FeedbackSensorType.QUAD`: a quadrature encoder wired to the Nova's data port. Its type comes from the vendor config, such as `NovaConfig.quadratureEncoderType(Motor.QuadratureEncoderType.custom(2048))`.
 * A `CanEncoder` (`com.thrifty.canEncoder.CanEncoder`): a Thrifty CAN Encoder on the same CAN bus.
 
-Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOffset` is only available for absolute encoders (`ABS` or a `CanEncoder`). An absolute encoder reads `[0, 1)` by default. Set another range with `withWrapping(min, max)`, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))`; any range works. With `[0, 1)` the Nova closes its loop on the encoder; with any other range the closed loop runs on the SystemCore. Only `withContinuousWrapping` turns on the Nova's `absWrapping` (see [Wrapping](smart-motor-controller-config.md#wrapping)).
+Any other encoder throws `IllegalArgumentException`. `withExternalEncoderZeroOffset` is only available for absolute encoders (`ABS` or a `CanEncoder`). An absolute encoder reads `[0, 1)` by default. Set another range with `withWrapping(min, max)`, such as `withWrapping(Rotations.of(-0.5), Rotations.of(0.5))`; any range works. The Nova closes its loop on the encoder over `[0, 1)`, or over any range with `withContinuousWrapping` and 1:1 external encoder gearing; with any other range the closed loop runs on the SystemCore. Only `withContinuousWrapping` turns on the Nova's `absWrapping` (see [Wrapping](smart-motor-controller-config.md#wrapping)).
 
 **Limitations.**
 

@@ -156,7 +156,7 @@ The range an absolute external encoder reads is set by `WithWrapping(min, max)` 
 | CANcoder, CANdi PWM           | A maximum from 0 to 1 rotation, sent as the encoder's `AbsoluteSensorDiscontinuityPoint`                  | The encoder's own range |
 | `SparkAbsoluteEncoder`        | One rotation from \[-1, 0) to \[0, 1); REVLib's range offset is the middle, `(min + max) / 2`           | \[0, 1)           |
 | `DetachedEncoder`             | \[-0.5, 0.5) (zero centered) or \[0, 1)                                                                 | \[0, 1)           |
-| Nova `ABS` or `CanEncoder`    | Any range; \[0, 1) of the absolute encoder closing the loop runs on the Nova, any other range on the SystemCore | \[0, 1)           |
+| Nova `ABS` or `CanEncoder`    | Any range; for the absolute encoder closing the loop, \[0, 1), or any range with continuous wrapping and 1:1 external encoder gearing, runs on the Nova, any other range on the SystemCore | \[0, 1)           |
 | A301 absolute encoder         | Any range, applied by the wrapper                                                                         | \[0, 1)           |
 
 Only continuous wrapping makes the closed loop wrap: PID continuous input, Talon `ClosedLoopGeneral.ContinuousWrap`, SPARK position wrapping or Nova `AbsWrapping`. `WithExternalEncoderDiscontinuityPoint` is removed; use `WithWrapping(-0.5_tr, 0.5_tr)` in place of `0.5_tr`, and `WithWrapping(0_tr, 1_tr)` in place of `1_tr`.
