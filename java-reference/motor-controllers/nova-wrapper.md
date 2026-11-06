@@ -53,7 +53,7 @@ SmartMotorController motor = new NovaWrapper(
 **Closed loop runs on the Nova.** In `ControlMode.CLOSED_LOOP` a PID, with or without a trapezoidal position profile, runs on the Nova (ThriftyLib 2027.0.0-alpha-6):
 
 * `SLOT_0` and `SLOT_1` are the Nova's `Pid0` and `Pid1` slots, and its `Mp0` and `Mp1` motion profile slots, which take the feedforward's kS, kV, kA and kG (cosine gravity for an `ArmFeedforward`).
-* A feedforward also works without a motion profile: YAMS sends kV times the velocity target with each velocity request, as ThriftyLib's per-request feedforward in volts, added to any feedforward force from `setVelocity(velocity, force)`. So a swerve drive motor or flywheel keeps its kV on the Nova. Velocity requests with a trapezoidal profile get kV per request too.
+* A feedforward also works without a motion profile. YAMS sends kS and kG (and the gravity type, cosine for an arm) to the slot's motion profile with or without a profile, and the Nova applies them in plain position and velocity control too. kV is sent as kV times the velocity target with each velocity request, as ThriftyLib's per-request feedforward in volts, added to any feedforward force from `setVelocity(velocity, force)`; velocity requests with a trapezoidal profile get it too. So a swerve drive motor or flywheel keeps its kS and kV on the Nova, and an arm without a profile keeps its kG. In simulation, kS (by the sign of the velocity target, or of the position error) and kG apply in position and velocity control too.
 * YAMS sends the Nova a sensor-to-mechanism ratio, so targets, gains and soft limits are in mechanism rotations. kI and kD are sent as configured (per second).
 * The closed loop tolerance is the slot's allowable error.
 * The mechanism limits become the Nova's soft limits.
@@ -72,7 +72,7 @@ When the Nova runs the closed loop, `applyConfig` throws `SmartMotorControllerCo
 
 | Option | Why |
 | ------ | --- |
-| A feedforward with a nonzero kS, kG or kA without `withTrapezoidalProfile(...)` | The Nova applies kS, kG and kA only in its motion profile. Add `withTrapezoidalProfile`, or use a feedforward with only kV. |
+| A feedforward with a nonzero kA without `withTrapezoidalProfile(...)` | The Nova applies kA only with a motion profile. Add `withTrapezoidalProfile`, or use a feedforward without kA. |
 | `SLOT_2` or `SLOT_3` | The Nova has two closed loop slots. |
 | Only one mechanism limit | The Nova's soft limits need both an upper and a lower limit. |
 | `withTemperatureCutoff`, `withClosedLoopControllerMaximumVoltage`, `withFeedbackSynchronizationThreshold`, `withClosedLoopControlPeriod` | Only the SystemCore's closed loop applies them. |
