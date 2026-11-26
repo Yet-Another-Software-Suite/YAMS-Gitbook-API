@@ -35,7 +35,9 @@ All methods return `SwerveDriveConfig&` for chaining.
 |--------|-----------|-------------|
 | `WithSubsystem` | `wpi::cmd::SubsystemBase* subsystem` | Associates a command subsystem with this drive (used for command requirements). |
 | `WithModules` | `std::vector<SwerveModule*> modules` | Sets the modules that make up this drive. Vector size must equal the `NumModules` template argument of `SwerveDrive`. |
-| `WithGyro` | `std::function<wpi::units::degree_t()> gyroSupplier` | **Required.** Supplies the current gyro heading for field-relative control and odometry. |
+| `WithRotation` | `std::function<wpi::math::Rotation3d()> rotationSupplier` | **Required** (or `WithGyro`). Supplies the robot's rotation from the gyro, as its full attitude, for field-relative control and odometry. |
+| `WithGyro` | `std::function<wpi::math::Rotation3d()> gyroSupplier` | Same as `WithRotation`. |
+| `WithGyro` | `std::function<wpi::units::degree_t()> gyroSupplier` | Supplies the gyro heading for a gyro mounted flat, as `WithRotation` with no roll or pitch. |
 | `WithGyroVelocity` | `std::function<wpi::units::degrees_per_second_t()> angularVelocitySupplier` | Supplies gyro angular velocity. Required for angular-velocity skew correction. |
 | `WithGyroOffset` | `wpi::units::degree_t offset` | Offset subtracted from the raw gyro reading in `GetGyroAngle()`. |
 | `WithGyroInverted` | `bool inverted` | Negates the raw gyro angle when `true`. |
@@ -60,7 +62,7 @@ All methods return `SwerveDriveConfig&` for chaining.
 {% endhint %}
 
 {% hint style="info" %}
-`WithGyro` is required. Omitting it causes `GetGyroAngle()` to throw a `std::runtime_error` and prevents field-relative control and odometry from functioning correctly.
+`WithRotation` (or `WithGyro`, which calls it) is required. Omitting it causes `GetGyroAngle()` to throw a `std::runtime_error` and prevents field-relative control and odometry from functioning correctly.
 
 Both `WithTelemetry` overloads require a name; there is no name-less `WithTelemetry(...)` or standalone `WithTelemetryName(...)` on `SwerveDriveConfig` (unlike, say, `SmartMotorControllerConfig`). `SwerveDriveConfig` also has no `WithDataLogName(...)`/`GetDataLogName()` of its own: DataLog output is configured on a `SwerveDriveTelemetryConfig` instead. See below.
 {% endhint %}

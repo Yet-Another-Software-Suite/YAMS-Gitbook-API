@@ -51,7 +51,8 @@ All builder methods return `SwerveDriveConfig` for chaining.
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `withSubsystem(Subsystem subsystem)` (v2) / `withMechanism(Mechanism mechanism)` (v3)           | `subsystem` / `mechanism`                      | Sets the owner (use with the no-arg constructor).                                                                                                                                                                                                                                                      |
 | `withModules(SwerveModule... modules)`                                                          | `modules`                                      | Sets the swerve modules for the drive.                                                                                                                                                                                                                                                                 |
-| `withGyro(Supplier<Rotation3d> gyro)`                                                           | `gyro`: attitude supplier                      | **Required.** The robot's attitude, e.g. `pigeon::getRotation3d`. Its yaw is the heading for field-relative control and odometry; its roll and pitch are used by anti-tipping.                                                                                                                         |
+| `withRotation(Supplier<Rotation3d> rotation)`                                                 | `rotation`: attitude supplier                  | **Required** (or `withGyro`). The robot's rotation from the gyro, as its attitude, e.g. `pigeon::getRotation3d`. Its yaw is the heading for field-relative control and odometry; its roll and pitch are used by anti-tipping. |
+| `withGyro(Supplier<Rotation3d> gyro)`                                                         | `gyro`: attitude supplier                      | Same as `withRotation`. |
 | `withGyroHeadingAxis(GyroAxis axis)`                                                            | `axis`                                         | Which gyro axis points up through the robot. Defaults to `GyroAxis.YAW`. See [Gyro](swerve-drive-config.md#gyro).                                                                                                                                                                                      |
 | `withGyroOffset(Angle offset)`                                                                  | `offset`                                       | Offset subtracted from the heading (the yaw of `getGyroRotation3d()`).                                                                                                                                                                                                                                 |
 | `withGyroInverted(boolean inverted)`                                                            | `inverted`                                     | Negates the heading when `true`.                                                                                                                                                                                                                                                                       |
@@ -80,14 +81,14 @@ Both overloads require a name; there is no name-less `withTelemetry(...)` or sta
 {% endhint %}
 
 {% hint style="info" %}
-`withGyro` is required. On a real robot, constructing a `SwerveDrive` without it throws `IllegalStateException`.
+`withRotation` (or `withGyro`, which calls it) is required. On a real robot, constructing a `SwerveDrive` without it throws `IllegalStateException`.
 {% endhint %}
 
 ***
 
 ## Gyro
 
-`withGyro` takes the gyro's full attitude as a `Rotation3d` supplier (most gyros expose one, e.g. `Pigeon2.getRotation3d()`).
+`withRotation` (or `withGyro`) takes the gyro's full attitude as a `Rotation3d` supplier (most gyros expose one, e.g. `Pigeon2.getRotation3d()`).
 
 `GyroAxis` (`yams.core.mechanisms.config.enums.GyroAxis`) says which axis of the gyro points up through the robot, so a gyro mounted on its side still reads the robot's heading:
 
