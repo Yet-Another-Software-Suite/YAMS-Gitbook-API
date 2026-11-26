@@ -35,8 +35,8 @@ Tests that are not parameterized use the TalonFX drive, SPARK MAX azimuth layout
 | `pidControllersAreOptional` | A config without translation or rotation controllers reports them missing. A drive built from it updates telemetry, simulates, and resets its controllers without throwing, and only `driveToPoseSetpoint` throws `SwerveDriveConfigurationException`. |
 | `initialPoseIsTheStartingPose` | A new drive's pose and gyro heading are at the origin, facing 0°. |
 | `resetOdometryMatchesPose` | After `resetOdometry` to (3, 2, 45°), the pose matches. |
-| `gyroHeadingWrapsAtHalfARotation` | Resetting to 270° gives a gyro heading and pose heading of -90°. |
-| `fieldRelativeSpeedsUseTheGyroHeading` | Facing 90°, a field relative 1 m/s toward +X becomes a robot relative 1 m/s to the robot's right (vy of -1). |
+| `odometryRotationWrapsAtHalfARotation` | Resetting to 270° gives an odometry rotation and pose heading of -90°, and leaves the gyro heading as it was. |
+| `fieldRelativeSpeedsUseTheOdometryRotation` | Facing 90°, a field relative 1 m/s toward +X becomes a robot relative 1 m/s to the robot's right (vy of -1). |
 | `stateFromSpeedsForwardDrive` | Module states for 1 m/s forward have every wheel at 1 m/s, pointing forward. |
 | `stateFromSpeedsPureRotation` | Module states for a pure rotation have every wheel moving and none pointing forward. |
 | `setRobotRelativeSpeedsDoesNotCrash` | `setRobotRelativeChassisSpeeds` with a moving and a zero speed does not throw. |

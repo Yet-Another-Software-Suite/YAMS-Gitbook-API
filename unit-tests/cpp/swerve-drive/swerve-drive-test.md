@@ -54,7 +54,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.DesiredModuleStatesAreTheOptimizedOnes` | Driving backward from forward pointing wheels gives desired states of -1 m/s at 0 degrees: the wheels are reversed, not turned. |
 | `SwerveDriveTest.CosineCompensationScalar` | The cosine compensation scalar is 1 when off. When on, it is 0.5 for a 60 degree azimuth error and 0 for 120 degrees. |
 | `SwerveDriveTest.ModuleStateCarriesTheAzimuthVelocity` | A module's state carries the azimuth motor's velocity and the drive motor's speed. |
-| `SwerveDriveTest.DriveGyroRotation3dFollowsTheHeading` | After a reset to 90 degrees, the drive's simulated 3D attitude has a 90 degree yaw and no roll or pitch. |
+| `SwerveDriveTest.DriveGyroRotation3dFollowsTheHeading` | `GetGyroRotation3d()` is the simulated gyro heading with no tilt, and a reset to 90 degrees doesn't turn it. |
 | `SwerveInputStreamTelemetryTest.LowPublishesOnlyTheMode` | At `LOW` verbosity only the mode (`ANGULAR_VELOCITY`) is published: no configuration, no rotation controller inputs, no tuning entries and no Live Tuning command. |
 | `SwerveInputStreamTelemetryTest.MediumPublishesTheConfigurationReadOnly` | At `MEDIUM` verbosity the deadband, translation scale and maximum linear speed are published, but nothing is tunable. Changes made in code are published the next time the stream is read. |
 | `SwerveInputStreamTelemetryTest.HighPublishesTuningValuesAndTheLiveTuningCommand` | At `HIGH` verbosity the deadband, scales, maximum speeds, cubing and alliance and robot relative flags are published as tuning values, and a Live Tuning command is created and published. |
