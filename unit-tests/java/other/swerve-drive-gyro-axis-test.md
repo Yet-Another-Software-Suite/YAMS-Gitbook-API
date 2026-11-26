@@ -16,8 +16,8 @@ Checks `SwerveDriveConfig.withGyroHeadingAxis(GyroAxis)`, for a gyro mounted on 
 | `yawHeadingFollowsGyroZ` | With `YAW`, turning the gyro about its Z axis through 0, 45, 89, 91, 135, 179, 181, 270 and 359°, then back through 181, 90, 0, -90 and -179°, gives that heading, wrapped to ±180°. |
 | `rollHeadingFollowsGyroX` | With `ROLL`, turning the gyro about its X axis through the same angles gives the same headings. |
 | `pitchHeadingFollowsGyroYPastAQuarterRotation` | With `PITCH`, turning the gyro about its Y axis through the same angles gives the same headings, past a quarter rotation, which a `Rotation3d`'s pitch alone cannot reach. |
-| `inversionAndOffsetApplyToTheChosenAxis` | With `ROLL`, inverted, and a 10° offset, a 30° gyro roll gives a heading of -40°. |
-| `offsetChangesOnlyTheHeading` | With `YAW` and a 90° offset, a gyro at 5° roll, -8° pitch and 30° yaw gives a heading of -60° and keeps the roll and pitch. |
+| `inversionAppliesToTheChosenAxis` | With `ROLL` and inverted, a 30° gyro roll gives a heading of -30°. |
+| `inversionChangesOnlyTheHeading` | With `YAW` and inverted, a gyro at 5° roll, -8° pitch and 30° yaw gives a heading of -30° and keeps the roll and pitch. |
 | `tiltIsTheRobotsForSideMountedGyros` | With `ROLL`, a gyro rotation about its Y axis reads as robot pitch. With `PITCH`, a gyro rotation about its X axis reads as robot roll. |
 | `antiTippingCorrectsTheRobotsTiltWithASideMountedGyro` | With `ROLL` and anti-tipping on, the robot tipping forward 15° gives a forward correction of 4 times sin(15°) and no sideways correction. |
 

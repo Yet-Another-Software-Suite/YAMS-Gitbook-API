@@ -43,7 +43,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.OptimizationKeepsTheOrientationTheWheelWasSentTo` | A target 135 degrees away is reached by reversing the wheel and turning -45 degrees. A following target 80 degrees away keeps the wheel reversed (turning -100 degrees) instead of flipping back. |
 | `SwerveDriveTest.GyroRotation3dMatchesTheHeading` | A heading gyro of 35 degrees gives a gyro angle and a 3D yaw of 35 degrees. A gyro given as a `Rotation3d` returns that roll, pitch and yaw. |
 | `SwerveDriveTest.GyroHeadingAxisReadsTheHeadingFromRollOrPitch` | With the heading axis set to roll, pitch or yaw, a 40 degree turn on that gyro axis reads as a 40 degree heading. With roll, the 3D attitude has no roll or pitch left. |
-| `SwerveDriveTest.GyroInversionAndOffsetApplyToTheHeading` | An inverted gyro reading 30 degrees with a 10 degree offset gives a heading of -40 degrees. |
+| `SwerveDriveTest.GyroInversionAppliesToTheHeading` | An inverted gyro reading 30 degrees gives a heading of -30 degrees. |
 | `SwerveDriveTest.AntiTippingRejectsBadValues` | `WithAntiTipping` throws `std::invalid_argument` for a zero gain, a 0 or 90 degree threshold, or a zero maximum correction, and accepts good values. |
 | `SwerveDriveTest.AntiTippingCorrectsOnlyPastTheThreshold` | With a 10 degree threshold, there is no correction when level or at 5 degrees of pitch. At 20 degrees the correction is along X only and matches WPILib's `AntiTipping`, and it is added to the chassis speeds. Turning anti-tipping off removes it. |
 | `SwerveDriveTest.ModuleSpeedsAreDesaturated` | Without a module limit, 6 m/s passes through. With a 3 m/s module limit, driving and turning together keeps every module at or under 3 m/s. |

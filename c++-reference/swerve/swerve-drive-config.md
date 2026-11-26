@@ -39,7 +39,6 @@ All methods return `SwerveDriveConfig&` for chaining.
 | `WithGyro` | `std::function<wpi::math::Rotation3d()> gyroSupplier` | Same as `WithRotation`. |
 | `WithGyro` | `std::function<wpi::units::degree_t()> gyroSupplier` | Supplies the gyro heading for a gyro mounted flat, as `WithRotation` with no roll or pitch. |
 | `WithGyroVelocity` | `std::function<wpi::units::degrees_per_second_t()> angularVelocitySupplier` | Supplies gyro angular velocity. Required for angular-velocity skew correction. |
-| `WithGyroOffset` | `wpi::units::degree_t offset` | Offset subtracted from the raw gyro reading in `GetGyroAngle()`. |
 | `WithGyroInverted` | `bool inverted` | Negates the raw gyro angle when `true`. |
 | `WithStartingPose` | `wpi::math::Pose2d pose` | Initial field-relative odometry pose. Defaults to the origin. |
 | `WithMaximumChassisSpeed` | `wpi::units::meters_per_second_t speed, wpi::units::degrees_per_second_t angularVelocity` | Maximum chassis linear/angular speeds used for wheel-speed desaturation. |
@@ -107,8 +106,7 @@ driveConfig.WithSubsystem(this)
 | `GetTelemetryVerbosity` | `std::optional<TelemetryVerbosity> GetTelemetryVerbosity() const` | Configured telemetry verbosity, if any. |
 | `GetTelemetryName` | `const std::string& GetTelemetryName() const` | Telemetry name prefix for the drive (defaults to `"swerve"`). |
 | `GetSwerveDriveTelemetryConfig` | `std::optional<telemetry::SwerveDriveTelemetryConfig> GetSwerveDriveTelemetryConfig()` | The explicit config passed to `WithTelemetry(name, SwerveDriveTelemetryConfig)`, if any. Moves it out; intended to be called exactly once, by `SwerveDrive` itself. |
-| `GetGyroOffset` | `wpi::units::degree_t GetGyroOffset() const` | Stored gyro offset (zero if never set). |
-| `GetGyroAngle` | `wpi::units::degree_t GetGyroAngle() const` | Gyro angle with inversion and offset applied. Throws a `std::runtime_error` if no gyro supplier was configured. |
+| `GetGyroAngle` | `wpi::units::degree_t GetGyroAngle() const` | Gyro angle with inversion applied. Throws a `std::runtime_error` if no gyro supplier was configured. |
 | `GetTranslationPID` | `std::optional<std::reference_wrapper<wpi::math::PIDController>> GetTranslationPID()` | Active translation controller (sim variant if simulating and configured), or `std::nullopt` if none was configured. |
 | `GetRotationPID` | `std::optional<std::reference_wrapper<wpi::math::PIDController>> GetRotationPID()` | Active rotation controller (sim variant if simulating and configured), or `std::nullopt` if none was configured. |
 | `OptimizeRobotRelativeChassisSpeeds` | `wpi::math::ChassisVelocities OptimizeRobotRelativeChassisSpeeds(wpi::math::ChassisVelocities speeds) const` | Applies angular-velocity skew correction (when a scale factor and `WithGyroVelocity` are both set) and discretization (when `WithDiscretizationTime` is set). `SwerveDrive` calls this before converting speeds into module states. |
