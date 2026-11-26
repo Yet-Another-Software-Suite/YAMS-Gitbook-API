@@ -42,8 +42,9 @@ explicit SwerveDrive(SwerveDriveConfig* config)
 | Method                                | Signature                                                                               | Description                                           |
 | ------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `GetPose`                             | `wpi::math::Pose2d GetPose()`                                                                 | Current estimated robot pose from the pose estimator. |
-| `ResetOdometry`                       | `void ResetOdometry(wpi::math::Pose2d pose)`                                                  | Resets the estimator and reseeds azimuth encoders.    |
-| `ZeroGyro`                            | `void ZeroGyro()`                                                                       | Resets the gyro heading to zero.                      |
+| `ResetOdometry`                       | `void ResetOdometry(wpi::math::Pose2d pose)`                                                  | Resets the estimator to `pose`. The gyro is not changed. |
+| `ZeroOdometryHeading`                 | `void ZeroOdometryHeading()`                                                            | Resets the odometry heading to zero, keeping the position. The gyro is not changed. |
+| `ZeroGyro`                            | `void ZeroGyro()`                                                                       | Same as `ZeroOdometryHeading()`. |
 | `AddVisionMeasurement`                | `void AddVisionMeasurement(wpi::math::Pose2d robotPose, wpi::units::second_t timestamp)`           | Fuses a vision pose measurement.                      |
 | `AddVisionMeasurement` (with stddevs) | `void AddVisionMeasurement(wpi::math::Pose2d, wpi::units::second_t, const wpi::util::array<double, 3>&)` | Vision measurement with custom standard deviations.   |
 | `SetVisionMeasurementStdDevs`         | `void SetVisionMeasurementStdDevs(const wpi::util::array<double, 3>& stdDevs)`                | Sets default vision measurement standard deviations.  |

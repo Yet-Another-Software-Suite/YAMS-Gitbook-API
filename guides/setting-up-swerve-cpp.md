@@ -330,7 +330,7 @@ At `TelemetryVerbosity::HIGH`, `SwerveDrive<N>` also publishes a live tuning com
 | `GetGyroAngle()`                                                     | Current gyro heading as a `degree_t`                                                        |
 | `GetGyroRotation3d()`                                                | The gyro's full attitude as a `Rotation3d`                                                  |
 | `ResetOdometry(Pose2d)`                                              | Reset odometry to a known pose                                                              |
-| `ZeroGyro()`                                                         | Zero the gyro heading                                                                       |
+| `ZeroOdometryHeading()`, or `ZeroGyro()`                             | Make the way the robot faces the zero heading for field-relative driving                    |
 | `AddVisionMeasurement(Pose2d, second_t)`                             | Fuse vision pose into odometry                                                              |
 | `GetSimPose()`                                                       | Ground-truth simulated pose, useful for feeding a simulated vision system                   |
 | `UpdateTelemetry()`                                                  | Call in `Periodic()`                                                                        |

@@ -22,7 +22,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.TelemetryAndSimRunWithoutCrash` | Telemetry and simulation run for 0.5 s without throwing. |
 | `SwerveDriveTest.InitialPoseIsOrigin` | The starting pose is the origin, facing 0 degrees. |
 | `SwerveDriveTest.ResetOdometryMatchesPose` | After `ResetOdometry` to (3, 2) at 45 degrees, `GetPose()` returns that pose. |
-| `SwerveDriveTest.ResetOdometryAlignsGyro` | `ResetOdometry` to 90 degrees sets the gyro angle and pose heading to 90 degrees. `ZeroGyro` then sets both to 0 and keeps the position. |
+| `SwerveDriveTest.ResetOdometryLeavesTheGyro` | `ResetOdometry` to 90 degrees sets the pose heading and `GetRotation()` to 90 degrees and leaves the gyro angle as it was. `ZeroOdometryHeading`, and `ZeroGyro`, then set the heading to 0 and leave the gyro. |
 | `SwerveDriveTest.GetStateFromSpeedsForwardDrive` | 1 m/s forward gives every module 1 m/s at 0 degrees. |
 | `SwerveDriveTest.GetStateFromSpeedsPureRotation` | Turning in place gives every module a nonzero speed and an angle that is not forward. |
 | `SwerveDriveTest.SetRobotRelativeSpeedsDoesNotCrash` | Setting robot relative speeds, moving and stopped, does not throw. |
