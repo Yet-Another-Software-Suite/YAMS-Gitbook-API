@@ -104,7 +104,7 @@ A stream copies `SwerveDriveConfig::WithMaximumChassisSpeed(...)`'s value (if se
 | Method                         | Signature                                                                                     | Description                                                                    |
 | ------------------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `WithAllianceRelativeControl`  | `WithAllianceRelativeControl()` or `WithAllianceRelativeControl(std::function<bool()>)`       | Rotates the translation input by 180 degrees on the Red alliance so "forward" always points away from your driver station. Ignored while robot-relative control is active. |
-| `WithRobotRelative`            | `WithRobotRelative()` or `WithRobotRelative(std::function<bool()>)`                           | Treats the translation input as robot-relative and converts it to field-relative using the gyro heading. The output of `Get()` is still field-relative. |
+| `WithRobotRelative`            | `WithRobotRelative()` or `WithRobotRelative(std::function<bool()>)`                           | Treats the translation input as robot-relative and converts it to field-relative using the drive's odometry rotation. The output of `Get()` is still field-relative. |
 | `WithTranslationHeadingOffset` | `WithTranslationHeadingOffset(wpi::math::Rotation2d angle)` or `WithTranslationHeadingOffset(wpi::math::Rotation2d angle, std::function<bool()> enabled)` | Rotates the output translation vector by a fixed `angle`.                      |
 
 ### Utility
@@ -152,15 +152,15 @@ Telemetry is off until you call `WithTelemetry(name, verbosity)` on a stream. It
 | `WithTelemetry`      | `SwerveInputStream& WithTelemetry(std::string name, TelemetryVerbosity verbosity)`                | Publishes this stream under `SwerveInputStream/<name>`. Replaces any telemetry the stream already had; `TelemetryVerbosity::NONE` turns it off. |
 | `GetTelemetry`       | `std::optional<std::reference_wrapper<SwerveInputStreamTelemetry<NumModules>>> GetTelemetry()` | The stream's telemetry, or empty if telemetry is not enabled. Creates it on first call. |
 | `GetCurrentModeName` | `std::string GetCurrentModeName() const`                                                          | Active drive mode (`ANGULAR_VELOCITY`, `HEADING`, `AIM`, `TRANSLATION_ONLY`). |
-| `GetRotationControllerMeasurement` | `std::optional<wpi::units::radian_t> GetRotationControllerMeasurement() const` | The measurement the last `Get()` gave the rotation controller in `HEADING`, `AIM` or `TRANSLATION_ONLY`: the robot's heading, in the gyro's frame. Empty if the last `Get()` did not use the controller. |
-| `GetRotationControllerSetpoint`    | `std::optional<wpi::units::radian_t> GetRotationControllerSetpoint() const`    | The setpoint the last `Get()` gave the rotation controller: the heading being turned to, in the gyro's frame. Empty if the last `Get()` did not use the controller. |
+| `GetRotationControllerMeasurement` | `std::optional<wpi::units::radian_t> GetRotationControllerMeasurement() const` | The measurement the last `Get()` gave the rotation controller in `HEADING`, `AIM` or `TRANSLATION_ONLY`: the robot's heading, on the field, from the drive's odometry rotation. Empty if the last `Get()` did not use the controller. |
+| `GetRotationControllerSetpoint`    | `std::optional<wpi::units::radian_t> GetRotationControllerSetpoint() const`    | The setpoint the last `Get()` gave the rotation controller: the heading being turned to, on the field, from the drive's odometry rotation. Empty if the last `Get()` did not use the controller. |
 
 `TelemetryVerbosity` is `SwerveDriveConfig::TelemetryVerbosity` (`NONE`, `LOW`, `MEDIUM`, `HIGH`; `MEDIUM` is Java's `MID`):
 
 | Verbosity | Publishes |
 | --------- | --------- |
 | `LOW`     | The current drive mode (`SwerveInputStream/<name>/mode`). |
-| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. And the rotation controller's inputs, `rotationController/measurement` and `rotationController/setpoint`, in radians in the gyro's frame. They are `NaN` while the stream isn't using the controller. |
+| `MEDIUM`  | Also the stream's configuration, read-only, under `SwerveInputStream/<name>/`. And the rotation controller's inputs, `rotationController/measurement` and `rotationController/setpoint`, in radians on the field, from the drive's odometry rotation. They are `NaN` while the stream isn't using the controller. |
 | `HIGH`    | Also editable copies of the configuration under `Tuning/SwerveInputStream/<name>/`, and a `Live Tuning` command at `Tuning/SwerveInputStream/<name>/Live Tuning`. |
 
 The tunable values are `deadband` `[0, 1)`, `translationScale` `(0, 1]`, `rotationScale` `(0, 1]`, `maxLinearVelocity` (m/s, > 0), `maxAngularVelocity` (rad/s, > 0), and the booleans `translationCube`, `rotationCube`, `allianceRelative` and `robotRelative`. The output velocities are not published (reading them would run the heading controller a second time each loop); log the speeds you send to the drive instead.

@@ -51,9 +51,9 @@ All builder methods return `SwerveDriveConfig` for chaining.
 | ----------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `withSubsystem(Subsystem subsystem)` (v2) / `withMechanism(Mechanism mechanism)` (v3)           | `subsystem` / `mechanism`                      | Sets the owner (use with the no-arg constructor).                                                                                                                                                                                                                                                      |
 | `withModules(SwerveModule... modules)`                                                          | `modules`                                      | Sets the swerve modules for the drive.                                                                                                                                                                                                                                                                 |
-| `withGyro(Supplier<Rotation3d> gyro)`                                                           | `gyro`: attitude supplier                      | **Required.** The robot's attitude, e.g. `pigeon::getRotation3d`. Its yaw is the heading for field-relative control and odometry; its roll and pitch are used by anti-tipping.                                                                                                                         |
+| `withRotation(Supplier<Rotation3d> rotation)`                                                 | `rotation`: attitude supplier                  | **Required** (or `withGyro`). The robot's rotation from the gyro, as its attitude, e.g. `pigeon::getRotation3d`. Its yaw is the heading for field-relative control and odometry; its roll and pitch are used by anti-tipping. |
+| `withGyro(Supplier<Rotation3d> gyro)`                                                         | `gyro`: attitude supplier                      | Same as `withRotation`. |
 | `withGyroHeadingAxis(GyroAxis axis)`                                                            | `axis`                                         | Which gyro axis points up through the robot. Defaults to `GyroAxis.YAW`. See [Gyro](swerve-drive-config.md#gyro).                                                                                                                                                                                      |
-| `withGyroOffset(Angle offset)`                                                                  | `offset`                                       | Offset subtracted from the heading (the yaw of `getGyroRotation3d()`).                                                                                                                                                                                                                                 |
 | `withGyroInverted(boolean inverted)`                                                            | `inverted`                                     | Negates the heading when `true`.                                                                                                                                                                                                                                                                       |
 | `withGyroVelocity(Supplier<AngularVelocity> supplier)`                                          | `supplier`                                     | Supplies gyro angular velocity. Used for angular-velocity skew correction.                                                                                                                                                                                                                             |
 | `withAntiTipping(LinearVelocity kP, Angle tippingThreshold, LinearVelocity maxCorrectionSpeed)` | `kP`, `tippingThreshold`, `maxCorrectionSpeed` | Drives the robot back under itself once its pitch or roll (from the gyro) passes `tippingThreshold`, using WPILib's `AntiTipping`. The correction is added to every robot-relative chassis velocity. Throws `IllegalArgumentException` for non-positive speeds or a threshold outside 0 to 90 degrees. |
@@ -80,14 +80,14 @@ Both overloads require a name; there is no name-less `withTelemetry(...)` or sta
 {% endhint %}
 
 {% hint style="info" %}
-`withGyro` is required. On a real robot, constructing a `SwerveDrive` without it throws `IllegalStateException`.
+`withRotation` (or `withGyro`, which calls it) is required. On a real robot, constructing a `SwerveDrive` without it throws `IllegalStateException`.
 {% endhint %}
 
 ***
 
 ## Gyro
 
-`withGyro` takes the gyro's full attitude as a `Rotation3d` supplier (most gyros expose one, e.g. `Pigeon2.getRotation3d()`).
+`withRotation` (or `withGyro`) takes the gyro's full attitude as a `Rotation3d` supplier (most gyros expose one, e.g. `Pigeon2.getRotation3d()`).
 
 `GyroAxis` (`yams.core.mechanisms.config.enums.GyroAxis`) says which axis of the gyro points up through the robot, so a gyro mounted on its side still reads the robot's heading:
 
@@ -97,12 +97,11 @@ Both overloads require a name; there is no name-less `withTelemetry(...)` or sta
 | `ROLL`  | The gyro's X axis points up: the robot turning shows up as the gyro's roll. The gyro's Y axis is taken to point to the robot's left.   |
 | `PITCH` | The gyro's Y axis points up: the robot turning shows up as the gyro's pitch. The gyro's X axis is taken to point to the robot's front. |
 
-`GyroAxis.toRobotAttitude(Rotation3d gyroAttitude)` rotates the gyro's attitude into the robot frame; `SwerveDriveConfig` calls it for you before reading the heading and the tilt. `withGyroInverted` and `withGyroOffset` apply to the resulting heading.
+`GyroAxis.toRobotAttitude(Rotation3d gyroAttitude)` rotates the gyro's attitude into the robot frame; `SwerveDriveConfig` calls it for you before reading the heading and the tilt. `withGyroInverted` applies to the resulting heading. There is no gyro offset: the pose estimator keeps the offset between the gyro and the pose, so set the robot's heading with the starting pose, `SwerveDrive.resetOdometry(Pose2d)` or `zeroOdometryHeading()`.
 
 | Getter                | Returns      | Description                                                                                                                                                                                                                                                                                      |
 | --------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `getGyroRotation3d()` | `Rotation3d` | The robot's attitude: the gyro attitude rotated into the robot frame for the configured `GyroAxis`, with the inversion and offset applied to its yaw. The yaw is the heading, wrapped to +/-180 degrees; roll and pitch are the robot's tilt. Throws `IllegalStateException` if no gyro was set. |
-| `getGyroOffset()`     | `Angle`      | The current heading offset.                                                                                                                                                                                                                                                                      |
+| `getGyroRotation3d()` | `Rotation3d` | The robot's attitude: the gyro attitude rotated into the robot frame for the configured `GyroAxis`, with the inversion applied to its yaw. The yaw is the heading, wrapped to +/-180 degrees; roll and pitch are the robot's tilt. Throws `IllegalStateException` if no gyro was set. |
 
 {% hint style="warning" %}
 `getGyroAngle()` was removed. Use `getGyroRotation3d()` (on the config or on [`SwerveDrive`](swerve-drive.md#gyro), which also handles simulation), e.g. `getGyroRotation3d().toRotation2d()` for a `Rotation2d` heading. `withGyro` now takes a `Supplier<Rotation3d>` instead of a `Supplier<Angle>`.

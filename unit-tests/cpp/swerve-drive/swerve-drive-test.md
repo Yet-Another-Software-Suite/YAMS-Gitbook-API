@@ -22,7 +22,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.TelemetryAndSimRunWithoutCrash` | Telemetry and simulation run for 0.5 s without throwing. |
 | `SwerveDriveTest.InitialPoseIsOrigin` | The starting pose is the origin, facing 0 degrees. |
 | `SwerveDriveTest.ResetOdometryMatchesPose` | After `ResetOdometry` to (3, 2) at 45 degrees, `GetPose()` returns that pose. |
-| `SwerveDriveTest.ResetOdometryAlignsGyro` | `ResetOdometry` to 90 degrees sets the gyro angle and pose heading to 90 degrees. `ZeroGyro` then sets both to 0 and keeps the position. |
+| `SwerveDriveTest.ResetOdometryLeavesTheGyro` | `ResetOdometry` to 90 degrees sets the pose heading and `GetRotation()` to 90 degrees and leaves the gyro angle as it was. `ZeroOdometryHeading`, and `ZeroGyro`, then set the heading to 0 and leave the gyro. |
 | `SwerveDriveTest.GetStateFromSpeedsForwardDrive` | 1 m/s forward gives every module 1 m/s at 0 degrees. |
 | `SwerveDriveTest.GetStateFromSpeedsPureRotation` | Turning in place gives every module a nonzero speed and an angle that is not forward. |
 | `SwerveDriveTest.SetRobotRelativeSpeedsDoesNotCrash` | Setting robot relative speeds, moving and stopped, does not throw. |
@@ -43,7 +43,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.OptimizationKeepsTheOrientationTheWheelWasSentTo` | A target 135 degrees away is reached by reversing the wheel and turning -45 degrees. A following target 80 degrees away keeps the wheel reversed (turning -100 degrees) instead of flipping back. |
 | `SwerveDriveTest.GyroRotation3dMatchesTheHeading` | A heading gyro of 35 degrees gives a gyro angle and a 3D yaw of 35 degrees. A gyro given as a `Rotation3d` returns that roll, pitch and yaw. |
 | `SwerveDriveTest.GyroHeadingAxisReadsTheHeadingFromRollOrPitch` | With the heading axis set to roll, pitch or yaw, a 40 degree turn on that gyro axis reads as a 40 degree heading. With roll, the 3D attitude has no roll or pitch left. |
-| `SwerveDriveTest.GyroInversionAndOffsetApplyToTheHeading` | An inverted gyro reading 30 degrees with a 10 degree offset gives a heading of -40 degrees. |
+| `SwerveDriveTest.GyroInversionAppliesToTheHeading` | An inverted gyro reading 30 degrees gives a heading of -30 degrees. |
 | `SwerveDriveTest.AntiTippingRejectsBadValues` | `WithAntiTipping` throws `std::invalid_argument` for a zero gain, a 0 or 90 degree threshold, or a zero maximum correction, and accepts good values. |
 | `SwerveDriveTest.AntiTippingCorrectsOnlyPastTheThreshold` | With a 10 degree threshold, there is no correction when level or at 5 degrees of pitch. At 20 degrees the correction is along X only and matches WPILib's `AntiTipping`, and it is added to the chassis speeds. Turning anti-tipping off removes it. |
 | `SwerveDriveTest.ModuleSpeedsAreDesaturated` | Without a module limit, 6 m/s passes through. With a 3 m/s module limit, driving and turning together keeps every module at or under 3 m/s. |
@@ -54,7 +54,7 @@ Checks a simulated four module swerve drive: odometry, the gyro, module states a
 | `SwerveDriveTest.DesiredModuleStatesAreTheOptimizedOnes` | Driving backward from forward pointing wheels gives desired states of -1 m/s at 0 degrees: the wheels are reversed, not turned. |
 | `SwerveDriveTest.CosineCompensationScalar` | The cosine compensation scalar is 1 when off. When on, it is 0.5 for a 60 degree azimuth error and 0 for 120 degrees. |
 | `SwerveDriveTest.ModuleStateCarriesTheAzimuthVelocity` | A module's state carries the azimuth motor's velocity and the drive motor's speed. |
-| `SwerveDriveTest.DriveGyroRotation3dFollowsTheHeading` | After a reset to 90 degrees, the drive's simulated 3D attitude has a 90 degree yaw and no roll or pitch. |
+| `SwerveDriveTest.DriveGyroRotation3dFollowsTheHeading` | `GetGyroRotation3d()` is the simulated gyro heading with no tilt, and a reset to 90 degrees doesn't turn it. |
 | `SwerveInputStreamTelemetryTest.LowPublishesOnlyTheMode` | At `LOW` verbosity only the mode (`ANGULAR_VELOCITY`) is published: no configuration, no rotation controller inputs, no tuning entries and no Live Tuning command. |
 | `SwerveInputStreamTelemetryTest.MediumPublishesTheConfigurationReadOnly` | At `MEDIUM` verbosity the deadband, translation scale and maximum linear speed are published, but nothing is tunable. Changes made in code are published the next time the stream is read. |
 | `SwerveInputStreamTelemetryTest.HighPublishesTuningValuesAndTheLiveTuningCommand` | At `HIGH` verbosity the deadband, scales, maximum speeds, cubing and alliance and robot relative flags are published as tuning values, and a Live Tuning command is created and published. |
